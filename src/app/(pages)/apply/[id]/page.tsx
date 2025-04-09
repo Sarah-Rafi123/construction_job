@@ -22,7 +22,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn"
 import WorkIcon from "@mui/icons-material/Work"
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney"
 
-// Simulated data (replace with real API if needed)
+
 import { sampleJobs } from "@/lib/sampleJobs"
 
 export default function ApplyJobPage() {
