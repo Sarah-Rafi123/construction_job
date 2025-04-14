@@ -165,7 +165,6 @@ export default function ApplyJobPage() {
                 setError("")
                 setOpenDialog(false)
                 alert("Your application has been submitted!")
-                // You can send `coverLetter` to your API here
               }
             }}
           >

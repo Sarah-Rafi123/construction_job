@@ -7,15 +7,12 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    // Redirect to the signup page when the main page loads
-    router.push("/signup")
+    router.push("/landing-page")
   }, [router])
 
   return (
-    <div className="bg-black min-h-screen flex items-center justify-center">
-      <div className="text-white text-center">
-        <p>Redirecting to signup page...</p>
-      </div>
+    <div className="flex-1 overflow-hidden min-h-screen flex items-center justify-center">
+     
     </div>
   )
 }

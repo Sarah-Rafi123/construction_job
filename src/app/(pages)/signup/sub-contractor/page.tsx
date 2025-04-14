@@ -55,11 +55,6 @@ export default function SubContractorSignup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-
-    // Here you would handle the form submission
-    // For example, sending the data to your API or storing in localStorage
-
-    // Store form data in localStorage to access it in the password page
     localStorage.setItem(
       "signupData",
       JSON.stringify({
@@ -67,8 +62,6 @@ export default function SubContractorSignup() {
         userType: "sub-contractor",
       }),
     )
-
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false)
       router.push("/signup/password")

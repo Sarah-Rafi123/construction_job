@@ -35,16 +35,153 @@ import IconButton from "@mui/material/IconButton"
 import Divider from "@mui/material/Divider"
 import Paper from "@mui/material/Paper"
 
-// Create a theme instance
 const theme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
     primary: {
-      main: "#90caf9",
+      main: "#4361ee",
     },
     background: {
-      default: "#000000",
-      paper: "#121212",
+      default: "#f9fafb",
+      paper: "#ffffff",
+    },
+    text: {
+      primary: "#333333",
+      secondary: "#666666",
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: "8px",
+          textTransform: "none",
+          fontWeight: 500,
+        },
+        contained: {
+          boxShadow: "none",
+          "&:hover": {
+            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          marginBottom: "16px",
+          borderRadius: "12px", 
+          boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.05)",
+          border: "1px solid #f0f0f0",
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: "20px",
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "8px", 
+            "& fieldset": {
+              borderColor: "#e0e0e0",
+            },
+            "&:hover fieldset": {
+              borderColor: "#4361ee",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#4361ee",
+            },
+          },
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        outlined: {
+          borderRadius: "8px", 
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: "8px",
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#ffffff",
+          color: "#333333",
+          boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.05)",
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: "12px", 
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: "6px", 
+        },
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          "& .MuiTabs-indicator": {
+            backgroundColor: "#4361ee",
+          },
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          fontWeight: 500,
+          "&.Mui-selected": {
+            color: "#4361ee",
+          },
+        },
+      },
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: "#f0f0f0",
+        },
+      },
+    },
+    MuiAvatar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#4361ee",
+        },
+      },
+    },
+  },
+  typography: {
+    fontFamily: "'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif",
+    h4: {
+      fontWeight: 600,
+      color: "#333333",
+    },
+    h6: {
+      fontWeight: 600,
+      color: "#333333",
     },
   },
 })
@@ -297,9 +434,7 @@ export default function Home() {
             bgcolor: "background.default",
           }}
         >
-          <Typography variant="h6" color="white">
-            Loading...
-          </Typography>
+          <Typography variant="h6">Loading...</Typography>
         </Box>
       </ThemeProvider>
     )
@@ -316,18 +451,18 @@ export default function Home() {
       <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}>
         <AppBar position="static">
           <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: "#333333" }}>
               Contractor Platform
             </Typography>
             {isLoggedIn && (
               <>
-                <Typography variant="body1" sx={{ mr: 2 }}>
+                <Typography variant="body1" sx={{ mr: 2, color: "#333333" }}>
                   {userType
                     ?.split("-")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(" ")}
                 </Typography>
-                <Button color="inherit" onClick={handleLogout}>
+                <Button color="primary" onClick={handleLogout}>
                   Logout
                 </Button>
               </>
@@ -335,9 +470,9 @@ export default function Home() {
           </Toolbar>
         </AppBar>
 
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom sx={{ color: "white" }}>
+            <Typography variant="h4" component="h1" gutterBottom>
               Welcome to Your Dashboard
             </Typography>
 
@@ -356,7 +491,7 @@ export default function Home() {
           </Box>
 
           {needsApproval && (
-            <Alert severity="info" sx={{ mb: 4 }}>
+            <Alert severity="info" sx={{ mb: 4, borderRadius: "8px" }}>
               <AlertTitle>Account Pending Approval</AlertTitle>
               Your account is currently under review by our admin team. Some features may be limited until your account
               is approved.
@@ -406,7 +541,7 @@ export default function Home() {
 
           {/* Job Listings Section */}
           <Box sx={{ mt: 6, mb: 4 }}>
-            <Typography variant="h4" component="h2" gutterBottom sx={{ color: "white", mb: 4 }}>
+            <Typography variant="h4" component="h2" gutterBottom sx={{ mb: 2 }}>
               Find your dream job
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
@@ -415,17 +550,7 @@ export default function Home() {
 
             {/* Tabs */}
             <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-              <Tabs
-                value={activeTab}
-                onChange={(e, newValue) => setActiveTab(newValue)}
-                sx={{
-                  "& .MuiTab-root": {
-                    color: "text.secondary",
-                    "&.Mui-selected": { color: "#90caf9" },
-                  },
-                  "& .MuiTabs-indicator": { backgroundColor: "#90caf9" },
-                }}
-              >
+              <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
                 <Tab label="Explore" />
                 <Tab label="Applied" />
                 <Tab label="Saved" />
@@ -433,7 +558,7 @@ export default function Home() {
             </Box>
 
             {/* Search Bar */}
-            <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+            <Paper elevation={0} sx={{ p: 3, mb: 3, border: "1px solid #f0f0f0" }}>
               <TextField
                 fullWidth
                 placeholder="Search by job title, company, & skills..."
@@ -537,149 +662,151 @@ export default function Home() {
               {filteredJobs.length > 0 ? (
                 filteredJobs.map((job) => (
                   <Grid sm="auto" item xs="auto" md="auto" key={job.id}>
-                <Card sx={{
-    position: "relative",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    width: {
-      xs: "100%", // full width on extra small screens
-      sm: 340, // full width on small screens
-      md: 340,    // fixed width on medium+
-      lg: 360,    // slightly larger on large+
-    },
-    maxWidth: "100%", // prevents overflow
-    mx: "auto" }}>
-  {job.urgent && (
-    <Chip
-      label="Urgently Needed"
-      size="small"
-      sx={{
-        position: "absolute",
-        top: 12,
-        left: 12,
-        backgroundColor: "#f44336",
-        color: "white",
-        fontWeight: "bold",
-        fontSize: "0.7rem",
-      }}
-    />
-  )}
-  <IconButton sx={{ position: "absolute", top: 8, right: 8 }} size="small">
-    <BookmarkBorderIcon />
-  </IconButton>
+                    <Card
+                      sx={{
+                        position: "relative",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        width: {
+                          xs: "100%", // full width on extra small screens
+                          sm: 340, // full width on small screens
+                          md: 340, // fixed width on medium+
+                          lg: 360, // slightly larger on large+
+                        },
+                        maxWidth: "100%", // prevents overflow
+                        mx: "auto",
+                      }}
+                    >
+                      {job.urgent && (
+                        <Chip
+                          label="Urgently Needed"
+                          size="small"
+                          sx={{
+                            position: "absolute",
+                            top: 12,
+                            left: 12,
+                            backgroundColor: "#f44336",
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: "0.7rem",
+                          }}
+                        />
+                      )}
+                      <IconButton sx={{ position: "absolute", top: 8, right: 8 }} size="small">
+                        <BookmarkBorderIcon />
+                      </IconButton>
 
-  <CardContent sx={{ pt: 4, flexGrow: 1 }}>
-    {/* Header */}
-    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-      <Avatar sx={{ bgcolor: "#1976d2", mr: 2 }}>{job.logo}</Avatar>
-      <Box>
-        <Typography variant="h6">{job.title}</Typography>
-        <Typography variant="body2" color="text.secondary">
-          {job.company}
-        </Typography>
-      </Box>
-    </Box>
+                      <CardContent sx={{ pt: 4, flexGrow: 1 }}>
+                        {/* Header */}
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                          <Avatar sx={{ bgcolor: "#4361ee", mr: 2 }}>{job.logo}</Avatar>
+                          <Box>
+                            <Typography variant="h6">{job.title}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {job.company}
+                            </Typography>
+                          </Box>
+                        </Box>
 
-    {/* Info */}
-    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-      <LocationOnIcon fontSize="small" sx={{ color: "text.secondary", mr: 1 }} />
-      <Typography variant="body2" color="text.secondary">
-        {job.location}
-      </Typography>
-    </Box>
+                        {/* Info */}
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                          <LocationOnIcon fontSize="small" sx={{ color: "text.secondary", mr: 1 }} />
+                          <Typography variant="body2" color="text.secondary">
+                            {job.location}
+                          </Typography>
+                        </Box>
 
-    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-      <WorkIcon fontSize="small" sx={{ color: "text.secondary", mr: 1 }} />
-      <Typography variant="body2" color="text.secondary">
-        {job.type}
-      </Typography>
-    </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                          <WorkIcon fontSize="small" sx={{ color: "text.secondary", mr: 1 }} />
+                          <Typography variant="body2" color="text.secondary">
+                            {job.type}
+                          </Typography>
+                        </Box>
 
-    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-      <AttachMoneyIcon fontSize="small" sx={{ color: "text.secondary", mr: 1 }} />
-      <Typography variant="body2" color="text.secondary">
-        {job.budget}
-      </Typography>
-    </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                          <AttachMoneyIcon fontSize="small" sx={{ color: "text.secondary", mr: 1 }} />
+                          <Typography variant="body2" color="text.secondary">
+                            {job.budget}
+                          </Typography>
+                        </Box>
 
-    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-      <Typography variant="body2" fontWeight="bold" sx={{ mr: 1 }}>
-        Duration:
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {job.duration}
-      </Typography>
-    </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                          <Typography variant="body2" fontWeight="bold" sx={{ mr: 1 }}>
+                            Duration:
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {job.duration}
+                          </Typography>
+                        </Box>
 
-    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-      <Typography variant="body2" fontWeight="bold" sx={{ mr: 1 }}>
-        Travel Radius:
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {job.radius} km
-      </Typography>
-    </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                          <Typography variant="body2" fontWeight="bold" sx={{ mr: 1 }}>
+                            Travel Radius:
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {job.radius} km
+                          </Typography>
+                        </Box>
 
-    <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", mb: 1 }}>
-      <Typography variant="body2" fontWeight="bold" sx={{ mr: 1 }}>
-        Services Required:
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {job.services.join(", ")}
-      </Typography>
-    </Box>
+                        <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", mb: 1 }}>
+                          <Typography variant="body2" fontWeight="bold" sx={{ mr: 1 }}>
+                            Services Required:
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {job.services.join(", ")}
+                          </Typography>
+                        </Box>
 
-    {/* Tags & Posted Time */}
-    <Divider sx={{ my: 1.5 }} />
-    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-        {job.tags.map((tag, index) => (
-          <Chip
-            key={index}
-            label={tag}
-            size="small"
-            sx={{
-              backgroundColor: tag === "On-site" ? "#2e7d32" : "#1976d2",
-              color: "white",
-              fontSize: "0.7rem",
-            }}
-          />
-        ))}
-      </Box>
-      <Typography variant="caption" color="text.secondary">
-        Posted {job.posted}
-      </Typography>
-    </Box>
-  </CardContent>
+                        {/* Tags & Posted Time */}
+                        <Divider sx={{ my: 1.5 }} />
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                            {job.tags.map((tag, index) => (
+                              <Chip
+                                key={index}
+                                label={tag}
+                                size="small"
+                                sx={{
+                                  backgroundColor: tag === "On-site" ? "#2e7d32" : "#4361ee",
+                                  color: "white",
+                                  fontSize: "0.7rem",
+                                }}
+                              />
+                            ))}
+                          </Box>
+                          <Typography variant="caption" color="text.secondary">
+                            Posted {job.posted}
+                          </Typography>
+                        </Box>
+                      </CardContent>
 
-  {/* Footer Actions */}
-  <Box sx={{ display: "flex", justifyContent: "space-between", p: 2, pt: 0 }}>
-    <Button
-      variant="outlined"
-      size="small"
-      fullWidth
-      onClick={() => router.push(`/apply/${job.id}`)}
-      sx={{ mr: 1 }}
-    >
-      View Details
-    </Button>
-    <Button
-      variant="contained"
-      size="small"
-      fullWidth
-      onClick={() => router.push(`/apply/${job.id}`)}
-    >
-      Apply
-    </Button>
-  </Box>
-</Card>
-
+                      {/* Footer Actions */}
+                      <Box sx={{ display: "flex", justifyContent: "space-between", p: 2, pt: 0 }}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          onClick={() => router.push(`/apply/${job.id}`)}
+                          sx={{ mr: 1 }}
+                        >
+                          View Details
+                        </Button>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          fullWidth
+                          onClick={() => router.push(`/apply/${job.id}`)}
+                        >
+                          Apply
+                        </Button>
+                      </Box>
+                    </Card>
                   </Grid>
                 ))
               ) : (
                 <Grid item xs={12}>
-                  <Paper sx={{ p: 3, textAlign: "center" }}>
+                  <Paper sx={{ p: 3, textAlign: "center", border: "1px solid #f0f0f0", boxShadow: "none" }}>
                     <Typography variant="h6">No jobs found</Typography>
                     <Typography variant="body2" color="text.secondary">
                       Try adjusting your search filters
