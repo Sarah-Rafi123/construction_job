@@ -1,5 +1,4 @@
-import Link from "next/link"
-import { Briefcase, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react'
+import { Briefcase, Facebook, Twitter, Linkedin, Instagram } from "lucide-react"
 
 export default function Footer() {
   return (
@@ -8,8 +7,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center mb-4">
-              <Briefcase className="h-6 w-6 mr-2" />
-              <span className="text-xl font-bold">ContractorHub</span>
+              <Briefcase className="h-6 w-6 mr-2 text-[#F5A623]" />
+              <span className="text-xl font-bold text-[#F5A623]">Jay</span>
             </div>
             <p className="text-gray-400 mb-4">
               The ultimate platform connecting contractors, sub-contractors, and skilled workers for successful
@@ -95,11 +94,11 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Email address"
-                className="px-4 py-2 bg-gray-800 text-white rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-gray-700 flex-grow"
+                className="px-4 py-2 bg-gray-800 text-white rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#F5A623] border border-gray-700 flex-grow"
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-white text-indigo-600 font-medium rounded-r-lg hover:bg-gray-100 transition-colors"
+                className="px-4 py-2 bg-[#F5A623] text-white font-medium rounded-r-lg hover:bg-[#E09613] transition-colors"
               >
                 Subscribe
               </button>
@@ -108,7 +107,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center">
-          <p className="text-gray-400">© {new Date().getFullYear()} ContractorHub. All rights reserved.</p>
+          <p className="text-gray-400">© {new Date().getFullYear()} Jay. All rights reserved.</p>
         </div>
       </div>
     </footer>

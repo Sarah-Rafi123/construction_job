@@ -1,128 +1,108 @@
-"use client"
+'use client'
+import type React from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import CardActions from "@mui/material/CardActions";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import FormLabel from "@mui/material/FormLabel";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Alert from "@mui/material/Alert";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png";
+import { Briefcase } from "lucide-react";
+import MenuItem from "@mui/material/MenuItem";
+import { loginUser } from "@/api/apiService";  // Import the API service
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-
-// Material UI imports
-import Box from "@mui/material/Box"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
-import CardHeader from "@mui/material/CardHeader"
-import CardActions from "@mui/material/CardActions"
-import Typography from "@mui/material/Typography"
-import Button from "@mui/material/Button"
-import TextField from "@mui/material/TextField"
-import FormLabel from "@mui/material/FormLabel"
-import InputAdornment from "@mui/material/InputAdornment"
-import IconButton from "@mui/material/IconButton"
-import Visibility from "@mui/icons-material/Visibility"
-import VisibilityOff from "@mui/icons-material/VisibilityOff"
-import Alert from "@mui/material/Alert"
-import Tabs from "@mui/material/Tabs"
-import Tab from "@mui/material/Tab"
-import FormControl from "@mui/material/FormControl"
-import Select from "@mui/material/Select"
-import MenuItem from "@mui/material/MenuItem"
-import { ThemeProvider, createTheme } from "@mui/material/styles"
-
-// Create a theme instance
 const theme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
     primary: {
-      main: "#90caf9",
+      main: "#D49F2E",
     },
     background: {
-      default: "#000000",
-      paper: "#121212",
+      default: "#ffffff",
+      paper: "#ffffff",
     },
   },
-})
+});
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState("")
-  const [loginMethod, setLoginMethod] = useState("email")
-  const [userType, setUserType] = useState("")
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [userType, setUserType] = useState("");
 
   const [formData, setFormData] = useState({
     email: "",
-    phone: "",
     password: "",
-  })
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target
+    const { id, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [id]: value,
-    }))
-
-    // Clear error when user types
-    if (error) setError("")
-  }
+    }));
+    if (error) setError("");
+  };
 
   const handleUserTypeChange = (e: any) => {
-    setUserType(e.target.value)
-    // Clear error when changing user type
-    if (error) setError("")
-  }
-
-  const handleLoginMethodChange = (event: React.SyntheticEvent, newValue: string) => {
-    setLoginMethod(newValue)
-    // Clear error when switching methods
-    if (error) setError("")
-  }
+    setUserType(e.target.value);
+    if (error) setError("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    // Basic validation
     if (!userType) {
-      setError("Please select your account type")
-      return
+      setError("Please select your account type");
+      return;
     }
 
-    if (loginMethod === "email" && !formData.email) {
-      setError("Email is required")
-      return
-    }
-
-    if (loginMethod === "phone" && !formData.phone) {
-      setError("Phone number is required")
-      return
+    if (!formData.email) {
+      setError("Email is required");
+      return;
     }
 
     if (!formData.password) {
-      setError("Password is required")
-      return
+      setError("Password is required");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
+    localStorage.setItem("userType", userType);
 
-    // Here you would handle the login logic
-    // For example, sending the data to your API for authentication
-
-    // Store user type in localStorage to use it on the home page
-    localStorage.setItem("userType", userType)
-
-    // For demo purposes, we'll just simulate a successful login
-    setTimeout(() => {
-      setIsSubmitting(false)
-
-      // In a real app, you would check the credentials and handle errors
-      // For this demo, we'll just redirect to the home page
-      router.push("/home")
-    }, 1500)
-  }
+    try {
+      const response = await loginUser(formData.email, formData.password); // Use the API service
+      if (response) {
+        setTimeout(() => {
+          setIsSubmitting(false);
+          router.push("/home"); // Redirect to home on successful login
+        }, 1500);
+      }
+    } catch (err: any) {
+      setIsSubmitting(false);
+      setError(err.message || "Login failed. Please check your credentials.");
+    }
+  };
 
   const handleClickShowPassword = () => {
-    setShowPassword(!showPassword)
-  }
+    setShowPassword(!showPassword);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -130,147 +110,203 @@ export default function LoginPage() {
         sx={{
           minHeight: "100vh",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           bgcolor: "background.default",
-          p: 2,
         }}
+        className="bg-white"
       >
-        <Card sx={{ width: "100%", maxWidth: "500px" }}>
-          <CardHeader
-            title={
-              <Typography variant="h5" fontWeight="bold" textAlign="center">
-                Log In
-              </Typography>
-            }
-            subheader={
-              <Typography variant="body2" color="text.secondary" textAlign="center">
-                Welcome back! Please log in to your account
-              </Typography>
-            }
-          />
-          <form onSubmit={handleSubmit}>
-            <CardContent sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
+        {/* Left side - Login Form */}
+        <Box
+          sx={{
+            width: { xs: "100%", md: "50%" },
+            display: "flex",
+            flexDirection: "column",
+            p: { xs: 2, sm: 4 },
+          }}
+        >
+          {/* Logo and brand name */}
+          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}>
+            <Box
+              sx={{
+                color: "#D49F2E",
+                mr: 1.5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Briefcase size={24} />
+            </Box>
+            <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
+              Jay
+            </Typography>
+          </Box>
 
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                <FormLabel htmlFor="user-type">Account Type</FormLabel>
-                <FormControl fullWidth size="small">
-                  <Select id="user-type" value={userType} onChange={handleUserTypeChange} displayEmpty>
-                    <MenuItem value="" disabled>
-                      Select account type
-                    </MenuItem>
-                    <MenuItem value="main-contractor">Main Contractor</MenuItem>
-                    <MenuItem value="sub-contractor">Sub Contractor</MenuItem>
-                    <MenuItem value="job-seeker">Job Seeker</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
-
-              <Tabs
-                value={loginMethod}
-                onChange={handleLoginMethodChange}
-                centered
-                indicatorColor="primary"
-                textColor="primary"
-              >
-                <Tab label="Email" value="email" />
-                <Tab label="Phone" value="phone" />
-              </Tabs>
-
-              {loginMethod === "email" ? (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  <FormLabel htmlFor="email">Email Address</FormLabel>
-                  <TextField
-                    id="email"
-                    type="email"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email address"
-                  />
-                </Box>
-              ) : (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  <FormLabel htmlFor="phone">Phone Number</FormLabel>
-                  <TextField
-                    id="phone"
-                    type="tel"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="Enter your phone number"
-                  />
-                </Box>
-              )}
-
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                <FormLabel htmlFor="password">Password</FormLabel>
-                <TextField
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  value={formData.password}
-                  onChange={handleChange}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Box>
-
-              <Typography
-                variant="body2"
-                color="primary"
-                sx={{ textAlign: "right", cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
-              >
-                Forgot Password?
-              </Typography>
-            </CardContent>
-
-            <CardActions sx={{ flexDirection: "column", gap: 1, p: 2 }}>
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={isSubmitting}
-                fullWidth
-                sx={{ textTransform: "none" }}
-              >
-                {isSubmitting ? "Logging in..." : "Log In"}
-              </Button>
-              <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
-                  Don't have an account?
-                </Typography>
-                <Link href="/signup" style={{ textDecoration: "none" }}>
-                  <Typography variant="body2" color="primary" sx={{ "&:hover": { textDecoration: "underline" } }}>
-                    Sign Up
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>
+            <Card
+              sx={{
+                width: "100%",
+                maxWidth: "500px",
+                boxShadow: "none", // Remove shadow
+                border: "none", // Remove border
+              }}
+              className=""
+            >
+              <CardHeader
+                title={
+                  <Typography variant="h5" fontWeight="bold" textAlign="center" className="text-gray-800">
+                    Log In
                   </Typography>
-                </Link>
-              </Box>
-            </CardActions>
-          </form>
-        </Card>
+                }
+                subheader={
+                  <Typography variant="body2" color="text.secondary" textAlign="center" className="text-gray-500">
+                    Welcome back! Please log in to your account
+                  </Typography>
+                }
+              />
+              <form onSubmit={handleSubmit}>
+                <CardContent sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                  {error && (
+                    <Alert severity="error" sx={{ mb: 2 }} className="rounded">
+                      {error}
+                    </Alert>
+                  )}
+
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    <FormLabel htmlFor="user-type" className="text-gray-700">
+                      Account Type
+                    </FormLabel>
+                    <FormControl fullWidth size="small">
+                      <Select
+                        id="user-type"
+                        value={userType}
+                        onChange={handleUserTypeChange}
+                        displayEmpty
+                        className="rounded"
+                      >
+                        <MenuItem value="" disabled>
+                          Select account type
+                        </MenuItem>
+                        <MenuItem value="main-contractor">Main Contractor</MenuItem>
+                        <MenuItem value="sub-contractor">Sub Contractor</MenuItem>
+                        <MenuItem value="job-seeker">Job Seeker</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    <FormLabel htmlFor="email" className="text-gray-700">
+                      Email Address
+                    </FormLabel>
+                    <TextField
+                      id="email"
+                      type="email"
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="Enter your email address"
+                      className="rounded"
+                    />
+                  </Box>
+
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    <FormLabel htmlFor="password" className="text-gray-700">
+                      Password
+                    </FormLabel>
+                    <TextField
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="rounded"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleClickShowPassword}
+                              edge="end"
+                              className="text-gray-500 hover:text-gray-700"
+                            >
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Box>
+
+                  <Typography
+                    variant="body2"
+                    color="primary"
+                    sx={{ textAlign: "right", cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+                    className="text-[#90caf9]"
+                  >
+                    Forgot Password?
+                  </Typography>
+                </CardContent>
+
+                <CardActions sx={{ flexDirection: "column", gap: 1, p: 2 }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={isSubmitting}
+                    fullWidth
+                    sx={{ textTransform: "none" }}
+                    className="bg-[#90caf9] hover:bg-[#90caf9]/90 py-2"
+                  >
+                    {isSubmitting ? "Logging in..." : "Log In"}
+                  </Button>
+                  <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }} className="text-gray-500">
+                      Don't have an account?
+                    </Typography>
+                    <Link href="/signup" style={{ textDecoration: "none" }}>
+                      <Typography
+                        variant="body2"
+                        color="primary"
+                        sx={{ "&:hover": { textDecoration: "underline" } }}
+                        className="text-[#90caf9]"
+                      >
+                        Sign Up
+                      </Typography>
+                    </Link>
+                  </Box>
+                </CardActions>
+              </form>
+            </Card>
+          </Box>
+        </Box>
+
+        {/* Right side - Image */}
+        <Box
+          sx={{
+            width: "50%",
+            bgcolor: "#F5F5FA", // Light background
+            display: { xs: "none", md: "block" },
+            position: "relative",
+            height: "100vh", // Ensure the container takes full height
+            overflow: "hidden",
+          }}
+        >
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            <Image
+              src={ConstructionImage || "/placeholder.svg"}
+              alt="Construction contractor"
+              fill
+              style={{
+                objectFit: "cover",
+                objectPosition: "center",
+              }}
+              priority
+            />
+          </div>
+        </Box>
       </Box>
     </ThemeProvider>
-  )
+  );
 }
