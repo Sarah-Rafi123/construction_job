@@ -48,8 +48,8 @@ export default function SubcontractorsSection() {
 
             <div className="mt-10">
               <Link
-                href="/signup"
-                className="px-28 py-2 bg-[#D49F2E] text-white font-medium rounded-md inline-block hover:bg-[#D49F2E] transition-colors"
+                href="/login"
+                className="px-28 py-2 bg-[#D49F2E] text-white font-medium rounded-md inline-block hover:bg-[#C48E1D] transition-colors"
               >
                 Find Projects
               </Link>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from 'next/font/google';
 import "./globals.css";
 import { Providers } from "@/store/provider";
-import type React from "react"
+import type React from "react";
 import { Roboto } from 'next/font/google';
 
 const roboto = Roboto({
@@ -32,13 +32,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full overflow-hidden">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${roboto.className} antialiased h-full overflow-hidden`}
       >
-          <Providers>{children}</Providers>
+        <Providers>
+          <div className="h-screen max-h-screen overflow-auto">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );
 }
-

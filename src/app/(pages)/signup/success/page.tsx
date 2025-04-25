@@ -1,16 +1,19 @@
 "use client"
-import Link from "next/link"
+
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Box from "@mui/material/Box"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import CardHeader from "@mui/material/CardHeader"
-import CardActions from "@mui/material/CardActions"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
+import Alert from "@mui/material/Alert"
+import CircularProgress from "@mui/material/CircularProgress"
+import { useSelector } from "react-redux"
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -28,6 +31,60 @@ const theme = createTheme({
 })
 
 export default function SignupSuccess() {
+ 
+  const [isLoading, setIsLoading] = useState(false)
+  const [resendStatus, setResendStatus] = useState<{
+    type: "success" | "error" | null
+    message: string
+  }>({ type: null, message: "" })
+  const userEmail = useSelector((state: any) => state.user?.email || "")
+
+
+  const handleResendVerificationEmail = async () => {
+    if (!userEmail) {
+      setResendStatus({
+        type: "error",
+        message: "Email address not found. Please refresh the page or contact support.",
+      })
+      return
+    }
+
+    setIsLoading(true)
+    setResendStatus({ type: null, message: "" })
+    const state = useSelector((state: any) => state)
+    console.log("State object:", state)
+    
+    try {
+      const response = await fetch("http://localhost:9000/api/v0/resend-verification-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: userEmail }),
+      })
+
+      if (response.ok) {
+        setResendStatus({
+          type: "success",
+          message: "Verification email has been resent successfully!",
+        })
+      } else {
+        const errorData = await response.json()
+        setResendStatus({
+          type: "error",
+          message: errorData.message || "Failed to resend verification email. Please try again.",
+        })
+      }
+    } catch (error) {
+      setResendStatus({
+        type: "error",
+        message: "An error occurred. Please try again later.",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -38,7 +95,6 @@ export default function SignupSuccess() {
         }}
         className="bg-white"
       >
-        {/* Left side - Success Message */}
         <Box
           sx={{
             width: { xs: "100%", md: "50%" },
@@ -53,8 +109,8 @@ export default function SignupSuccess() {
               width: "100%",
               maxWidth: "400px",
               textAlign: "center",
-              boxShadow: "none", // Remove shadow
-              border: "none", // Remove border
+              boxShadow: "none",
+              border: "none",
             }}
             className="rounded-lg"
           >
@@ -69,37 +125,51 @@ export default function SignupSuccess() {
               }
               subheader={
                 <Typography variant="body2" color="text.secondary" className="text-gray-500">
-                  Your account has been created successfully
+                  Your account has been created successfully.
                 </Typography>
               }
             />
             <CardContent>
-              <Typography color="text.secondary" className="text-gray-600">
-                Thank you for signing up. Your account is now ready to use.
+            <Typography color="text.secondary" className="text-gray-600 mb-4">
+  A verification email has been sent to your registered email address 
+  <strong>{userEmail}</strong>. Please check your inbox and follow the instructions to activate your account.
+</Typography>
+              <Typography color="text.secondary" className="text-gray-600 mb-4">
+                Didn't receive the verification email? Click the button below to resend it.
               </Typography>
+
+              {resendStatus.type && (
+                <Alert severity={resendStatus.type} sx={{ mb: 2, textAlign: "left" }}>
+                  {resendStatus.message}
+                </Alert>
+              )}
+
+              <Button
+                variant="outlined"
+                color="primary"
+                disabled={isLoading}
+                onClick={handleResendVerificationEmail}
+                sx={{
+                  textTransform: "none",
+                  mt: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  mx: "auto",
+                }}
+              >
+                {isLoading ? <CircularProgress size={20} color="inherit" /> : "Resend Verification Email"}
+              </Button>
             </CardContent>
-            <CardActions sx={{ justifyContent: "center", p: 2 }}>
-              <Link href="/home" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="contained"
-                  sx={{ textTransform: "none" }}
-                  className="bg-[#90caf9] hover:bg-[#90caf9]/90 py-2 px-6"
-                >
-                  Go to Home Page
-                </Button>
-              </Link>
-            </CardActions>
           </Card>
         </Box>
-
-        {/* Right side - Image */}
         <Box
           sx={{
             width: "50%",
-            bgcolor: "#F5F5FA", // Light background
+            bgcolor: "#F5F5FA",
             display: { xs: "none", md: "block" },
             position: "relative",
-            height: "100vh", // Ensure the container takes full height
+            height: "100vh",
             overflow: "hidden",
           }}
         >

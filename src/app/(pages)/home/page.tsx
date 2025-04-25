@@ -111,7 +111,7 @@ export default function Home() {
       <MainSection userType={userType} />
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex justify-between items-center mb-8">
+        {/* <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl md:text-3xl font-semibold text-gray-800">Welcome to Your Dashboard</h1>
 
           {isContractor && (
@@ -129,11 +129,11 @@ export default function Home() {
               Let's Post a Job
             </button>
           )}
-        </div>
+        </div> */}
 
-        {needsApproval && <ApprovalAlert />}
+        {/* {needsApproval && <ApprovalAlert />} */}
 
-        <DashboardCards userType={userType} />
+        {/* <DashboardCards userType={userType} /> */}
 
         <div className="mt-12 mb-8 bg-white p-6 rounded-xl shadow-sm">
           <JobSearch

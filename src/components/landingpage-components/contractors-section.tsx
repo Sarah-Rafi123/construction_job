@@ -45,7 +45,7 @@ export default function ContractorsSection() {
             </div>
             <div className="mt-8">
               <Link
-                href="/signup"
+                href="/login"
                 className="px-20 py-2 bg-[#D49F2E] text-white font-medium rounded-md inline-block hover:bg-[#C48E1D] transition-colors w-full md:w-auto text-center"
               >
                 Start Posting Jobs

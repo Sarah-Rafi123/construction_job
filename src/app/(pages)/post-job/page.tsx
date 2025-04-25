@@ -41,30 +41,61 @@ import ListItemIcon from "@mui/material/ListItemIcon"
 import ClickAwayListener from "@mui/material/ClickAwayListener"
 import CircularProgress from "@mui/material/CircularProgress"
 
-// Create a theme instance
+// Create a theme instance with mustard and white colors
 const theme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
     primary: {
-      main: "#90caf9",
+      main: "#D49F2E", // Mustard color
+    },
+    success: {
+      main: "#22c55e",
+    },
+    error: {
+      main: "#ef4444",
     },
     background: {
-      default: "#000000",
-      paper: "#121212",
+      default: "#ffffff", // White background
+      paper: "#ffffff",
+    },
+    text: {
+      primary: "#000000", // Black text
+      secondary: "#4B5563", // Dark gray for secondary text
     },
   },
   components: {
+    MuiButton: {
+      styleOverrides: {
+        contained: {
+          backgroundColor: "#D49F2E", // Mustard background for buttons
+          color: "#ffffff", // White text for buttons
+          "&:hover": {
+            backgroundColor: "#C48E1D", // Slightly darker mustard on hover
+          },
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#ffffff", // White app bar
+          color: "#000000", // Black text in app bar
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)", // Subtle shadow
+        },
+      },
+    },
     MuiCard: {
       styleOverrides: {
         root: {
           marginBottom: "16px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
         },
       },
     },
     MuiCardHeader: {
       styleOverrides: {
         root: {
-          borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+          borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
         },
       },
     },
@@ -385,8 +416,9 @@ export default function PostJob() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ flexGrow: 1, minHeight: "100vh", bgcolor: "background.default" }}>
-        <AppBar position="static">
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", bgcolor: "background.default" }}>
+        {/* Fixed Header */}
+        <AppBar position="sticky">
           <Toolbar>
             <IconButton edge="start" color="inherit" onClick={() => router.push("/")} sx={{ mr: 2 }}>
               <ArrowBackIcon />
@@ -397,431 +429,432 @@ export default function PostJob() {
           </Toolbar>
         </AppBar>
 
-        <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
-          <Box component="form" onSubmit={handleSubmit}>
-            <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4, color: "white", textAlign: "center" }}>
-              Create a New Job Posting
-            </Typography>
+        {/* Scrollable Content */}
+        <Box sx={{ flexGrow: 1, overflow: "auto", py: 4 }}>
+          <Container maxWidth="md">
+            <Box component="form" onSubmit={handleSubmit}>
+              <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4, color: "text.primary", textAlign: "center" }}>
+                Create a New Job Posting
+              </Typography>
 
-            {/* Job Title */}
-            <Card>
-              <CardHeader title="Job Title" />
-              <CardContent>
-                <TextField
-                  required
-                  fullWidth
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g., Residential Electrical Wiring Project"
-                  variant="outlined"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Job Type */}
-            <Card>
-              <CardHeader title="Job Type" />
-              <CardContent>
-                <FormControl fullWidth variant="outlined">
-                  <InputLabel id="job-type-label">Select Job Type</InputLabel>
-                  <Select
-                    labelId="job-type-label"
-                    value={jobType}
-                    onChange={(e) => setJobType(e.target.value)}
-                    label="Select Job Type"
-                  >
-                    {jobTypes.map((type) => (
-                      <MenuItem key={type} value={type}>
-                        {type}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </CardContent>
-            </Card>
-
-            {/* Target Users */}
-            <Card>
-              <CardHeader title="Target Users" />
-              <CardContent>
-                <FormControl fullWidth variant="outlined">
-                  <InputLabel id="target-users-label">Select Target Users</InputLabel>
-                  <Select
-                    labelId="target-users-label"
-                    value={targetUsers}
-                    onChange={(e) => setTargetUsers(e.target.value)}
-                    label="Select Target Users"
-                  >
-                    {targetUserTypes.map((type) => (
-                      <MenuItem key={type} value={type}>
-                        {type}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </CardContent>
-            </Card>
-
-            {/* Urgently Needed */}
-            <Card>
-              <CardHeader title="Job Priority" />
-              <CardContent>
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={isUrgent} onChange={(e) => setIsUrgent(e.target.checked)} color="primary" />
-                  }
-                  label={
-                    <Typography
-                      variant="body1"
-                      sx={{ fontWeight: isUrgent ? "bold" : "normal", color: isUrgent ? "#f44336" : "inherit" }}
-                    >
-                      Mark as Urgently Needed
-                    </Typography>
-                  }
-                />
-                {isUrgent && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Marking a job as urgent will highlight it in the job listings and notify potential candidates
-                    immediately.
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Job Description */}
-            <Card>
-              <CardHeader title="Job Description" />
-              <CardContent>
-                <TextField
-                  required
-                  fullWidth
-                  multiline
-                  rows={4}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Provide detailed information about the job requirements, expectations, and any specific skills needed."
-                  variant="outlined"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Duration Type */}
-            <Card>
-              <CardHeader title="Duration Type" />
-              <CardContent>
-                <FormControl component="fieldset" fullWidth>
-                  <RadioGroup value={durationType} onChange={(e) => setDurationType(e.target.value)}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6} sm={3}>
-                        <FormControlLabel value="days" control={<Radio />} label="Days" />
-                      </Grid>
-                      <Grid item xs={6} sm={3}>
-                        <FormControlLabel value="weeks" control={<Radio />} label="Weeks" />
-                      </Grid>
-                      <Grid item xs={6} sm={3}>
-                        <FormControlLabel value="months" control={<Radio />} label="Months" />
-                      </Grid>
-                      <Grid item xs={6} sm={3}>
-                        <FormControlLabel value="ongoing" control={<Radio />} label="Ongoing" />
-                      </Grid>
-                    </Grid>
-                  </RadioGroup>
-                </FormControl>
-              </CardContent>
-            </Card>
-
-            {/* Duration Value */}
-            {durationType !== "ongoing" && (
+              {/* Job Title */}
               <Card>
-                <CardHeader title={`Duration in ${durationType.charAt(0).toUpperCase() + durationType.slice(1)}`} />
+                <CardHeader title="Job Title" />
                 <CardContent>
                   <TextField
                     required
                     fullWidth
-                    type="number"
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    InputProps={{ inputProps: { min: 1 } }}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="e.g., Residential Electrical Wiring Project"
                     variant="outlined"
                   />
                 </CardContent>
               </Card>
-            )}
 
-            {/* Location with Map */}
-            <Card>
-              <CardHeader title="Project Location" />
-              <CardContent>
-                <Box sx={{ mb: 2, position: "relative" }}>
-                  <ClickAwayListener onClickAway={() => setShowSuggestions(false)}>
-                    <Box>
-                      <TextField
-                        fullWidth
-                        value={searchAddress}
-                        onChange={handleSearchInputChange}
-                        placeholder="Search for an address"
-                        variant="outlined"
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchIcon />
-                            </InputAdornment>
-                          ),
-                          endAdornment: isSearching ? (
-                            <InputAdornment position="end">
-                              <CircularProgress size={20} />
-                            </InputAdornment>
-                          ) : null,
-                        }}
-                      />
-
-                      {/* Location suggestions dropdown */}
-                      {showSuggestions && (
-                        <Paper
-                          sx={{
-                            position: "absolute",
-                            width: "100%",
-                            zIndex: 1000,
-                            maxHeight: "300px",
-                            overflowY: "auto",
-                            mt: 0.5,
-                          }}
-                        >
-                          <List>
-                            {locationSuggestions.map((suggestion) => (
-                              <ListItem
-                                key={suggestion.place_id}
-                                button
-                                onClick={() => handleSuggestionSelect(suggestion)}
-                                sx={{
-                                  "&:hover": {
-                                    bgcolor: "rgba(144, 202, 249, 0.08)",
-                                  },
-                                }}
-                              >
-                                <ListItemIcon>
-                                  <LocationOnIcon color="primary" />
-                                </ListItemIcon>
-                                <ListItemText
-                                  primary={suggestion.display_name.split(",")[0]}
-                                  secondary={suggestion.display_name.split(",").slice(1).join(",")}
-                                  primaryTypographyProps={{ noWrap: true }}
-                                  secondaryTypographyProps={{ noWrap: true }}
-                                />
-                              </ListItem>
-                            ))}
-                          </List>
-                        </Paper>
-                      )}
-                    </Box>
-                  </ClickAwayListener>
-                </Box>
-
-                {/* Map Container */}
-                <Paper
-                  ref={mapRef}
-                  sx={{
-                    height: "300px",
-                    width: "100%",
-                    mb: 2,
-                    bgcolor: "background.paper",
-                    position: "relative",
-                  }}
-                >
-                  {!mapInitialized && (
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "column",
-                        gap: 2,
-                      }}
-                    >
-                      <Typography variant="body1">Loading map...</Typography>
-                    </Box>
-                  )}
-                </Paper>
-
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <LocationOnIcon sx={{ mr: 1, color: "primary.main" }} />
-                  <Typography variant="body2" sx={{ fontWeight: "medium" }}>
-                    {coordinates
-                      ? "Selected location:"
-                      : "Click on the map to select a location or search for an address"}
-                  </Typography>
-                </Box>
-
-                <TextField
-                  required
-                  fullWidth
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g., 123 Main St, City, State, ZIP"
-                  variant="outlined"
-                  helperText="You can manually edit the address or select a location on the map"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Radius */}
-            <Card>
-              <CardHeader title="Travel Radius" />
-              <CardContent>
-                <TextField
-                  required
-                  fullWidth
-                  type="number"
-                  value={radius}
-                  onChange={(e) => setRadius(e.target.value)}
-                  InputProps={{
-                    inputProps: { min: 1 },
-                    endAdornment: <InputAdornment position="end">km</InputAdornment>,
-                  }}
-                  variant="outlined"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Services */}
-            <Card>
-              <CardHeader
-                title="Required Services"
-                action={
-                  <Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddService} size="small">
-                    Add Service
-                  </Button>
-                }
-              />
-              <CardContent>
-                {services.map((service, index) => (
-                  <Card key={index} sx={{ mb: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>
-                    <CardHeader
-                      title={`Service ${index + 1}`}
-                      action={
-                        services.length > 1 && (
-                          <IconButton color="error" onClick={() => handleRemoveService(index)} size="small">
-                            <RemoveIcon />
-                          </IconButton>
-                        )
-                      }
-                    />
-                    <CardContent>
-                      <Grid container spacing={3}>
-                        <Grid item xs={12}>
-                          <FormLabel required sx={{ display: "block", mb: 1 }}>
-                            Service Type
-                          </FormLabel>
-                          <TextField
-                            select
-                            required
-                            fullWidth
-                            value={service.type}
-                            onChange={(e) => handleServiceTypeChange(index, e.target.value)}
-                            variant="outlined"
-                          >
-                            {serviceTypes.map((type) => (
-                              <MenuItem key={type} value={type}>
-                                {type}
-                              </MenuItem>
-                            ))}
-                          </TextField>
-                        </Grid>
-
-                        {service.type === "Other" && (
-                          <Grid item xs={12}>
-                            <FormLabel required sx={{ display: "block", mb: 1 }}>
-                              Custom Service Type
-                            </FormLabel>
-                            <TextField
-                              required
-                              fullWidth
-                              value={service.customType || ""}
-                              onChange={(e) => handleCustomServiceChange(index, e.target.value)}
-                              placeholder="Enter custom service type"
-                              variant="outlined"
-                            />
-                          </Grid>
-                        )}
-
-                        <Grid item xs={12}>
-                          <FormLabel required sx={{ display: "block", mb: 1 }}>
-                            Number of {service.type === "Other" ? service.customType || "Workers" : service.type + "s"}{" "}
-                            Required
-                          </FormLabel>
-                          <TextField
-                            required
-                            fullWidth
-                            type="number"
-                            value={service.count}
-                            onChange={(e) => handleServiceCountChange(index, e.target.value)}
-                            InputProps={{ inputProps: { min: 1 } }}
-                            variant="outlined"
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Budget Type */}
-            <Card>
-              <CardHeader title="Budget Type" />
-              <CardContent>
-                <FormControl component="fieldset" fullWidth>
-                  <RadioGroup value={budgetType} onChange={(e) => setBudgetType(e.target.value)}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <FormControlLabel value="fixed" control={<Radio />} label="Fixed Amount" />
-                      </Grid>
-                      <Grid item xs={6}>
-                        <FormControlLabel value="negotiable" control={<Radio />} label="Negotiable" />
-                      </Grid>
-                    </Grid>
-                  </RadioGroup>
-                </FormControl>
-              </CardContent>
-            </Card>
-
-            {/* Budget Amount */}
-            {budgetType === "fixed" && (
+              {/* Job Type */}
               <Card>
-                <CardHeader title="Budget Amount" />
+                <CardHeader title="Job Type" />
+                <CardContent>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="job-type-label">Select Job Type</InputLabel>
+                    <Select
+                      labelId="job-type-label"
+                      value={jobType}
+                      onChange={(e) => setJobType(e.target.value)}
+                      label="Select Job Type"
+                    >
+                      {jobTypes.map((type) => (
+                        <MenuItem key={type} value={type}>
+                          {type}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </CardContent>
+              </Card>
+
+              {/* Target Users */}
+              <Card>
+                <CardHeader title="Target Users" />
+                <CardContent>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="target-users-label">Select Target Users</InputLabel>
+                    <Select
+                      labelId="target-users-label"
+                      value={targetUsers}
+                      onChange={(e) => setTargetUsers(e.target.value)}
+                      label="Select Target Users"
+                    >
+                      {targetUserTypes.map((type) => (
+                        <MenuItem key={type} value={type}>
+                          {type}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </CardContent>
+              </Card>
+
+              {/* Urgently Needed */}
+              <Card>
+                <CardHeader title="Job Priority" />
+                <CardContent>
+                  <FormControlLabel
+                    control={
+                      <Checkbox checked={isUrgent} onChange={(e) => setIsUrgent(e.target.checked)} color="primary" />
+                    }
+                    label={
+                      <Typography
+                        variant="body1"
+                        sx={{ fontWeight: isUrgent ? "bold" : "normal", color: isUrgent ? "#ef4444" : "inherit" }}
+                      >
+                        Mark as Urgently Needed
+                      </Typography>
+                    }
+                  />
+                  {isUrgent && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      Marking a job as urgent will highlight it in the job listings and notify potential candidates
+                      immediately.
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Job Description */}
+              <Card>
+                <CardHeader title="Job Description" />
+                <CardContent>
+                  <TextField
+                    required
+                    fullWidth
+                    multiline
+                    rows={4}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Provide detailed information about the job requirements, expectations, and any specific skills needed."
+                    variant="outlined"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Duration Type */}
+              <Card>
+                <CardHeader title="Duration Type" />
+                <CardContent>
+                  <FormControl component="fieldset" fullWidth>
+                    <RadioGroup value={durationType} onChange={(e) => setDurationType(e.target.value)}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={6} sm={3}>
+                          <FormControlLabel value="days" control={<Radio />} label="Days" />
+                        </Grid>
+                        <Grid item xs={6} sm={3}>
+                          <FormControlLabel value="weeks" control={<Radio />} label="Weeks" />
+                        </Grid>
+                        <Grid item xs={6} sm={3}>
+                          <FormControlLabel value="months" control={<Radio />} label="Months" />
+                        </Grid>
+                        <Grid item xs={6} sm={3}>
+                          <FormControlLabel value="ongoing" control={<Radio />} label="Ongoing" />
+                        </Grid>
+                      </Grid>
+                    </RadioGroup>
+                  </FormControl>
+                </CardContent>
+              </Card>
+
+              {/* Duration Value */}
+              {durationType !== "ongoing" && (
+                <Card>
+                  <CardHeader title={`Duration in ${durationType.charAt(0).toUpperCase() + durationType.slice(1)}`} />
+                  <CardContent>
+                    <TextField
+                      required
+                      fullWidth
+                      type="number"
+                      value={duration}
+                      onChange={(e) => setDuration(e.target.value)}
+                      InputProps={{ inputProps: { min: 1 } }}
+                      variant="outlined"
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Location with Map */}
+              <Card>
+                <CardHeader title="Project Location" />
+                <CardContent>
+                  <Box sx={{ mb: 2, position: "relative" }}>
+                    <ClickAwayListener onClickAway={() => setShowSuggestions(false)}>
+                      <Box>
+                        <TextField
+                          fullWidth
+                          value={searchAddress}
+                          onChange={handleSearchInputChange}
+                          placeholder="Search for an address"
+                          variant="outlined"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon />
+                              </InputAdornment>
+                            ),
+                            endAdornment: isSearching ? (
+                              <InputAdornment position="end">
+                                <CircularProgress size={20} />
+                              </InputAdornment>
+                            ) : null,
+                          }}
+                        />
+
+                        {/* Location suggestions dropdown */}
+                        {showSuggestions && (
+                          <Paper
+                            sx={{
+                              position: "absolute",
+                              width: "100%",
+                              zIndex: 1000,
+                              maxHeight: "300px",
+                              overflowY: "auto",
+                              mt: 0.5,
+                            }}
+                          >
+                            <List>
+                              {locationSuggestions.map((suggestion) => (
+                                <ListItem
+                                  key={suggestion.place_id}
+                                  button
+                                  onClick={() => handleSuggestionSelect(suggestion)}
+                                  sx={{
+                                    "&:hover": {
+                                      bgcolor: "rgba(212, 159, 46, 0.08)",
+                                    },
+                                  }}
+                                >
+                                  <ListItemIcon>
+                                    <LocationOnIcon color="primary" />
+                                  </ListItemIcon>
+                                  <ListItemText
+                                    primary={suggestion.display_name.split(",")[0]}
+                                    secondary={suggestion.display_name.split(",").slice(1).join(",")}
+                                    primaryTypographyProps={{ noWrap: true }}
+                                    secondaryTypographyProps={{ noWrap: true }}
+                                  />
+                                </ListItem>
+                              ))}
+                            </List>
+                          </Paper>
+                        )}
+                      </Box>
+                    </ClickAwayListener>
+                  </Box>
+
+                  {/* Map Container */}
+                  <Paper
+                    ref={mapRef}
+                    sx={{
+                      height: "300px",
+                      width: "100%",
+                      mb: 2,
+                      bgcolor: "background.paper",
+                      position: "relative",
+                    }}
+                  >
+                    {!mapInitialized && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexDirection: "column",
+                          gap: 2,
+                        }}
+                      >
+                        <Typography variant="body1">Loading map...</Typography>
+                      </Box>
+                    )}
+                  </Paper>
+
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                    <LocationOnIcon sx={{ mr: 1, color: "primary.main" }} />
+                    <Typography variant="body2" sx={{ fontWeight: "medium" }}>
+                      {coordinates
+                        ? "Selected location:"
+                        : "Click on the map to select a location or search for an address"}
+                    </Typography>
+                  </Box>
+
+                  <TextField
+                    required
+                    fullWidth
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g., 123 Main St, City, State, ZIP"
+                    variant="outlined"
+                    helperText="You can manually edit the address or select a location on the map"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Radius */}
+              <Card>
+                <CardHeader title="Travel Radius" />
                 <CardContent>
                   <TextField
                     required
                     fullWidth
                     type="number"
-                    value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
+                    value={radius}
+                    onChange={(e) => setRadius(e.target.value)}
                     InputProps={{
                       inputProps: { min: 1 },
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                      endAdornment: <InputAdornment position="end">km</InputAdornment>,
                     }}
                     variant="outlined"
                   />
                 </CardContent>
               </Card>
-            )}
 
-            {/* Submit Buttons */}
-            <Box sx={{ mt: 4, mb: 4, display: "flex", justifyContent: "space-between" }}>
-              <Button variant="outlined" onClick={() => router.push("/")} size="large">
-                Cancel
-              </Button>
-              <Button type="submit" variant="contained" color="primary" size="large">
-                Post Job
-              </Button>
+              {/* Services */}
+              <Card>
+                <CardHeader
+                  title="Required Services"
+                  action={
+                    <Button variant="outlined" startIcon={<AddIcon />} onClick={handleAddService} size="small">
+                      Add Service
+                    </Button>
+                  }
+                />
+                <CardContent>
+                  {services.map((service, index) => (
+                    <Card key={index} sx={{ mb: 3, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+                      <CardHeader
+                        title={`Service ${index + 1}`}
+                        action={
+                          services.length > 1 && (
+                            <IconButton color="error" onClick={() => handleRemoveService(index)} size="small">
+                              <RemoveIcon />
+                            </IconButton>
+                          )
+                        }
+                      />
+                      <CardContent>
+                        <Grid container spacing={3}>
+                          <Grid item xs={12}>
+                            <FormLabel required sx={{ display: "block", mb: 1 }}>
+                              Service Type
+                            </FormLabel>
+                            <TextField
+                              select
+                              required
+                              fullWidth
+                              value={service.type}
+                              onChange={(e) => handleServiceTypeChange(index, e.target.value)}
+                              variant="outlined"
+                            >
+                              {serviceTypes.map((type) => (
+                                <MenuItem key={type} value={type}>
+                                  {type}
+                                </MenuItem>
+                              ))}
+                            </TextField>
+                          </Grid>
+
+                          {service.type === "Other" && (
+                            <Grid item xs={12}>
+                              <FormLabel required sx={{ display: "block", mb: 1 }}>
+                                Custom Service Type
+                              </FormLabel>
+                              <TextField
+                                required
+                                fullWidth
+                                value={service.customType || ""}
+                                onChange={(e) => handleCustomServiceChange(index, e.target.value)}
+                                placeholder="Enter custom service type"
+                                variant="outlined"
+                              />
+                            </Grid>
+                          )}
+
+                          <Grid item xs={12}>
+                            <FormLabel required sx={{ display: "block", mb: 1 }}>
+                              Number of {service.type === "Other" ? service.customType || "Workers" : service.type + "s"}{" "}
+                              Required
+                            </FormLabel>
+                            <TextField
+                              required
+                              fullWidth
+                              type="number"
+                              value={service.count}
+                              onChange={(e) => handleServiceCountChange(index, e.target.value)}
+                              InputProps={{ inputProps: { min: 1 } }}
+                              variant="outlined"
+                            />
+                          </Grid>
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Budget Type */}
+              <Card>
+                <CardHeader title="Budget Type" />
+                <CardContent>
+                  <FormControl component="fieldset" fullWidth>
+                    <RadioGroup value={budgetType} onChange={(e) => setBudgetType(e.target.value)}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                          <FormControlLabel value="fixed" control={<Radio />} label="Fixed Amount" />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <FormControlLabel value="negotiable" control={<Radio />} label="Negotiable" />
+                        </Grid>
+                      </Grid>
+                    </RadioGroup>
+                  </FormControl>
+                </CardContent>
+              </Card>
+
+              {/* Budget Amount */}
+              {budgetType === "fixed" && (
+                <Card>
+                  <CardHeader title="Budget Amount" />
+                  <CardContent>
+                    <TextField
+                      required
+                      fullWidth
+                      type="number"
+                      value={budget}
+                      onChange={(e) => setBudget(e.target.value)}
+                      InputProps={{
+                        inputProps: { min: 1 },
+                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                      }}
+                      variant="outlined"
+                    />
+                  </CardContent>
+                </Card>
+              )}
+              <Box sx={{ mt: 4, mb: 4, display: "flex", justifyContent: "space-between" }}>
+                <Button variant="outlined" onClick={() => router.push("/")} size="large">
+                  Cancel
+                </Button>
+                <Button type="submit" variant="contained" color="primary" size="large">
+                  Post Job
+                </Button>
+              </Box>
             </Box>
-          </Box>
-        </Container>
+          </Container>
+        </Box>
       </Box>
     </ThemeProvider>
   )

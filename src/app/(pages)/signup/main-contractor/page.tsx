@@ -15,6 +15,7 @@ import TextField from "@mui/material/TextField"
 import FormLabel from "@mui/material/FormLabel"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
+
 // Create a theme instance with light mode and blue primary color
 const theme = createTheme({
   palette: {
@@ -26,8 +27,29 @@ const theme = createTheme({
       default: "#ffffff",
       paper: "#ffffff",
     },
+    error: {
+      main: "#d32f2f", // Red color for errors
+    },
   },
 })
+
+// Custom error message component with fixed height to prevent layout shifts
+const ErrorMessage = ({ message }: { message: string }) => (
+  <Box
+    sx={{
+      height: "20px", // Fixed height for error container
+      mt: 0.5,
+      display: "flex",
+      alignItems: "center",
+    }}
+  >
+    {message && (
+      <Typography variant="caption" sx={{ color: "error.main", lineHeight: 1 }}>
+        {message}
+      </Typography>
+    )}
+  </Box>
+)
 
 export default function MainContractorSignup() {
   const router = useRouter()
@@ -39,20 +61,103 @@ export default function MainContractorSignup() {
     email: "",
   })
 
+  const [errors, setErrors] = useState({
+    contractorName: "",
+    companyName: "",
+    contactNumber: "",
+    email: "",
+  })
+
+  // Validation functions
+  const validateName = (name: string) => {
+    const nameRegex = /^[a-zA-Z\s]+$/
+    return nameRegex.test(name)
+  }
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const validatePhoneNumber = (phone: string) => {
+    const phoneRegex = /^\d+$/
+    return phoneRegex.test(phone)
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
+
+    // Apply specific validation during input for contact number
+    if (id === "contactNumber" && value !== "" && !/^\d*$/.test(value)) {
+      return // Don't update if not a number
+    }
+
     setFormData((prev) => ({
       ...prev,
       [id]: value,
     }))
+
+    // Clear the specific error when user starts typing
+    setErrors((prev) => ({
+      ...prev,
+      [id]: "",
+    }))
+  }
+
+  const validateForm = () => {
+    const newErrors = {
+      contractorName: "",
+      companyName: "",
+      contactNumber: "",
+      email: "",
+    }
+    let isValid = true
+
+    // Validate contractor name
+    if (!formData.contractorName.trim()) {
+      newErrors.contractorName = "Contractor name is required"
+      isValid = false
+    } else if (!validateName(formData.contractorName)) {
+      newErrors.contractorName = "Name should only contain letters and spaces"
+      isValid = false
+    }
+
+    // Validate company name
+    if (!formData.companyName.trim()) {
+      newErrors.companyName = "Company name is required"
+      isValid = false
+    }
+
+    // Validate email
+    if (!formData.email) {
+      newErrors.email = "Email is required"
+      isValid = false
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Please enter a valid email address"
+      isValid = false
+    }
+
+    // Validate contact number
+    if (!formData.contactNumber) {
+      newErrors.contactNumber = "Contact number is required"
+      isValid = false
+    } else if (!validatePhoneNumber(formData.contactNumber)) {
+      newErrors.contactNumber = "Contact number should only contain digits"
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
 
-    // Here you would handle the form submission
-    // For example, sending the data to your API or storing in localStorage
+    if (!validateForm()) {
+      return
+    }
+
+    setIsSubmitting(true)
 
     // Store form data in localStorage to access it in the password page
     localStorage.setItem(
@@ -133,10 +238,10 @@ export default function MainContractorSignup() {
               </Typography>
 
               <form onSubmit={handleSubmit}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="contractorName" className="text-gray-700">
-                      Contractor Name
+                      Contractor Name *
                     </FormLabel>
                     <TextField
                       id="contractorName"
@@ -148,12 +253,14 @@ export default function MainContractorSignup() {
                       onChange={handleChange}
                       className="rounded"
                       placeholder="Enter your full name"
+                      error={!!errors.contractorName}
                     />
+                    <ErrorMessage message={errors.contractorName} />
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="companyName" className="text-gray-700">
-                      Company Name
+                      Company Name *
                     </FormLabel>
                     <TextField
                       id="companyName"
@@ -165,12 +272,14 @@ export default function MainContractorSignup() {
                       onChange={handleChange}
                       className="rounded"
                       placeholder="Enter your company name"
+                      error={!!errors.companyName}
                     />
+                    <ErrorMessage message={errors.companyName} />
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="email" className="text-gray-700">
-                      Email Address
+                      Email Address *
                     </FormLabel>
                     <TextField
                       id="email"
@@ -183,12 +292,14 @@ export default function MainContractorSignup() {
                       onChange={handleChange}
                       className="rounded"
                       placeholder="example@email.com"
+                      error={!!errors.email}
                     />
+                    <ErrorMessage message={errors.email} />
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="contactNumber" className="text-gray-700">
-                      Contact Number
+                      Contact Number *
                     </FormLabel>
                     <TextField
                       id="contactNumber"
@@ -200,8 +311,11 @@ export default function MainContractorSignup() {
                       value={formData.contactNumber}
                       onChange={handleChange}
                       className="rounded"
-                      placeholder="+1 (123) 456-7890"
+                      placeholder="Enter digits only"
+                      error={!!errors.contactNumber}
+                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                     />
+                    <ErrorMessage message={errors.contactNumber} />
                   </Box>
 
                   <Button

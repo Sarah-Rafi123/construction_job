@@ -1,5 +1,5 @@
 "use client"
-import { useRegisterUserMutation } from "@/store/api/authApi";
+import { useRegisterUserMutation } from "@/store/api/authApi"
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -18,10 +18,10 @@ import InputAdornment from "@mui/material/InputAdornment"
 import IconButton from "@mui/material/IconButton"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
-import Alert from "@mui/material/Alert"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
-
+import { useDispatch } from "react-redux"
+import { setEmail } from "@/store/slices/userSlice"
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -32,85 +32,46 @@ const theme = createTheme({
       default: "#ffffff",
       paper: "#ffffff",
     },
+    error: {
+      main: "#d32f2f", 
+    },
   },
 })
+
+const ErrorMessage = ({ message }: { message: string }) => (
+  <Box
+    sx={{
+      height: "20px", // Fixed height for error container
+      mt: 0.5,
+      display: "flex",
+      alignItems: "center",
+    }}
+  >
+    {message && (
+      <Typography variant="caption" sx={{ color: "error.main", lineHeight: 1 }}>
+        {message}
+      </Typography>
+    )}
+  </Box>
+)
 
 export default function PasswordSetup() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [error, setError] = useState("")
   const [userData, setUserData] = useState<any>(null)
-  const [registerUser] = useRegisterUserMutation();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
-  
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-  
-    setIsSubmitting(true);
-  
-    let completeUserData: any;
-  
-    if (userData.userType === "job-seeker") {
-      completeUserData = {
-        role: "job_seeker",
-        email: userData.email,
-        password: formData.password,
-        phone_number: userData.contactNumber,
-        full_name: userData.name,
-        trade: userData.trade,
-        travel_radius_km: userData.travelRadius,
-        profile_picture: userData.profilePicture || "https://example.com/profile.jpg",
-        id_document: userData.idDocument || "https://example.com/id.jpg",
-      };
-    } else if (userData.userType === "main-contractor") {
-      completeUserData = {
-        role: "main_contractor",
-        email: userData.email,
-        password: formData.password,
-        company_name: userData.companyName,
-        company_number: userData.contactNumber,
-      };
-    } else if (userData.userType === "sub-contractor") {
-      completeUserData = {
-        role: "subcontractor",
-        email: userData.email,
-        password: formData.password,
-        company_name: userData.companyName,
-        company_number: userData.contactNumber,
-      };
-    } else {
-      setError("Invalid user type");
-      setIsSubmitting(false);
-      return;
-    }
-  
-    try {
-      await registerUser(completeUserData).unwrap();
-      localStorage.removeItem("signupData");
-      router.push("/signup/success");
-    } catch (err: any) {
-      setError(err?.data?.message || "Registration failed");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-  
-  
-
+  const [registerUser] = useRegisterUserMutation()
+  const dispatch = useDispatch()
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: "",
+  })
+
+  const [errors, setErrors] = useState({
+    password: "",
+    confirmPassword: "",
+    general: "",
   })
 
   useEffect(() => {
@@ -131,8 +92,42 @@ export default function PasswordSetup() {
       [id]: value,
     }))
 
-    // Clear error when user types
-    if (error) setError("")
+    // Clear the specific error when user starts typing
+    setErrors((prev) => ({
+      ...prev,
+      [id]: "",
+      general: "",
+    }))
+  }
+
+  const validateForm = () => {
+    const newErrors = {
+      password: "",
+      confirmPassword: "",
+      general: "",
+    }
+    let isValid = true
+
+    // Validate password - minimum 6 characters as requested
+    if (!formData.password) {
+      newErrors.password = "Password is required"
+      isValid = false
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long"
+      isValid = false
+    }
+
+    // Validate confirm password
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password"
+      isValid = false
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match"
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
   }
 
   const handleClickShowPassword = () => {
@@ -141,6 +136,69 @@ export default function PasswordSetup() {
 
   const handleClickShowConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!validateForm()) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    let completeUserData: any
+
+    if (userData.userType === "job-seeker") {
+      completeUserData = {
+        role: "job_seeker",
+        email: userData.email,
+        password: formData.password,
+        phone_number: userData.contactNumber,
+        full_name: userData.name,
+        trade: userData.trade,
+        travel_radius_km: userData.travelRadius,
+        profile_picture: userData.profilePicture || "https://example.com/profile.jpg",
+        id_document: userData.idDocument || "https://example.com/id.jpg",
+      }
+    } else if (userData.userType === "main-contractor") {
+      completeUserData = {
+        role: "main_contractor",
+        email: userData.email,
+        password: formData.password,
+        company_name: userData.companyName,
+        company_number: userData.contactNumber,
+      }
+    } else if (userData.userType === "sub-contractor") {
+      completeUserData = {
+        role: "subcontractor",
+        email: userData.email,
+        password: formData.password,
+        company_name: userData.companyName,
+        company_number: userData.contactNumber,
+      }
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        general: "Invalid user type",
+      }))
+      setIsSubmitting(false)
+      return
+    }
+
+    try {
+      await registerUser(completeUserData).unwrap()
+      localStorage.removeItem("signupData")
+      dispatch(setEmail(userData.email))
+      router.push("/signup/success")
+    } catch (err: any) {
+      setErrors((prev) => ({
+        ...prev,
+        general: err?.data?.message || "Registration failed",
+      }))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -185,12 +243,19 @@ export default function PasswordSetup() {
             />
             <form onSubmit={handleSubmit}>
               <CardContent sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                {error && (
-                  <Alert severity="error" sx={{ mb: 2 }} className="rounded">
-                    {error}
-                  </Alert>
+                {/* General error message */}
+                {errors.general && (
+                  <Box
+                    sx={{
+                      backgroundColor: "rgba(211, 47, 47, 0.1)",
+                      borderRadius: 1,
+                      p: 1.5,
+                      color: "error.main",
+                    }}
+                  >
+                    <Typography variant="body2">{errors.general}</Typography>
+                  </Box>
                 )}
-
                 {userData && (
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary" className="text-gray-600">
@@ -198,10 +263,9 @@ export default function PasswordSetup() {
                     </Typography>
                   </Box>
                 )}
-
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
                   <FormLabel htmlFor="password" className="text-gray-700">
-                    Password
+                    Password *
                   </FormLabel>
                   <TextField
                     id="password"
@@ -210,9 +274,11 @@ export default function PasswordSetup() {
                     size="small"
                     required
                     fullWidth
+                    placeholder="Enter your Password"
                     value={formData.password}
                     onChange={handleChange}
                     className="rounded"
+                    error={!!errors.password}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -228,14 +294,15 @@ export default function PasswordSetup() {
                       ),
                     }}
                   />
+                  <ErrorMessage message={errors.password} />
                   <Typography variant="caption" color="text.secondary" className="text-gray-500">
-                    Password must be at least 8 characters long
+                    Password must be at least 6 characters long
                   </Typography>
                 </Box>
 
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
                   <FormLabel htmlFor="confirmPassword" className="text-gray-700">
-                    Confirm Password
+                    Confirm Password *
                   </FormLabel>
                   <TextField
                     id="confirmPassword"
@@ -246,7 +313,9 @@ export default function PasswordSetup() {
                     fullWidth
                     value={formData.confirmPassword}
                     onChange={handleChange}
+                    placeholder="Enter your Password"
                     className="rounded"
+                    error={!!errors.confirmPassword}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -262,6 +331,7 @@ export default function PasswordSetup() {
                       ),
                     }}
                   />
+                  <ErrorMessage message={errors.confirmPassword} />
                 </Box>
               </CardContent>
 
@@ -271,8 +341,14 @@ export default function PasswordSetup() {
                   variant="contained"
                   disabled={isSubmitting}
                   fullWidth
-                  sx={{ textTransform: "none" }}
-                  className="bg-[#90caf9] hover:bg-[#90caf9]/90 py-2"
+                  sx={{
+                    textTransform: "none",
+                    bgcolor: "#D49F2E",
+                    "&:hover": {
+                      bgcolor: "#C08E20",
+                    },
+                  }}
+                  className="py-2"
                 >
                   {isSubmitting ? "Creating Account..." : "Complete Sign Up"}
                 </Button>
@@ -304,7 +380,7 @@ export default function PasswordSetup() {
         >
           <div style={{ position: "relative", width: "100%", height: "100%" }}>
             <Image
-  src={ConstructionImage || "/placeholder.svg"}
+              src={ConstructionImage || "/placeholder.svg"}
               alt="Construction security"
               fill
               style={{

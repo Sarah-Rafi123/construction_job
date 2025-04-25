@@ -15,13 +15,13 @@ export default function Header() {
               href="/login"
               className="px-4 py-2 text-[#D49F2E] font-medium border  border-[#D2D2D0] rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Sign In
+              Login
             </Link>
             <Link
               href="/signup"
               className="px-4 py-2 bg-[#D49F2E] text-white font-medium rounded-lg hover:bg-[#C48E1D] transition-colors"
             >
-              Post a Job
+             Sign Up
             </Link>
           </div>
         </div>

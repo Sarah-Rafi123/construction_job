@@ -1,7 +1,7 @@
 "use client"
 
 import { jobTypes, serviceTypes } from "@/lib/data/sampledata"
-import { Search, ChevronDown } from "lucide-react"
+import { Search, ChevronDown } from 'lucide-react'
 import { useState, useRef, useEffect } from "react"
 
 interface JobSearchProps {
@@ -29,11 +29,25 @@ export default function JobSearch({
   const [radiusOpen, setRadiusOpen] = useState(false)
   const [jobTypeOpen, setJobTypeOpen] = useState(false)
   const [serviceTypeOpen, setServiceTypeOpen] = useState(false)
+  
+  // State for dropdown position
+  const [radiusDropdownPosition, setRadiusDropdownPosition] = useState({ top: 0, left: 0 })
 
   // Refs for dropdown positioning
   const radiusRef = useRef<HTMLDivElement>(null)
   const jobTypeRef = useRef<HTMLDivElement>(null)
   const serviceTypeRef = useRef<HTMLDivElement>(null)
+
+  // Update dropdown position when it's opened
+  useEffect(() => {
+    if (radiusOpen && radiusRef.current) {
+      const rect = radiusRef.current.getBoundingClientRect()
+      setRadiusDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX
+      })
+    }
+  }, [radiusOpen])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -74,7 +88,7 @@ export default function JobSearch({
   }
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 relative">
       <h2 className="text-2xl font-bold text-black mb-4">Explore Jobs</h2>
       <div className="flex flex-wrap gap-3 mb-4">
         <div className="flex-grow md:flex-grow-0 md:w-[370px] lg:w-[600px] flex items-center border border-gray-200 rounded-full bg-white overflow-hidden">
@@ -105,37 +119,6 @@ export default function JobSearch({
               </span>
               <ChevronDown className="h-5 w-5 text-gray-700" />
             </button>
-
-            {radiusOpen && (
-              <div className="absolute z-50 left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg">
-                <div className="py-1">
-                  <button
-                    onClick={() => handleRadiusSelect(0, 10)}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    0-10 km
-                  </button>
-                  <button
-                    onClick={() => handleRadiusSelect(0, 30)}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    0-30 km
-                  </button>
-                  <button
-                    onClick={() => handleRadiusSelect(0, 50)}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    0-50 km
-                  </button>
-                  <button
-                    onClick={() => handleRadiusSelect(0, 100)}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    0-100 km
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -150,7 +133,7 @@ export default function JobSearch({
           </button>
 
           {jobTypeOpen && (
-            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
               <div className="py-1">
                 {jobTypes.map((type) => (
                   <button
@@ -177,7 +160,7 @@ export default function JobSearch({
           </button>
 
           {serviceTypeOpen && (
-            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
               <div className="py-1">
                 {serviceTypes.map((type) => (
                   <button
@@ -193,6 +176,44 @@ export default function JobSearch({
           )}
         </div>
       </div>
+
+      {/* Radius dropdown rendered at the root level */}
+      {radiusOpen && (
+        <div 
+          className="fixed z-50 w-48 bg-white border border-gray-200 rounded-lg shadow-lg"
+          style={{
+            top: `${radiusDropdownPosition.top}px`,
+            left: `${radiusDropdownPosition.left}px`
+          }}
+        >
+          <div className="py-1">
+            <button
+              onClick={() => handleRadiusSelect(0, 10)}
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+            >
+              0-10 km
+            </button>
+            <button
+              onClick={() => handleRadiusSelect(0, 30)}
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+            >
+              0-30 km
+            </button>
+            <button
+              onClick={() => handleRadiusSelect(0, 50)}
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+            >
+              0-50 km
+            </button>
+            <button
+              onClick={() => handleRadiusSelect(0, 100)}
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+            >
+              0-100 km
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="text-sm text-gray-600 mb-4">
         Over {radiusFilter[1] === 50 ? 80 : 40} Job within {radiusFilter[1]} Km

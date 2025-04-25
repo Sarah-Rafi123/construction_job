@@ -1,30 +1,29 @@
-'use client'
-import type React from "react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
-import CardActions from "@mui/material/CardActions";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import FormLabel from "@mui/material/FormLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import IconButton from "@mui/material/IconButton";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Alert from "@mui/material/Alert";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png";
-import { Briefcase } from "lucide-react";
-import MenuItem from "@mui/material/MenuItem";
-import { loginUser } from "@/api/apiService";  // Import the API service
+"use client"
+import type React from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import Image from "next/image"
+import Box from "@mui/material/Box"
+import Card from "@mui/material/Card"
+import CardContent from "@mui/material/CardContent"
+import CardHeader from "@mui/material/CardHeader"
+import CardActions from "@mui/material/CardActions"
+import Typography from "@mui/material/Typography"
+import Button from "@mui/material/Button"
+import TextField from "@mui/material/TextField"
+import FormLabel from "@mui/material/FormLabel"
+import InputAdornment from "@mui/material/InputAdornment"
+import IconButton from "@mui/material/IconButton"
+import Visibility from "@mui/icons-material/Visibility"
+import VisibilityOff from "@mui/icons-material/VisibilityOff"
+import FormControl from "@mui/material/FormControl"
+import Select from "@mui/material/Select"
+import { ThemeProvider, createTheme } from "@mui/material/styles"
+import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
+import { Briefcase } from "lucide-react"
+import MenuItem from "@mui/material/MenuItem"
+import { loginUser } from "@/api/apiService" // Import the API service
 
 const theme = createTheme({
   palette: {
@@ -36,73 +35,143 @@ const theme = createTheme({
       default: "#ffffff",
       paper: "#ffffff",
     },
+    error: {
+      main: "#d32f2f", // Red color for errors
+    },
   },
-});
+})
+
+// Custom error message component with fixed height to prevent layout shifts
+const ErrorMessage = ({ message }: { message: string }) => (
+  <Box
+    sx={{
+      height: "20px", // Fixed height for error container
+      mt: 0.5,
+      mb: 0.5,
+      display: "flex",
+      alignItems: "center",
+    }}
+  >
+    {message && (
+      <Typography variant="caption" sx={{ color: "error.main", lineHeight: 1 }}>
+        {message}
+      </Typography>
+    )}
+  </Box>
+)
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [userType, setUserType] = useState("");
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+    userType: "",
+  })
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-  });
+  })
+
+  const [userType, setUserType] = useState("")
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
+    const { id, value } = e.target
     setFormData((prev) => ({
       ...prev,
       [id]: value,
-    }));
-    if (error) setError("");
-  };
+    }))
+
+    // Clear the specific error when user starts typing
+    setErrors((prev) => ({
+      ...prev,
+      [id]: "",
+    }))
+  }
 
   const handleUserTypeChange = (e: any) => {
-    setUserType(e.target.value);
-    if (error) setError("");
-  };
+    setUserType(e.target.value)
+    // Clear userType error when user selects an option
+    setErrors((prev) => ({
+      ...prev,
+      userType: "",
+    }))
+  }
+
+  const validateForm = () => {
+    const newErrors = {
+      email: "",
+      password: "",
+      userType: "",
+    }
+    let isValid = true
+
+    // Validate user type
+    if (!userType) {
+      newErrors.userType = "Please select your account type"
+      isValid = false
+    }
+
+    // Validate email
+    if (!formData.email) {
+      newErrors.email = "Email is required"
+      isValid = false
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Please enter a valid email address"
+      isValid = false
+    }
+
+    // Validate password
+    if (!formData.password) {
+      newErrors.password = "Password is required"
+      isValid = false
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long"
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    if (!userType) {
-      setError("Please select your account type");
-      return;
+    if (!validateForm()) {
+      return
     }
 
-    if (!formData.email) {
-      setError("Email is required");
-      return;
-    }
-
-    if (!formData.password) {
-      setError("Password is required");
-      return;
-    }
-
-    setIsSubmitting(true);
-    localStorage.setItem("userType", userType);
+    setIsSubmitting(true)
+    localStorage.setItem("userType", userType)
 
     try {
-      const response = await loginUser(formData.email, formData.password); // Use the API service
+      const response = await loginUser(formData.email, formData.password) // Use the API service
       if (response) {
         setTimeout(() => {
-          setIsSubmitting(false);
-          router.push("/home"); // Redirect to home on successful login
-        }, 1500);
+          setIsSubmitting(false)
+          router.push("/home") // Redirect to home on successful login
+        }, 1500)
       }
     } catch (err: any) {
-      setIsSubmitting(false);
-      setError(err.message || "Login failed. Please check your credentials.");
+      setIsSubmitting(false)
+      // Set a general error message
+      setErrors((prev) => ({
+        ...prev,
+        email: "Login failed. Please check your credentials.",
+      }))
     }
-  };
+  }
 
   const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+    setShowPassword(!showPassword)
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -164,14 +233,8 @@ export default function LoginPage() {
                 }
               />
               <form onSubmit={handleSubmit}>
-                <CardContent sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  {error && (
-                    <Alert severity="error" sx={{ mb: 2 }} className="rounded">
-                      {error}
-                    </Alert>
-                  )}
-
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="user-type" className="text-gray-700">
                       Account Type
                     </FormLabel>
@@ -182,6 +245,7 @@ export default function LoginPage() {
                         onChange={handleUserTypeChange}
                         displayEmpty
                         className="rounded"
+                        error={!!errors.userType}
                       >
                         <MenuItem value="" disabled>
                           Select account type
@@ -191,9 +255,10 @@ export default function LoginPage() {
                         <MenuItem value="job-seeker">Job Seeker</MenuItem>
                       </Select>
                     </FormControl>
+                    <ErrorMessage message={errors.userType} />
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="email" className="text-gray-700">
                       Email Address
                     </FormLabel>
@@ -207,10 +272,13 @@ export default function LoginPage() {
                       onChange={handleChange}
                       placeholder="Enter your email address"
                       className="rounded"
+                      error={!!errors.email}
+                      // Remove helperText to use our custom error component
                     />
+                    <ErrorMessage message={errors.email} />
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="password" className="text-gray-700">
                       Password
                     </FormLabel>
@@ -223,6 +291,9 @@ export default function LoginPage() {
                       value={formData.password}
                       onChange={handleChange}
                       className="rounded"
+                      placeholder="Enter your password"
+                      error={!!errors.password}
+                      // Remove helperText to use our custom error component
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -238,12 +309,13 @@ export default function LoginPage() {
                         ),
                       }}
                     />
+                    <ErrorMessage message={errors.password} />
                   </Box>
 
                   <Typography
                     variant="body2"
                     color="primary"
-                    sx={{ textAlign: "right", cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+                    sx={{ textAlign: "right", cursor: "pointer", "&:hover": { textDecoration: "underline" }, mt: 1 }}
                     className="text-[#90caf9]"
                   >
                     Forgot Password?
@@ -281,15 +353,13 @@ export default function LoginPage() {
             </Card>
           </Box>
         </Box>
-
-        {/* Right side - Image */}
         <Box
           sx={{
             width: "50%",
-            bgcolor: "#F5F5FA", // Light background
+            bgcolor: "#F5F5FA", 
             display: { xs: "none", md: "block" },
             position: "relative",
-            height: "100vh", // Ensure the container takes full height
+            height: "100vh",
             overflow: "hidden",
           }}
         >
@@ -308,5 +378,5 @@ export default function LoginPage() {
         </Box>
       </Box>
     </ThemeProvider>
-  );
+  )
 }

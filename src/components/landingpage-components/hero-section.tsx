@@ -10,6 +10,12 @@ interface HeroSectionProps {
 export default function HeroSection({ companies = [] }: HeroSectionProps) {
   const router = useRouter()
 
+  // Function to handle navigation when "Explore More" is clicked
+  const handleExploreClick = () => {
+    // Navigate to the desired route - change '/explore' to any route you want
+    router.push("/login")
+  }
+
   return (
     <section className="py-12 md:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,14 +28,17 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
               No more endless searching. Whether you're hiring or ready to work, we connect you with the right people —
               fast.
             </p>
-            <button className="bg-[#F5A623] hover:bg-[#E09613] text-white text-lg font-bold py-3 px-8 rounded-md">
+            <button
+              className="bg-[#D49F2E] hover:bg-[#C48E1D] text-white text-lg font-bold py-3 px-8 rounded-md transition duration-300 ease-in-out"
+              onClick={handleExploreClick}
+            >
               Explore More
             </button>
           </div>
 
           {/* Right Column: House Blueprint SVG */}
           <div className="flex justify-center">
-            <HouseSvg className="w-52 h-52"/>
+            <HouseSvg className="w-52 h-52" />
           </div>
         </div>
 
