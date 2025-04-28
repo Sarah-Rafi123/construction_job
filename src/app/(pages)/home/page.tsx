@@ -9,11 +9,15 @@ import ApprovalAlert from "@/components/home-components/approval-alert";
 import ProtectedRoute from "@/components/global/ProtectedRoute";
 import { useSelector } from "react-redux";
 import JobsSection from "@/components/home-components/JobsSection";
+import useGetCurrentLocation from "../../../../hooks/useGetCurrentLocation";
+
 export default function Home() {
   const router = useRouter();
-
+  useGetCurrentLocation();
   const currentUser = useSelector((state: any) => state.user?.currentUser || "");
+  const currentUserlocation = useSelector((state: any) => state.user?.currentUserLocation || "");
   console.log("current user is", currentUser);
+  console.log("current user location is", currentUserlocation);
 
   return (
     <ProtectedRoute>

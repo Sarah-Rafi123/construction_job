@@ -13,9 +13,15 @@ interface User {
   admin_status?: string;
 }
 
+interface Location {
+  latitude: number;
+  longitude: number;
+}
+
 const initialState = {
   email: null as string | null,
   currentUser: null as User | null,
+  currentUserLocation: null as Location | null,
 };
 
 export const userSlice = createSlice({
@@ -34,9 +40,16 @@ export const userSlice = createSlice({
     clearCurrentUser: (state) => {
       state.currentUser = null;
     },
+    setCurrentUserLocation: (state, action: PayloadAction<Location>) => {
+      state.currentUserLocation = action.payload;
+    },
+    clearCurrentUserLocation: (state) => {
+      state.currentUserLocation = null;
+    },
   },
 });
 
-export const { setEmail, clearUser, setCurrentUser, clearCurrentUser } = userSlice.actions;
+export const { setEmail, clearUser, setCurrentUser, clearCurrentUser, setCurrentUserLocation, clearCurrentUserLocation } =
+  userSlice.actions;
 
 export default userSlice.reducer;
