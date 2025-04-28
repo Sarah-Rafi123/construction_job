@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { Briefcase } from "lucide-react"
-
-// Material UI imports
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
@@ -16,7 +14,6 @@ import FormLabel from "@mui/material/FormLabel"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
 
-// Create a theme instance with light mode and blue primary color
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -182,8 +179,7 @@ export default function MainContractorSignup() {
         );
   
         router.push("/signup/password");
-      } else {
-        // ❌ Email already exists, show error
+ 
         setErrors((prev) => ({
           ...prev,
           email: "User with this email already exists",

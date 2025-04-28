@@ -12,7 +12,7 @@ import TextField from "@mui/material/TextField"
 import FormLabel from "@mui/material/FormLabel"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
-import { Slider } from "@mui/material"
+import { Autocomplete, Chip, Slider } from "@mui/material"
 
 const theme = createTheme({
   palette: {
@@ -48,6 +48,35 @@ const ErrorMessage = ({ message }: { message: string }) => (
   </Box>
 )
 
+// Predefined list of services
+const predefinedServices = [
+  "Electrician",
+  "Plumber",
+  "Carpenter",
+  "Painter",
+  "Construction Manager",
+  "Project Engineer",
+  "Site Supervisor",
+  "General Contractor",
+  "Construction Laborer",
+  "Mason",
+  "Roofing Contractor",
+  "Heavy Equipment Operator",
+  "Steelworker",
+  "Welder",
+  "Surveyor",
+  "Architect",
+  "Structural Engineer",
+  "HVAC Technician",
+  "Interior Designer",
+  "Landscape Architect",
+  "Safety Officer",
+  "Drywaller",
+  "Flooring Installer",
+  "Insulation Worker",
+  "Demolition Worker",
+]
+
 export default function SubContractorSignup() {
   const router = useRouter()
   const [travelRadius, setTravelRadius] = useState(5) // Default to 5 km
@@ -57,7 +86,7 @@ export default function SubContractorSignup() {
     companyName: "",
     contactNumber: "",
     email: "",
-    services: "",
+    services: [] as string[],
   })
 
   const [errors, setErrors] = useState({
@@ -102,6 +131,22 @@ export default function SubContractorSignup() {
       ...prev,
       [id]: "",
     }))
+  }
+
+  // Handle services selection and custom input
+  const handleServicesChange = (event: any, newValue: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      services: newValue,
+    }))
+
+    // Clear any error when user selects services
+    if (newValue.length > 0) {
+      setErrors((prev) => ({
+        ...prev,
+        services: "",
+      }))
+    }
   }
 
   const validateForm = () => {
@@ -157,16 +202,8 @@ export default function SubContractorSignup() {
     return isValid
   }
 
-  const handleServicesChange = (event: any, value: string[]) => {
-    setFormData((prev) => ({ ...prev, services: value }))
-    // Clear any error when user selects services
-    setErrors((prev) => ({ ...prev, services: "" }))
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    console.log("Current services:", formData.services)
 
     if (!validateForm()) {
       return
@@ -175,14 +212,25 @@ export default function SubContractorSignup() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch("http://localhost:9000/api/v0/check-email", {
-        method: "POST",
+      // Prepare data for the request based on the user data and formData
+      const requestData = {
+        role: "subcontractor",
+        email: formData.email,
+        password: "your_password_here", // Replace with the actual password
+        company_name: formData.companyName,
+        company_number: formData.contactNumber,
+        services_offered: formData.services, // This will include the selected services
+        travel_radius_km: travelRadius, // This is coming from the slider
+      }
+
+      const response = await fetch('http://localhost:9000/api/v0/check-email', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email: formData.email }),
-      })
-
+      });
+  
       const data = await response.json()
 
       if (data.success) {
@@ -190,7 +238,7 @@ export default function SubContractorSignup() {
           "signupData",
           JSON.stringify({
             ...formData,
-            travelRadius, // 🔥 ADD this field here
+            travelRadius,
             userType: "sub-contractor",
           }),
         )
@@ -199,12 +247,12 @@ export default function SubContractorSignup() {
       } else {
         setErrors((prev) => ({
           ...prev,
-          email: "User with this email already exists",
+          email: data.message || "User with this email already exists",
         }))
         setIsSubmitting(false)
       }
     } catch (error) {
-      console.error("Error checking email:", error)
+      console.error("Error during registration:", error)
       setErrors((prev) => ({
         ...prev,
         email: "Something went wrong. Please try again.",
@@ -362,21 +410,50 @@ export default function SubContractorSignup() {
                     <FormLabel htmlFor="services" className="text-gray-700">
                       Services Offered *
                     </FormLabel>
-                    <TextField
+                    <Autocomplete
+                      multiple
                       id="services"
-                      placeholder="Enter the list of services you offer"
-                      variant="outlined"
-                      multiline
-                      rows={4}
-                      required
-                      fullWidth
+                      options={predefinedServices}
+                      freeSolo
                       value={formData.services}
-                      onChange={handleChange}
-                      className="rounded"
-                      error={!!errors.services}
+                      onChange={handleServicesChange}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                          <Chip
+                            key={option}
+                            variant="outlined"
+                            label={option}
+                            size="small"
+                            {...getTagProps({ index })}
+                            sx={{
+                              backgroundColor: "#f5f5f5",
+                              borderColor: "#D49F2E",
+                              "& .MuiChip-deleteIcon": {
+                                color: "#D49F2E",
+                                "&:hover": {
+                                  color: "#C08E20",
+                                },
+                              },
+                            }}
+                          />
+                        ))
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          variant="outlined"
+                          size="small"
+                          placeholder={formData.services.length > 0 ? "" : "Select or type services"}
+                          error={!!errors.services}
+                        />
+                      )}
                     />
                     <ErrorMessage message={errors.services} />
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                      Select from the list or type your own services
+                    </Typography>
                   </Box>
+
                   <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                       <FormLabel className="text-gray-700">Travel Radius</FormLabel>
