@@ -151,29 +151,55 @@ export default function MainContractorSignup() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+    e.preventDefault();
+  
     if (!validateForm()) {
-      return
+      return;
     }
-
-    setIsSubmitting(true)
-
-    // Store form data in localStorage to access it in the password page
-    localStorage.setItem(
-      "signupData",
-      JSON.stringify({
-        ...formData,
-        userType: "main-contractor",
-      }),
-    )
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      router.push("/signup/password")
-    }, 1000)
-  }
+  
+    setIsSubmitting(true);
+  
+    try {
+      // 1. Check email uniqueness first
+      const response = await fetch('http://localhost:9000/api/v0/check-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        // ✅ Email is unique, proceed
+        localStorage.setItem(
+          "signupData",
+          JSON.stringify({
+            ...formData,
+            userType: "main-contractor",
+          }),
+        );
+  
+        router.push("/signup/password");
+      } else {
+        // ❌ Email already exists, show error
+        setErrors((prev) => ({
+          ...prev,
+          email: "User with this email already exists",
+        }));
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Error checking email:", error);
+      setErrors((prev) => ({
+        ...prev,
+        email: "Something went wrong. Please try again.",
+      }));
+      setIsSubmitting(false);
+    }
+  };
+  
 
   return (
     <ThemeProvider theme={theme}>

@@ -91,8 +91,6 @@ export default function PasswordSetup() {
       ...prev,
       [id]: value,
     }))
-
-    // Clear the specific error when user starts typing
     setErrors((prev) => ({
       ...prev,
       [id]: "",
@@ -107,8 +105,6 @@ export default function PasswordSetup() {
       general: "",
     }
     let isValid = true
-
-    // Validate password - minimum 6 characters as requested
     if (!formData.password) {
       newErrors.password = "Password is required"
       isValid = false
@@ -176,6 +172,8 @@ export default function PasswordSetup() {
         password: formData.password,
         company_name: userData.companyName,
         company_number: userData.contactNumber,
+        travel_radius_km: userData.travelRadius,
+        services_offered: userData.services || [],
       }
     } else {
       setErrors((prev) => ({
@@ -211,7 +209,6 @@ export default function PasswordSetup() {
         }}
         className="bg-white"
       >
-        {/* Left side - Password Form */}
         <Box
           sx={{
             width: { xs: "100%", md: "50%" },
@@ -225,8 +222,8 @@ export default function PasswordSetup() {
             sx={{
               width: "100%",
               maxWidth: "500px",
-              boxShadow: "none", // Remove shadow
-              border: "none", // Remove border
+              boxShadow: "none", 
+              border: "none", 
             }}
           >
             <CardHeader
@@ -366,15 +363,13 @@ export default function PasswordSetup() {
             </form>
           </Card>
         </Box>
-
-        {/* Right side - Image */}
         <Box
           sx={{
             width: "50%",
-            bgcolor: "#F5F5FA", // Light background
+            bgcolor: "#F5F5FA", 
             display: { xs: "none", md: "block" },
             position: "relative",
-            height: "100vh", // Ensure the container takes full height
+            height: "100vh", 
             overflow: "hidden",
           }}
         >

@@ -12,6 +12,7 @@ import TextField from "@mui/material/TextField"
 import FormLabel from "@mui/material/FormLabel"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
+import { Slider } from "@mui/material"
 
 const theme = createTheme({
   palette: {
@@ -49,6 +50,7 @@ const ErrorMessage = ({ message }: { message: string }) => (
 
 export default function SubContractorSignup() {
   const router = useRouter()
+  const [travelRadius, setTravelRadius] = useState(5) // Default to 5 km
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -146,8 +148,8 @@ export default function SubContractorSignup() {
     }
 
     // Validate services
-    if (!formData.services.trim()) {
-      newErrors.services = "Services offered is required"
+    if (formData.services.length === 0) {
+      newErrors.services = "Please select at least one service"
       isValid = false
     }
 
@@ -155,33 +157,67 @@ export default function SubContractorSignup() {
     return isValid
   }
 
+  const handleServicesChange = (event: any, value: string[]) => {
+    setFormData((prev) => ({ ...prev, services: value }))
+    // Clear any error when user selects services
+    setErrors((prev) => ({ ...prev, services: "" }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    console.log("Current services:", formData.services)
 
     if (!validateForm()) {
       return
     }
 
     setIsSubmitting(true)
-    localStorage.setItem(
-      "signupData",
-      JSON.stringify({
-        ...formData,
-        userType: "sub-contractor",
-      }),
-    )
 
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost:9000/api/v0/check-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: formData.email }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        localStorage.setItem(
+          "signupData",
+          JSON.stringify({
+            ...formData,
+            travelRadius, // 🔥 ADD this field here
+            userType: "sub-contractor",
+          }),
+        )
+
+        router.push("/signup/password")
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          email: "User with this email already exists",
+        }))
+        setIsSubmitting(false)
+      }
+    } catch (error) {
+      console.error("Error checking email:", error)
+      setErrors((prev) => ({
+        ...prev,
+        email: "Something went wrong. Please try again.",
+      }))
       setIsSubmitting(false)
-      router.push("/signup/password")
-    }, 1000)
+    }
   }
 
   return (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          minHeight: "100vh",
+          height: "100vh",
           display: "flex",
           bgcolor: "background.default",
         }}
@@ -193,8 +229,8 @@ export default function SubContractorSignup() {
             display: "flex",
             flexDirection: "column",
             p: { xs: 2, sm: 4 },
-            overflowY: "auto",
-            maxHeight: "100vh",
+            overflow: "hidden", // Change from overflowY: "auto" to prevent scrolling
+            height: "100vh", // Use fixed height instead of maxHeight
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }}>
@@ -220,6 +256,7 @@ export default function SubContractorSignup() {
               alignItems: "center",
               justifyContent: "center",
               flex: 1,
+              overflow: "hidden", // Prevent scrolling
             }}
           >
             <Box
@@ -237,42 +274,47 @@ export default function SubContractorSignup() {
 
               <form onSubmit={handleSubmit}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <FormLabel htmlFor="name" className="text-gray-700">
-                      Name *
-                    </FormLabel>
-                    <TextField
-                      id="name"
-                      variant="outlined"
-                      size="small"
-                      required
-                      fullWidth
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="rounded"
-                      placeholder="Enter your full name"
-                      error={!!errors.name}
-                    />
-                    <ErrorMessage message={errors.name} />
-                  </Box>
+                  {/* Name and Company Name in same row */}
+                  <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                    {/* Name Field */}
+                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                      <FormLabel htmlFor="name" className="text-gray-700">
+                        Name *
+                      </FormLabel>
+                      <TextField
+                        id="name"
+                        variant="outlined"
+                        size="small"
+                        required
+                        fullWidth
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="rounded"
+                        placeholder="Enter your full name"
+                        error={!!errors.name}
+                      />
+                      <ErrorMessage message={errors.name} />
+                    </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <FormLabel htmlFor="companyName" className="text-gray-700">
-                      Company Name *
-                    </FormLabel>
-                    <TextField
-                      id="companyName"
-                      variant="outlined"
-                      size="small"
-                      required
-                      fullWidth
-                      value={formData.companyName}
-                      onChange={handleChange}
-                      className="rounded"
-                      placeholder="Enter your company name"
-                      error={!!errors.companyName}
-                    />
-                    <ErrorMessage message={errors.companyName} />
+                    {/* Company Name Field */}
+                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                      <FormLabel htmlFor="companyName" className="text-gray-700">
+                        Company Name *
+                      </FormLabel>
+                      <TextField
+                        id="companyName"
+                        variant="outlined"
+                        size="small"
+                        required
+                        fullWidth
+                        value={formData.companyName}
+                        onChange={handleChange}
+                        className="rounded"
+                        placeholder="Enter your company name"
+                        error={!!errors.companyName}
+                      />
+                      <ErrorMessage message={errors.companyName} />
+                    </Box>
                   </Box>
 
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -334,6 +376,31 @@ export default function SubContractorSignup() {
                       error={!!errors.services}
                     />
                     <ErrorMessage message={errors.services} />
+                  </Box>
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                      <FormLabel className="text-gray-700">Travel Radius</FormLabel>
+                      <Typography variant="body2" fontWeight="medium" className="text-gray-800">
+                        {travelRadius} km
+                      </Typography>
+                    </Box>
+                    <Slider
+                      value={travelRadius}
+                      min={5}
+                      max={40}
+                      step={5}
+                      onChange={(_, value) => setTravelRadius(value as number)}
+                      aria-label="Travel Radius"
+                      sx={{ color: "#D49F2E" }}
+                    />
+                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                      <Typography variant="caption" color="text.secondary" className="text-gray-500">
+                        5 km
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" className="text-gray-500">
+                        40 km
+                      </Typography>
+                    </Box>
                   </Box>
 
                   <Button

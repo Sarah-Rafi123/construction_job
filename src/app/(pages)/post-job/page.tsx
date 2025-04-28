@@ -40,13 +40,11 @@ import ListItemText from "@mui/material/ListItemText"
 import ListItemIcon from "@mui/material/ListItemIcon"
 import ClickAwayListener from "@mui/material/ClickAwayListener"
 import CircularProgress from "@mui/material/CircularProgress"
-
-// Create a theme instance with mustard and white colors
 const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#D49F2E", // Mustard color
+      main: "#D49F2E", 
     },
     success: {
       main: "#22c55e",
@@ -55,22 +53,21 @@ const theme = createTheme({
       main: "#ef4444",
     },
     background: {
-      default: "#ffffff", // White background
+      default: "#ffffff", 
       paper: "#ffffff",
     },
     text: {
-      primary: "#000000", // Black text
-      secondary: "#4B5563", // Dark gray for secondary text
-    },
+      primary: "#000000", 
+      secondary: "#4B5563", 
   },
   components: {
     MuiButton: {
       styleOverrides: {
         contained: {
-          backgroundColor: "#D49F2E", // Mustard background for buttons
-          color: "#ffffff", // White text for buttons
+          backgroundColor: "#D49F2E",
+          color: "#ffffff", 
           "&:hover": {
-            backgroundColor: "#C48E1D", // Slightly darker mustard on hover
+            backgroundColor: "#C48E1D", 
           },
         },
       },
@@ -78,9 +75,9 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#ffffff", // White app bar
-          color: "#000000", // Black text in app bar
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)", // Subtle shadow
+          backgroundColor: "#ffffff", 
+          color: "#000000", 
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)", 
         },
       },
     },
@@ -102,14 +99,12 @@ const theme = createTheme({
   },
 })
 
-// Service type definition
 interface Service {
   type: string
   count: number
   customType?: string
 }
 
-// Location suggestion interface
 interface LocationSuggestion {
   display_name: string
   lat: string
@@ -117,7 +112,6 @@ interface LocationSuggestion {
   place_id: number
 }
 
-// Available service types
 const serviceTypes = [
   "Electrician",
   "Plumber",
@@ -131,10 +125,8 @@ const serviceTypes = [
   "Other",
 ]
 
-// Job types
 const jobTypes = ["Full Time", "Part Time", "Contract", "Project-based", "Temporary", "Seasonal"]
 
-// Target user types
 const targetUserTypes = ["Sub-contractors", "Job Seekers", "Both"]
 
 export default function PostJob() {
@@ -321,18 +313,13 @@ export default function PostJob() {
     const storedUserType = localStorage.getItem("userType")
     setUserType(storedUserType)
 
-    // Redirect if not a contractor
     if (storedUserType !== "main-contractor" && storedUserType !== "sub-contractor") {
       router.push("/")
     }
   }, [router])
-
-  // Handle adding a new service
   const handleAddService = () => {
     setServices([...services, { type: "Electrician", count: 1 }])
   }
-
-  // Handle removing a service
   const handleRemoveService = (index: number) => {
     const updatedServices = [...services]
     updatedServices.splice(index, 1)
@@ -859,8 +846,6 @@ export default function PostJob() {
     </ThemeProvider>
   )
 }
-
-// Add global type definition for Leaflet
 declare global {
   interface Window {
     L: any

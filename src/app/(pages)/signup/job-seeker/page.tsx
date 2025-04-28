@@ -108,18 +108,14 @@ export default function JobSeekerSignup() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
-
-    // Apply specific validation during input
     if (id === "contactNumber" && value !== "" && !/^\d*$/.test(value)) {
-      return // Don't update if not a number
+      return 
     }
 
     setFormData((prev) => ({
       ...prev,
       [id]: value,
     }))
-
-    // Clear the specific error when user starts typing
     setErrors((prev) => ({
       ...prev,
       [id]: "",
@@ -191,8 +187,6 @@ export default function JobSeekerSignup() {
       newErrors.contactNumber = "Contact number should only contain digits"
       isValid = false
     }
-
-    // Validate trade
     if (!formData.trade.trim()) {
       newErrors.trade = "Trade is required"
       isValid = false
@@ -212,32 +206,56 @@ export default function JobSeekerSignup() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+    e.preventDefault();
+  
     if (!validateForm()) {
-      return
+      return;
     }
-
-    setIsSubmitting(true)
-
-    // Create file URLs array for storage
-    const fileUrls = uploadedFiles.map((file) => file.url || "")
-
-    localStorage.setItem(
-      "signupData",
-      JSON.stringify({
-        ...formData,
-        travelRadius,
-        userType: "job-seeker",
-        documents: fileUrls,
-      }),
-    )
-
-    setTimeout(() => {
-      setIsSubmitting(false)
-      router.push("/signup/password")
-    }, 1000)
-  }
+  
+    setIsSubmitting(true);
+  
+    try {
+      const response = await fetch('http://localhost:9000/api/v0/check-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        const fileUrls = uploadedFiles.map((file) => file.url || "");
+  
+        localStorage.setItem(
+          "signupData",
+          JSON.stringify({
+            ...formData,
+            travelRadius,
+            userType: "job-seeker",
+            documents: fileUrls,
+          }),
+        );
+  
+        router.push("/signup/password");
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          email: "User with this email already exists",
+        }));
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Error checking email:", error);
+      setErrors((prev) => ({
+        ...prev,
+        email: "Something went wrong. Please try again.",
+      }));
+      setIsSubmitting(false);
+    }
+  };
+  
 
   return (
     <ThemeProvider theme={theme}>
@@ -302,9 +320,7 @@ export default function JobSeekerSignup() {
 
               <form onSubmit={handleSubmit}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  {/* Name and Company Name in the same row */}
                   <Box sx={{ display: "flex", gap: 2 }}>
-                    {/* Name field */}
                     <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
                       <FormLabel htmlFor="name" className="text-gray-700">
                         Name *
@@ -324,10 +340,7 @@ export default function JobSeekerSignup() {
                       <ErrorMessage message={errors.name} />
                     </Box>
                   </Box>
-
-                  {/* Email and Contact Number in the same row */}
                   <Box sx={{ display: "flex", gap: 2 }}>
-                    {/* Email field */}
                     <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
                       <FormLabel htmlFor="email" className="text-gray-700">
                         Email Address *
@@ -347,8 +360,6 @@ export default function JobSeekerSignup() {
                       />
                       <ErrorMessage message={errors.email} />
                     </Box>
-
-                    {/* Contact Number field */}
                     <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
                       <FormLabel htmlFor="contactNumber" className="text-gray-700">
                         Contact Number *
