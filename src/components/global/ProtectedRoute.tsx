@@ -4,9 +4,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCurrentUser, clearCurrentUser } from "@/store/slices/userSlice";
-
+import { RootState } from "@/store";
 interface ProtectedRouteProps {
   children: React.ReactNode;
   allowedRoles?: string[];
@@ -16,17 +16,17 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
+  const currentUser = useSelector((state: RootState) => state.user?.currentUser || "");
 
   useEffect(() => {
+    if (currentUser) return;
     const fetchUser = async () => {
       try {
         const response = await axios.get("http://localhost:9000/api/v0/get-me", {
           withCredentials: true,
         });
-
-        const user = response.data;
+        const user = response.data.data;
         dispatch(setCurrentUser(user));
-
         if (allowedRoles && !allowedRoles.includes(user.role)) {
           console.error("User role not authorized:", user.role);
           router.replace("/unauthorized");
@@ -41,7 +41,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     };
 
     fetchUser();
-  }, [dispatch, router, allowedRoles]);
+  }, [allowedRoles, currentUser]);
 
   if (loading) {
     return (

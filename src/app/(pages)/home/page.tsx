@@ -10,7 +10,7 @@ import JobSearch from "@/components/home-components/job-search";
 import JobGrid from "@/components/home-components/job-grid";
 import ApprovalAlert from "@/components/home-components/approval-alert";
 import ProtectedRoute from "@/components/global/ProtectedRoute";
-
+import { useSelector } from "react-redux";
 export default function Home() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -22,7 +22,8 @@ export default function Home() {
   const [radiusFilter, setRadiusFilter] = useState<number[]>([0, 30]);
   const [filteredJobs, setFilteredJobs] = useState(sampleJobs);
   const [sortBy, setSortBy] = useState("newest");
-
+  const currentUser = useSelector((state: any) => state.user?.currentUser || "");
+  console.log("current user is", currentUser);
   useEffect(() => {
     const storedUserType = localStorage.getItem("userType");
 
@@ -107,10 +108,8 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-        <Navbar notificationCount={5} isLoggedIn={isLoggedIn} userType={userType} onLogout={handleLogout} />
-
-        {/* Pass userType to MainSection */}
-        <MainSection userType={userType} />
+        <Navbar />
+        <MainSection userType={currentUser.role} />
 
         <main className="container mx-auto px-4 py-8 max-w-7xl">
           {/* <div className="flex justify-between items-center mb-8">
