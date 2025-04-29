@@ -33,7 +33,7 @@ const theme = createTheme({
       paper: "#ffffff",
     },
     error: {
-      main: "#d32f2f", 
+      main: "#d32f2f",
     },
   },
 })
@@ -78,7 +78,25 @@ export default function PasswordSetup() {
     // Retrieve user data from localStorage
     const storedData = localStorage.getItem("signupData")
     if (storedData) {
-      setUserData(JSON.parse(storedData))
+      const parsedData = JSON.parse(storedData)
+      setUserData(parsedData)
+
+      // Check if we have the document files in sessionStorage
+      const idDoc = sessionStorage.getItem("idDocumentFile")
+      const qualDoc = sessionStorage.getItem("qualificationDocumentFile")
+
+      console.log("Document check on load:", {
+        idDocument: idDoc ? "Found" : "Not found",
+        qualificationDocument: qualDoc ? "Found" : "Not found",
+      })
+
+      // If documents are missing, show an error
+      if (!idDoc || !qualDoc) {
+        setErrors((prev) => ({
+          ...prev,
+          general: "Both id document and qualification documents are required.",
+        }))
+      }
     } else {
       // If no data is found, redirect back to the signup page
       router.push("/signup")
@@ -146,6 +164,15 @@ export default function PasswordSetup() {
     let completeUserData: any
 
     if (userData.userType === "job-seeker") {
+      // Get the stored files from sessionStorage
+      const idDocumentBase64 = sessionStorage.getItem("idDocumentFile")
+      const qualificationDocumentBase64 = sessionStorage.getItem("qualificationDocumentFile")
+
+      console.log("Retrieved document files:", {
+        idDocument: idDocumentBase64 ? "Found" : "Not found",
+        qualificationDocument: qualificationDocumentBase64 ? "Found" : "Not found",
+      })
+
       completeUserData = {
         role: "job_seeker",
         email: userData.email,
@@ -154,9 +181,16 @@ export default function PasswordSetup() {
         full_name: userData.name,
         trade: userData.trade,
         travel_radius_km: userData.travelRadius,
-        profile_picture: userData.profilePicture || "https://example.com/profile.jpg",
-        id_document: userData.idDocument || "https://example.com/id.jpg",
+        id_document: idDocumentBase64 || "",
+        qualification_document: qualificationDocumentBase64 || "",
       }
+
+      // Log the data being sent to the API
+      console.log("Sending registration data with documents:", {
+        ...completeUserData,
+        id_document: completeUserData.id_document ? "Document included" : "Missing",
+        qualification_document: completeUserData.qualification_document ? "Document included" : "Missing",
+      })
     } else if (userData.userType === "main-contractor") {
       completeUserData = {
         role: "main_contractor",
@@ -185,11 +219,56 @@ export default function PasswordSetup() {
     }
 
     try {
-      await registerUser(completeUserData).unwrap()
-      localStorage.removeItem("signupData")
-      dispatch(setEmail(userData.email))
-      router.push("/signup/success")
+      // If we're using the API that expects multipart/form-data
+      if (userData.userType === "job-seeker") {
+        const formData = new FormData()
+
+        // Add all the text fields
+        formData.append("role", completeUserData.role)
+        formData.append("email", completeUserData.email)
+        formData.append("password", completeUserData.password)
+        formData.append("phone_number", completeUserData.phone_number)
+        formData.append("full_name", completeUserData.full_name)
+        formData.append("trade", completeUserData.trade)
+        formData.append("travel_radius_km", completeUserData.travel_radius_km)
+
+        // Convert base64 back to files if needed
+        if (completeUserData.id_document && completeUserData.id_document.startsWith("data:")) {
+          const idDocBlob = await fetch(completeUserData.id_document).then((r) => r.blob())
+          formData.append("id_document", idDocBlob, "id_document.png")
+        }
+
+        if (completeUserData.qualification_document && completeUserData.qualification_document.startsWith("data:")) {
+          const qualDocBlob = await fetch(completeUserData.qualification_document).then((r) => r.blob())
+          formData.append("qualification_document", qualDocBlob, "qualification_document.png")
+        }
+
+        // Make a direct fetch call instead of using the mutation
+        const response = await fetch("http://localhost:9000/api/v0/register", {
+          method: "POST",
+          body: formData,
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw { data: { message: errorData.message || "Registration failed" } }
+        }
+
+        // Success handling
+        localStorage.removeItem("signupData")
+        sessionStorage.removeItem("idDocumentFile")
+        sessionStorage.removeItem("qualificationDocumentFile")
+        dispatch(setEmail(userData.email))
+        router.push("/signup/success")
+      } else {
+        // For other user types, use the existing mutation
+        await registerUser(completeUserData).unwrap()
+        localStorage.removeItem("signupData")
+        dispatch(setEmail(userData.email))
+        router.push("/signup/success")
+      }
     } catch (err: any) {
+      console.error("Registration error:", err)
       setErrors((prev) => ({
         ...prev,
         general: err?.data?.message || "Registration failed",
@@ -222,8 +301,8 @@ export default function PasswordSetup() {
             sx={{
               width: "100%",
               maxWidth: "500px",
-              boxShadow: "none", 
-              border: "none", 
+              boxShadow: "none",
+              border: "none",
             }}
           >
             <CardHeader
@@ -366,10 +445,10 @@ export default function PasswordSetup() {
         <Box
           sx={{
             width: "50%",
-            bgcolor: "#F5F5FA", 
+            bgcolor: "#F5F5FA",
             display: { xs: "none", md: "block" },
             position: "relative",
-            height: "100vh", 
+            height: "100vh",
             overflow: "hidden",
           }}
         >

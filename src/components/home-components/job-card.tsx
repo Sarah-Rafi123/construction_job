@@ -11,7 +11,7 @@ interface JobCardProps {
 
 export default function JobCard({ job, router }: JobCardProps) {
   const handleViewDetails = () => {
-    router.push(`/job/${job.id}`)
+    router.push(`/apply/${job.id}`)
   }
 
   return (

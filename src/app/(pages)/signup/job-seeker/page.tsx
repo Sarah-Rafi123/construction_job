@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -16,7 +16,6 @@ import Slider from "@mui/material/Slider"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
 import Chip from "@mui/material/Chip"
-import Stack from "@mui/material/Stack"
 
 const theme = createTheme({
   palette: {
@@ -29,16 +28,14 @@ const theme = createTheme({
       paper: "#ffffff",
     },
     error: {
-      main: "#d32f2f", // Red color for errors
+      main: "#d32f2f",
     },
   },
 })
-
-// Custom error message component with fixed height to prevent layout shifts
 const ErrorMessage = ({ message }: { message: string }) => (
   <Box
     sx={{
-      height: "20px", // Fixed height for error container
+      height: "20px",
       mt: 0.5,
       display: "flex",
       alignItems: "center",
@@ -62,28 +59,69 @@ interface UploadedFile {
 }
 
 export default function JobSeekerSignup() {
+  console.log("Component rendered")
+
   const router = useRouter()
+  console.log("Router instance:", router)
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [travelRadius, setTravelRadius] = useState(5) // Default to 5km
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [shouldNavigate, setShouldNavigate] = useState(false)
+  const [navigationPath, setNavigationPath] = useState("")
+
+  // Add these refs at the top of the component
+  const idDocumentInputRef = useRef<HTMLInputElement>(null)
+  const qualificationDocumentInputRef = useRef<HTMLInputElement>(null)
+
+  // Replace the uploadedFiles state with separate states for each document
+  const [idDocument, setIdDocument] = useState<UploadedFile | null>(null)
+  const [qualificationDocument, setQualificationDocument] = useState<UploadedFile | null>(null)
 
   const [formData, setFormData] = useState({
     name: "",
-    companyName: "",
+
     contactNumber: "",
     email: "",
     trade: "",
+    idDocument: "",
+    qualificationDocument: "",
   })
 
+  // Update the errors state
   const [errors, setErrors] = useState({
     name: "",
-    companyName: "",
+   
     contactNumber: "",
     email: "",
     trade: "",
-    fileUpload: "",
+    idDocument: "",
+    qualificationDocument: "",
   })
+
+  // Effect for navigation after state update
+  useEffect(() => {
+    console.log("Navigation effect triggered:", { shouldNavigate, navigationPath })
+
+    if (shouldNavigate && navigationPath) {
+      console.log("Attempting to navigate to:", navigationPath)
+      try {
+        router.push(navigationPath)
+        console.log("Router.push called successfully")
+      } catch (error) {
+        console.error("Error during router.push:", error)
+      }
+    }
+  }, [shouldNavigate, navigationPath, router])
+
+  // Debug effect to log localStorage on mount
+  useEffect(() => {
+    try {
+      const storedData = localStorage.getItem("signupData")
+      console.log("Current localStorage signupData:", storedData ? JSON.parse(storedData) : "None")
+    } catch (error) {
+      console.error("Error reading localStorage:", error)
+    }
+  }, [])
 
   // Validation functions
   const validateName = (name: string) => {
@@ -109,7 +147,7 @@ export default function JobSeekerSignup() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
     if (id === "contactNumber" && value !== "" && !/^\d*$/.test(value)) {
-      return 
+      return
     }
 
     setFormData((prev) => ({
@@ -122,36 +160,59 @@ export default function JobSeekerSignup() {
     }))
   }
 
-  const handleFileUpload = (files: FileList | null) => {
+  const handleIdDocumentUpload = (files: FileList | null) => {
     if (!files || files.length === 0) return
 
-    const newFiles: UploadedFile[] = Array.from(files).map((file) => ({
+    const file = files[0]
+    const newFile: UploadedFile = {
       id: Math.random().toString(36).substring(2, 9),
       name: file.name,
       size: file.size,
       type: file.type,
       url: URL.createObjectURL(file),
-    }))
+    }
 
-    setUploadedFiles((prev) => [...prev, ...newFiles])
+    console.log("ID Document uploaded:", newFile)
+    setIdDocument(newFile)
     setErrors((prev) => ({
       ...prev,
-      fileUpload: "",
+      idDocument: "",
     }))
   }
 
-  const handleRemoveFile = (id: string) => {
-    setUploadedFiles((prev) => prev.filter((file) => file.id !== id))
+  const handleQualificationDocumentUpload = (files: FileList | null) => {
+    if (!files || files.length === 0) return
+
+    const file = files[0]
+    const newFile: UploadedFile = {
+      id: Math.random().toString(36).substring(2, 9),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      url: URL.createObjectURL(file),
+    }
+
+    console.log("Qualification Document uploaded:", newFile)
+    setQualificationDocument(newFile)
+    setErrors((prev) => ({
+      ...prev,
+      qualificationDocument: "",
+    }))
   }
 
   const validateForm = () => {
+    console.log("Validating form with data:", formData)
+    console.log("ID Document:", idDocument)
+    console.log("Qualification Document:", qualificationDocument)
+
     const newErrors = {
       name: "",
-      companyName: "",
+  
       contactNumber: "",
       email: "",
       trade: "",
-      fileUpload: "",
+      idDocument: "",
+      qualificationDocument: "",
     }
     let isValid = true
 
@@ -164,12 +225,7 @@ export default function JobSeekerSignup() {
       isValid = false
     }
 
-    // Validate company name (now required)
-    if (!formData.companyName.trim()) {
-      newErrors.companyName = "Company name is required"
-      isValid = false
-    }
-
+   
     // Validate email
     if (!formData.email) {
       newErrors.email = "Email is required"
@@ -187,6 +243,7 @@ export default function JobSeekerSignup() {
       newErrors.contactNumber = "Contact number should only contain digits"
       isValid = false
     }
+
     if (!formData.trade.trim()) {
       newErrors.trade = "Trade is required"
       isValid = false
@@ -195,67 +252,136 @@ export default function JobSeekerSignup() {
       isValid = false
     }
 
-    // Validate file upload
-    if (uploadedFiles.length === 0) {
-      newErrors.fileUpload = "Please upload at least one document"
+    // Validate ID document upload
+    if (!idDocument) {
+      newErrors.idDocument = "Please upload your ID document"
       isValid = false
     }
+
+    // Validate qualification document upload
+    if (!qualificationDocument) {
+      newErrors.qualificationDocument = "Please upload your qualification document"
+      isValid = false
+    }
+
+    console.log("Validation result:", isValid ? "Valid" : "Invalid")
+    console.log("Validation errors:", newErrors)
 
     setErrors(newErrors)
     return isValid
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
+    e.preventDefault()
+    console.log("Form submitted")
+
     if (!validateForm()) {
-      return;
+      console.log("Form validation failed")
+      return
     }
-  
-    setIsSubmitting(true);
-  
+
+    console.log("Form validation passed, proceeding with submission")
+    setIsSubmitting(true)
+
     try {
-      const response = await fetch('http://localhost:9000/api/v0/check-email', {
-        method: 'POST',
+      console.log("Sending API request to check email:", formData.email)
+
+      const response = await fetch("http://localhost:9000/api/v0/check-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email: formData.email }),
-      });
-  
-      const data = await response.json();
-  
+      })
+
+      console.log("API response status:", response.status)
+      const data = await response.json()
+      console.log("API response data:", data)
+
       if (data.success) {
-        const fileUrls = uploadedFiles.map((file) => file.url || "");
-  
-        localStorage.setItem(
-          "signupData",
-          JSON.stringify({
-            ...formData,
-            travelRadius,
-            userType: "job-seeker",
-            documents: fileUrls,
-          }),
-        );
-  
-        router.push("/signup/password");
+        console.log("Email check successful, preparing to navigate")
+
+        const dataToStore = {
+          ...formData,
+          travelRadius,
+          userType: "job-seeker",
+          idDocument: idDocument?.name || "",
+          qualificationDocument: qualificationDocument?.name || "",
+        }
+
+        // Store the actual file objects in sessionStorage or as FormData
+        if (idDocument && qualificationDocument) {
+          // Create a FormData object to store the files
+          const formData = new FormData()
+
+          // Get the actual files from the refs
+          const idFile = idDocumentInputRef.current?.files?.[0]
+          const qualificationFile = qualificationDocumentInputRef.current?.files?.[0]
+
+          if (idFile && qualificationFile) {
+            // Store the files in sessionStorage as base64 strings
+            const storeFileAsBase64 = async (file, key) => {
+              return new Promise((resolve) => {
+                const reader = new FileReader()
+                reader.onloadend = () => {
+                  const base64String = reader.result
+                  sessionStorage.setItem(key, base64String)
+                  resolve()
+                }
+                reader.readAsDataURL(file)
+              })
+            }
+
+            // Store both files
+            await storeFileAsBase64(idFile, "idDocumentFile")
+            await storeFileAsBase64(qualificationFile, "qualificationDocumentFile")
+            console.log("Files stored in sessionStorage")
+          }
+        }
+
+        console.log("Storing data in localStorage:", dataToStore)
+
+        try {
+          localStorage.setItem("signupData", JSON.stringify(dataToStore))
+          console.log("Data successfully stored in localStorage")
+        } catch (storageError) {
+          console.error("Error storing data in localStorage:", storageError)
+        }
+
+        console.log("Attempting navigation with router.push")
+        try {
+          router.push("/signup/password")
+          console.log("Router.push called")
+        } catch (routerError) {
+          console.error("Error with router.push:", routerError)
+        }
+
+        console.log("Setting up fallback navigation")
+        setNavigationPath("/signup/password")
+        setShouldNavigate(true)
+
+        console.log("Attempting direct navigation with window.location")
+        setTimeout(() => {
+          console.log("Executing fallback navigation with window.location")
+          window.location.href = "/signup/password"
+        }, 1000)
       } else {
+        console.log("Email already exists or API returned error")
         setErrors((prev) => ({
           ...prev,
-          email: "User with this email already exists",
-        }));
-        setIsSubmitting(false);
+          email: data.message || "User with this email already exists",
+        }))
+        setIsSubmitting(false)
       }
     } catch (error) {
-      console.error("Error checking email:", error);
+      console.error("Error during API call:", error)
       setErrors((prev) => ({
         ...prev,
         email: "Something went wrong. Please try again.",
-      }));
-      setIsSubmitting(false);
+      }))
+      setIsSubmitting(false)
     }
-  };
-  
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -273,8 +399,9 @@ export default function JobSeekerSignup() {
             display: "flex",
             flexDirection: "column",
             p: { xs: 2, sm: 4 },
-            overflowY: "auto",
-            maxHeight: "100vh",
+            height: "100vh",
+            position: "relative",
+            overflow: "hidden", // Prevent outer container from scrolling
           }}
         >
           {/* Logo and brand name */}
@@ -301,8 +428,11 @@ export default function JobSeekerSignup() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               flex: 1,
+              overflowY: "auto", // Only this container should scroll
+              height: "calc(100vh - 120px)",
+              py: 2,
             }}
           >
             <Box
@@ -338,6 +468,59 @@ export default function JobSeekerSignup() {
                         error={!!errors.name}
                       />
                       <ErrorMessage message={errors.name} />
+                    </Box>
+                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                      <FormLabel htmlFor="trade" className="text-gray-700">
+                        Trade (Job) *
+                      </FormLabel>
+                      <TextField
+                        id="trade"
+                        select
+                        variant="outlined"
+                        size="small"
+                        required
+                        fullWidth
+                        value={formData.trade}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            trade: e.target.value,
+                          }))
+                        }
+                        className="rounded"
+                        error={!!errors.trade}
+                        SelectProps={{
+                          native: true,
+                        }}
+                      >
+                        <option value="">Select your trade</option>
+                        <option value="Electrician">Electrician</option>
+                        <option value="Plumber">Plumber</option>
+                        <option value="Carpenter">Carpenter</option>
+                        <option value="Painter">Painter</option>
+                        <option value="Construction Manager">Construction Manager</option>
+                        <option value="Project Engineer">Project Engineer</option>
+                        <option value="Site Supervisor">Site Supervisor</option>
+                        <option value="General Contractor">General Contractor</option>
+                        <option value="Construction Laborer">Construction Laborer</option>
+                        <option value="Mason">Mason</option>
+                        <option value="Roofing Contractor">Roofing Contractor</option>
+                        <option value="Heavy Equipment Operator">Heavy Equipment Operator</option>
+                        <option value="Steelworker">Steelworker</option>
+                        <option value="Welder">Welder</option>
+                        <option value="Surveyor">Surveyor</option>
+                        <option value="Architect">Architect</option>
+                        <option value="Structural Engineer">Structural Engineer</option>
+                        <option value="HVAC Technician">HVAC Technician</option>
+                        <option value="Interior Designer">Interior Designer</option>
+                        <option value="Landscape Architect">Landscape Architect</option>
+                        <option value="Safety Officer">Safety Officer</option>
+                        <option value="Drywaller">Drywaller</option>
+                        <option value="Flooring Installer">Flooring Installer</option>
+                        <option value="Insulation Worker">Insulation Worker</option>
+                        <option value="Demolition Worker">Demolition Worker</option>
+                      </TextField>
+                      <ErrorMessage message={errors.trade} />
                     </Box>
                   </Box>
                   <Box sx={{ display: "flex", gap: 2 }}>
@@ -382,67 +565,83 @@ export default function JobSeekerSignup() {
                     </Box>
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <FormLabel htmlFor="trade" className="text-gray-700">
-                      Trade (Job) *
-                    </FormLabel>
-                    <TextField
-                      id="trade"
-                      placeholder="e.g. Electrician, Plumber, Carpenter"
-                      variant="outlined"
-                      size="small"
-                      required
-                      fullWidth
-                      value={formData.trade}
-                      onChange={handleChange}
-                      className="rounded"
-                      error={!!errors.trade}
-                    />
-                    <ErrorMessage message={errors.trade} />
-                  </Box>
+                  {/* Document Upload Section */}
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                      Document Upload *
+                    </Typography>
 
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <FormLabel className="text-gray-700">Upload ID/Qualifications/Profile *</FormLabel>
+                    {/* ID Document Upload */}
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <FormLabel className="text-gray-700">ID Document *</FormLabel>
+                      <Box sx={{ mb: 1 }}>
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => handleIdDocumentUpload(e.target.files)}
+                          style={{ display: "none" }}
+                          ref={idDocumentInputRef}
+                        />
+                        <Button
+                          variant="outlined"
+                          onClick={() => idDocumentInputRef.current?.click()}
+                          fullWidth
+                          sx={{
+                            textTransform: "none",
+                            borderColor: errors.idDocument ? "error.main" : undefined,
+                          }}
+                        >
+                          Upload ID Document (PDF, JPG, PNG up to 5MB)
+                        </Button>
+                      </Box>
 
-                    {/* Custom file uploader with preview */}
-                    <Box sx={{ mb: 1 }}>
-                      <input
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        multiple
-                        onChange={(e) => handleFileUpload(e.target.files)}
-                        style={{ display: "none" }}
-                        ref={fileInputRef}
-                      />
-                      <Button
-                        variant="outlined"
-                        onClick={() => fileInputRef.current?.click()}
-                        fullWidth
-                        sx={{
-                          textTransform: "none",
-                          borderColor: errors.fileUpload ? "error.main" : undefined,
-                        }}
-                      >
-                        Upload documents (PDF, JPG, PNG up to 5MB)
-                      </Button>
+                      {/* ID Document preview */}
+                      {idDocument && (
+                        <Chip
+                          label={idDocument.name}
+                          onDelete={() => setIdDocument(null)}
+                          deleteIcon={<X size={16} />}
+                          sx={{ mb: 1, maxWidth: "100%" }}
+                        />
+                      )}
+                      <ErrorMessage message={errors.idDocument} />
                     </Box>
 
-                    {/* File preview */}
-                    {uploadedFiles.length > 0 && (
-                      <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", gap: 1, mt: 1 }}>
-                        {uploadedFiles.map((file) => (
-                          <Chip
-                            key={file.id}
-                            label={file.name}
-                            onDelete={() => handleRemoveFile(file.id)}
-                            deleteIcon={<X size={16} />}
-                            sx={{ mb: 1 }}
-                          />
-                        ))}
-                      </Stack>
-                    )}
+                    {/* Qualification Document Upload */}
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <FormLabel className="text-gray-700">Qualification Document *</FormLabel>
+                      <Box sx={{ mb: 1 }}>
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => handleQualificationDocumentUpload(e.target.files)}
+                          style={{ display: "none" }}
+                          ref={qualificationDocumentInputRef}
+                        />
+                        <Button
+                          variant="outlined"
+                          onClick={() => qualificationDocumentInputRef.current?.click()}
+                          fullWidth
+                          sx={{
+                            textTransform: "none",
+                            borderColor: errors.qualificationDocument ? "error.main" : undefined,
+                          }}
+                        >
+                          Upload Qualification Document (PDF, JPG, PNG up to 5MB)
+                        </Button>
+                      </Box>
 
-                    <ErrorMessage message={errors.fileUpload} />
+                      {/* Qualification Document preview */}
+                      {qualificationDocument && (
+                        <Chip
+                          label={qualificationDocument.name}
+                          onDelete={() => setQualificationDocument(null)}
+                          deleteIcon={<X size={16} />}
+                          sx={{ mb: 1, maxWidth: "100%" }}
+                        />
+                      )}
+                      <ErrorMessage message={errors.qualificationDocument} />
+                    </Box>
                   </Box>
 
                   <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
@@ -485,6 +684,7 @@ export default function JobSeekerSignup() {
                         bgcolor: "#C08E20",
                       },
                     }}
+                    onClick={() => console.log("Submit button clicked")}
                   >
                     {isSubmitting ? "Submitting..." : "Continue to Set Password"}
                   </Button>

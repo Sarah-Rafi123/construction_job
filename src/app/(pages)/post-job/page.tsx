@@ -59,6 +59,7 @@ const theme = createTheme({
     text: {
       primary: "#000000", 
       secondary: "#4B5563", 
+    }, // <-- This closing brace was missing
   },
   components: {
     MuiButton: {
@@ -100,9 +101,9 @@ const theme = createTheme({
 })
 
 interface Service {
-  type: string
-  count: number
-  customType?: string
+  type: string;
+  count: number;
+  customType?: string;
 }
 
 interface LocationSuggestion {
@@ -689,26 +690,6 @@ export default function PostJob() {
                   />
                 </CardContent>
               </Card>
-
-              {/* Radius */}
-              <Card>
-                <CardHeader title="Travel Radius" />
-                <CardContent>
-                  <TextField
-                    required
-                    fullWidth
-                    type="number"
-                    value={radius}
-                    onChange={(e) => setRadius(e.target.value)}
-                    InputProps={{
-                      inputProps: { min: 1 },
-                      endAdornment: <InputAdornment position="end">km</InputAdornment>,
-                    }}
-                    variant="outlined"
-                  />
-                </CardContent>
-              </Card>
-
               {/* Services */}
               <Card>
                 <CardHeader

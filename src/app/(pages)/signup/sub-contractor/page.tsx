@@ -25,16 +25,15 @@ const theme = createTheme({
       paper: "#ffffff",
     },
     error: {
-      main: "#d32f2f", // Red color for errors
+      main: "#d32f2f", 
     },
   },
 })
 
-// Custom error message component with fixed height to prevent layout shifts
 const ErrorMessage = ({ message }: { message: string }) => (
   <Box
     sx={{
-      height: "20px", // Fixed height for error container
+      height: "20px", 
       mt: 0.5,
       display: "flex",
       alignItems: "center",
@@ -212,16 +211,6 @@ export default function SubContractorSignup() {
     setIsSubmitting(true)
 
     try {
-      // Prepare data for the request based on the user data and formData
-      const requestData = {
-        role: "subcontractor",
-        email: formData.email,
-        password: "your_password_here", // Replace with the actual password
-        company_name: formData.companyName,
-        company_number: formData.contactNumber,
-        services_offered: formData.services, // This will include the selected services
-        travel_radius_km: travelRadius, // This is coming from the slider
-      }
 
       const response = await fetch('http://localhost:9000/api/v0/check-email', {
         method: 'POST',
