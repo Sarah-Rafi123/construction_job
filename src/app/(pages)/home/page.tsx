@@ -16,9 +16,10 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedJobType, setSelectedJobType] = useState("All Types")
   const [selectedServiceType, setSelectedServiceType] = useState("All Services")
-  const [radiusFilter, setRadiusFilter] = useState<number[]>([0, 30])
+  const [radiusFilter, setRadiusFilter] = useState<number>(0)
   const [sortBy, setSortBy] = useState("newest")
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([])
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
 
   // Fetch jobs using Redux Toolkit Query
   const { data: jobsData, error, isLoading } = useGetJobsQuery()
@@ -28,6 +29,23 @@ export default function Home() {
       router.push("/login")
     }
   }, [isAuthenticated, router])
+
+  // Calculate distance between two points in km using Haversine formula
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371 // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1)
+    const dLon = deg2rad(lon2 - lon1)
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    const distance = R * c // Distance in km
+    return distance
+  }
+
+  const deg2rad = (deg: number): number => {
+    return deg * (Math.PI / 180)
+  }
 
   useEffect(() => {
     if (jobsData?.data?.jobs) {
@@ -40,12 +58,29 @@ export default function Home() {
 
       // Apply job type filter
       if (selectedJobType !== "All Types") {
-        results = results.filter((job) => job.job_type === selectedJobType)
+        results = results.filter((job) => job.job_type.toLowerCase() === selectedJobType.toLowerCase())
       }
 
       // Apply service type filter
       if (selectedServiceType !== "All Services") {
-        results = results.filter((job) => job.services.some((service) => service.service_name === selectedServiceType))
+        results = results.filter((job) => job.services?.some((service) => service.service_name === selectedServiceType))
+      }
+
+      // Apply radius filter if user location is available
+      if (userLocation && radiusFilter > 0) {
+        results = results.filter((job) => {
+          if (
+            job.job_location?.coordinates &&
+            Array.isArray(job.job_location.coordinates) &&
+            job.job_location.coordinates.length === 2
+          ) {
+            const jobLat = job.job_location.coordinates[1]
+            const jobLng = job.job_location.coordinates[0]
+            const distance = calculateDistance(userLocation.lat, userLocation.lng, jobLat, jobLng)
+            return distance <= radiusFilter
+          }
+          return true // Include jobs without location data
+        })
       }
 
       // Sort jobs
@@ -67,7 +102,7 @@ export default function Home() {
 
       setFilteredJobs(results)
     }
-  }, [jobsData, searchTerm, selectedJobType, selectedServiceType, radiusFilter, sortBy])
+  }, [jobsData, searchTerm, selectedJobType, selectedServiceType, radiusFilter, sortBy, userLocation])
 
   const handlePostJob = () => {
     router.push("/post-job")
@@ -110,9 +145,16 @@ export default function Home() {
             setRadiusFilter={setRadiusFilter}
             setSortBy={setSortBy}
             sortBy={sortBy}
+            userLocation={userLocation}
           />
 
-          <JobGrid jobs={filteredJobs} router={router} />
+          <JobGrid
+            jobs={filteredJobs}
+            router={router}
+            userLocation={userLocation}
+            radiusFilter={radiusFilter}
+            onUserLocationChange={setUserLocation}
+          />
         </div>
 
         <div className="mt-8 text-center">

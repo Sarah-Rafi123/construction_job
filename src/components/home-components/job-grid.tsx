@@ -2,8 +2,7 @@
 
 import type { useRouter } from "next/navigation"
 import JobCard from "./job-card"
-import Image from "next/image"
-import Map from "../../../public/assets/images/Map.png"
+import GoogleMapComponent from "../maps/google-maps"
 import type { Job } from "@/store/api/jobsApi"
 
 type Router = ReturnType<typeof useRouter>
@@ -11,9 +10,12 @@ type Router = ReturnType<typeof useRouter>
 interface JobGridProps {
   jobs: Job[]
   router: Router
+  userLocation: { lat: number; lng: number } | null
+  radiusFilter: number
+  onUserLocationChange: (location: { lat: number; lng: number } | null) => void
 }
 
-export default function JobGrid({ jobs, router }: JobGridProps) {
+export default function JobGrid({ jobs, router, userLocation, radiusFilter, onUserLocationChange }: JobGridProps) {
   if (jobs.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
@@ -34,7 +36,12 @@ export default function JobGrid({ jobs, router }: JobGridProps) {
         </div>
       </div>
       <div className="relative h-[600px] rounded-lg overflow-hidden border border-gray-200">
-        <Image src={Map || "/placeholder.svg"} alt="Job locations map" fill className="object-cover" />
+        <GoogleMapComponent
+          jobs={jobs}
+          userLocation={userLocation}
+          radiusFilter={radiusFilter}
+          onUserLocationChange={onUserLocationChange}
+        />
       </div>
     </div>
   )
