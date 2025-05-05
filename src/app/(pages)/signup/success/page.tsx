@@ -1,6 +1,5 @@
 "use client"
-
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import Box from "@mui/material/Box"
 import Card from "@mui/material/Card"
@@ -13,7 +12,9 @@ import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
 import Alert from "@mui/material/Alert"
 import CircularProgress from "@mui/material/CircularProgress"
-import { useSelector } from "react-redux"
+import { useAppSelector } from "@/store/hooks"
+import { useResendVerificationEmailMutation } from "@/store/api/authApi"
+
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -31,14 +32,14 @@ const theme = createTheme({
 })
 
 export default function SignupSuccess() {
- 
   const [isLoading, setIsLoading] = useState(false)
   const [resendStatus, setResendStatus] = useState<{
     type: "success" | "error" | null
     message: string
   }>({ type: null, message: "" })
-  const userEmail = useSelector((state: any) => state.user?.email || "")
 
+  const userEmail = useAppSelector((state) => state.user?.email || "")
+  const [resendVerificationEmail] = useResendVerificationEmailMutation()
 
   const handleResendVerificationEmail = async () => {
     if (!userEmail) {
@@ -51,34 +52,18 @@ export default function SignupSuccess() {
 
     setIsLoading(true)
     setResendStatus({ type: null, message: "" })
-    const state = useSelector((state: any) => state)
-    console.log("State object:", state)
-    
-    try {
-      const response = await fetch("http://localhost:9000/api/v0/resend-verification-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: userEmail }),
-      })
 
-      if (response.ok) {
-        setResendStatus({
-          type: "success",
-          message: "Verification email has been resent successfully!",
-        })
-      } else {
-        const errorData = await response.json()
-        setResendStatus({
-          type: "error",
-          message: errorData.message || "Failed to resend verification email. Please try again.",
-        })
-      }
-    } catch (error) {
+    try {
+      const result = await resendVerificationEmail({ email: userEmail }).unwrap()
+
+      setResendStatus({
+        type: "success",
+        message: "Verification email has been resent successfully!",
+      })
+    } catch (error: any) {
       setResendStatus({
         type: "error",
-        message: "An error occurred. Please try again later.",
+        message: error.data?.message || "Failed to resend verification email. Please try again.",
       })
     } finally {
       setIsLoading(false)
@@ -130,10 +115,10 @@ export default function SignupSuccess() {
               }
             />
             <CardContent>
-            <Typography color="text.secondary" className="text-gray-600 mb-4">
-  A verification email has been sent to your registered email address 
-  <strong>{userEmail}</strong>. Please check your inbox and follow the instructions to activate your account.
-</Typography>
+              <Typography color="text.secondary" className="text-gray-600 mb-4">
+                A verification email has been sent to your registered email address <strong>{userEmail}</strong>. Please
+                check your inbox and follow the instructions to activate your account.
+              </Typography>
               <Typography color="text.secondary" className="text-gray-600 mb-4">
                 Didn't receive the verification email? Click the button below to resend it.
               </Typography>
