@@ -19,7 +19,6 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const currentUser = useSelector((state: RootState) => state.user?.currentUser || "");
 
   useEffect(() => {
-    if (currentUser) return;
     const fetchUser = async () => {
       try {
         const response = await axios.get("http://localhost:9000/api/v0/get-me", {
@@ -27,20 +26,28 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
         });
         const user = response.data.data;
         dispatch(setCurrentUser(user));
+
         if (allowedRoles && !allowedRoles.includes(user.role)) {
-          console.error("User role not authorized:", user.role);
           router.replace("/unauthorized");
+          return;
         }
+        setLoading(false);
       } catch (error) {
         console.error("Not authenticated:", error);
         dispatch(clearCurrentUser());
         router.replace("/login");
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchUser();
+    if (!currentUser) {
+      fetchUser();
+    } else {
+      if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
+        router.replace("/unauthorized");
+      } else {
+        setLoading(false);
+      }
+    }
   }, [allowedRoles, currentUser]);
 
   if (loading) {
