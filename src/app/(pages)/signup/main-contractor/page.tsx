@@ -1,5 +1,4 @@
 "use client"
-
 import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -13,6 +12,9 @@ import TextField from "@mui/material/TextField"
 import FormLabel from "@mui/material/FormLabel"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
+import { useCheckEmailMutation } from "@/store/api/authApi"
+import { useAppDispatch } from "@/store/hooks"
+import { setEmail, setUserType } from "@/store/slices/userSlice"
 
 const theme = createTheme({
   palette: {
@@ -25,16 +27,15 @@ const theme = createTheme({
       paper: "#ffffff",
     },
     error: {
-      main: "#d32f2f", // Red color for errors
+      main: "#d32f2f",
     },
   },
 })
 
-// Custom error message component with fixed height to prevent layout shifts
 const ErrorMessage = ({ message }: { message: string }) => (
   <Box
     sx={{
-      height: "20px", // Fixed height for error container
+      height: "20px",
       mt: 0.5,
       display: "flex",
       alignItems: "center",
@@ -50,6 +51,9 @@ const ErrorMessage = ({ message }: { message: string }) => (
 
 export default function MainContractorSignup() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
+  const [checkEmail] = useCheckEmailMutation()
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     contractorName: "",
@@ -65,7 +69,6 @@ export default function MainContractorSignup() {
     email: "",
   })
 
-  // Validation functions
   const validateName = (name: string) => {
     const nameRegex = /^[a-zA-Z\s]+$/
     return nameRegex.test(name)
@@ -148,54 +151,51 @@ export default function MainContractorSignup() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
+    e.preventDefault()
+
     if (!validateForm()) {
-      return;
+      return
     }
-  
-    setIsSubmitting(true);
-  
+
+    setIsSubmitting(true)
+
     try {
-      // 1. Check email uniqueness first
-      const response = await fetch('http://localhost:9000/api/v0/check-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: formData.email }),
-      });
-  
-      const data = await response.json();
-  
-      if (data.success) {
-        // ✅ Email is unique, proceed
+      // Check email uniqueness using Redux Toolkit mutation
+      const result = await checkEmail({ email: formData.email }).unwrap()
+
+      if (result.success) {
+        // Email is unique, proceed with signup
         localStorage.setItem(
           "signupData",
           JSON.stringify({
             ...formData,
             userType: "main-contractor",
           }),
-        );
-  
-        router.push("/signup/password");
- 
+        )
+
+        // Update Redux state
+        dispatch(setEmail(formData.email))
+        dispatch(setUserType("main-contractor"))
+
+        // Navigate to password page
+        router.push("/signup/password")
+      } else {
+        // Email already exists
         setErrors((prev) => ({
           ...prev,
-          email: "User with this email already exists",
-        }));
-        setIsSubmitting(false);
+          email: result.message || "This email is already registered. Please use a different email.",
+        }))
       }
-    } catch (error) {
-      console.error("Error checking email:", error);
+    } catch (error: any) {
+      console.error("Error checking email:", error)
       setErrors((prev) => ({
         ...prev,
-        email: "Something went wrong. Please try again.",
-      }));
-      setIsSubmitting(false);
+        email: error.data?.message || "Something went wrong. Please try again.",
+      }))
+    } finally {
+      setIsSubmitting(false)
     }
-  };
-  
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -232,7 +232,7 @@ export default function MainContractorSignup() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay
+              BuildConnect
             </Typography>
           </Box>
 

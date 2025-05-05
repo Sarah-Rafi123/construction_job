@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
+import { usePostJobMutation } from "@/store/api/jobPostingApi"
 
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
@@ -40,11 +41,15 @@ import ListItemText from "@mui/material/ListItemText"
 import ListItemIcon from "@mui/material/ListItemIcon"
 import ClickAwayListener from "@mui/material/ClickAwayListener"
 import CircularProgress from "@mui/material/CircularProgress"
+import Snackbar from "@mui/material/Snackbar"
+import Alert from "@mui/material/Alert"
+import DocumentSubmissionDialog from "@/components/widgets/document-submission-dialog"
+
 const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#D49F2E", 
+      main: "#D49F2E",
     },
     success: {
       main: "#22c55e",
@@ -53,22 +58,22 @@ const theme = createTheme({
       main: "#ef4444",
     },
     background: {
-      default: "#ffffff", 
+      default: "#ffffff",
       paper: "#ffffff",
     },
     text: {
-      primary: "#000000", 
-      secondary: "#4B5563", 
-    }, // <-- This closing brace was missing
+      primary: "#000000",
+      secondary: "#4B5563",
+    },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         contained: {
           backgroundColor: "#D49F2E",
-          color: "#ffffff", 
+          color: "#ffffff",
           "&:hover": {
-            backgroundColor: "#C48E1D", 
+            backgroundColor: "#C48E1D",
           },
         },
       },
@@ -76,9 +81,9 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#ffffff", 
-          color: "#000000", 
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)", 
+          backgroundColor: "#ffffff",
+          color: "#000000",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
         },
       },
     },
@@ -101,9 +106,9 @@ const theme = createTheme({
 })
 
 interface Service {
-  type: string;
-  count: number;
-  customType?: string;
+  type: string
+  count: number
+  customType?: string
 }
 
 interface LocationSuggestion {
@@ -137,6 +142,7 @@ export default function PostJob() {
   const [map, setMap] = useState<any>(null)
   const [marker, setMarker] = useState<any>(null)
   const markerRef = useRef<any>(null) // Use a ref to track the marker across renders
+  const mapInstanceRef = useRef<any>(null) // New ref to track map instance
 
   // Form state
   const [title, setTitle] = useState("")
@@ -163,6 +169,23 @@ export default function PostJob() {
   // Check if user is authorized to access this page
   const [userType, setUserType] = useState<string | null>(null)
 
+  // API mutation hook
+  const [postJob, { isLoading: isSubmitting }] = usePostJobMutation()
+
+  // Notification state
+  const [notification, setNotification] = useState<{
+    open: boolean
+    message: string
+    severity: "success" | "error" | "info" | "warning"
+  }>({
+    open: false,
+    message: "",
+    severity: "info",
+  })
+
+  // Add this state
+  const [showDocumentDialog, setShowDocumentDialog] = useState(false)
+
   // Initialize OpenStreetMap
   useEffect(() => {
     if (typeof window !== "undefined" && !mapInitialized && mapRef.current) {
@@ -183,20 +206,32 @@ export default function PostJob() {
       setMapInitialized(true)
     }
 
-    // Cleanup function to remove marker when component unmounts
+    // Cleanup function to remove marker and map when component unmounts
     return () => {
-      if (markerRef.current && map) {
-        map.removeLayer(markerRef.current)
+      if (markerRef.current && mapInstanceRef.current) {
+        mapInstanceRef.current.removeLayer(markerRef.current)
         markerRef.current = null
       }
+
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove()
+        mapInstanceRef.current = null
+      }
     }
-  }, [mapInitialized, map])
+  }, [mapInitialized])
 
   const initializeMap = () => {
     if (!mapRef.current || !window.L) return
 
+    // Check if map is already initialized to prevent the error
+    if (mapInstanceRef.current) {
+      console.log("Map already initialized, skipping initialization")
+      return
+    }
+
     // Create map
     const newMap = window.L.map(mapRef.current).setView([40.7128, -74.006], 13)
+    mapInstanceRef.current = newMap // Store map instance in ref
 
     // Add tile layer
     window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -275,16 +310,16 @@ export default function PostJob() {
     const longitude = Number.parseFloat(suggestion.lon)
 
     // Update map view
-    if (map) {
-      map.setView([latitude, longitude], 16)
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setView([latitude, longitude], 16)
 
       // Remove existing marker if it exists
       if (markerRef.current) {
-        map.removeLayer(markerRef.current)
+        mapInstanceRef.current.removeLayer(markerRef.current)
       }
 
       // Create new marker
-      const newMarker = window.L.marker([latitude, longitude]).addTo(map)
+      const newMarker = window.L.marker([latitude, longitude]).addTo(mapInstanceRef.current)
       setMarker(newMarker)
       markerRef.current = newMarker // Update the ref
     }
@@ -318,9 +353,11 @@ export default function PostJob() {
       router.push("/")
     }
   }, [router])
+
   const handleAddService = () => {
     setServices([...services, { type: "Electrician", count: 1 }])
   }
+
   const handleRemoveService = (index: number) => {
     const updatedServices = [...services]
     updatedServices.splice(index, 1)
@@ -353,53 +390,119 @@ export default function PostJob() {
     setServices(updatedServices)
   }
 
+  // Close notification
+  const handleCloseNotification = () => {
+    setNotification({ ...notification, open: false })
+  }
+
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Process services to use customType when type is "Other"
-    const processedServices = services.map((service) => {
-      if (service.type === "Other" && service.customType) {
-        return {
-          type: service.customType,
-          count: service.count,
-        }
-      }
+    // Validate required fields
+    if (!title || !coordinates || services.length === 0) {
+      setNotification({
+        open: true,
+        message: "Please fill in all required fields",
+        severity: "error",
+      })
+      return
+    }
+
+    // Format services data according to API requirements
+    const formattedServices = services.map((service) => {
       return {
-        type: service.type,
-        count: service.count,
+        service_name: service.type === "Other" ? service.customType || "Custom Service" : service.type,
+        resource_count: service.count || 1,
+        number_of_days:
+          durationType === "days"
+            ? Number.parseInt(duration) || 1
+            : durationType === "weeks"
+              ? Number.parseInt(duration) * 7 || 7
+              : durationType === "months"
+                ? Number.parseInt(duration) * 30 || 30
+                : 7, // Default to 7 days for ongoing
       }
     })
 
-    // Create job object
-    const jobData = {
-      title,
-      description,
-      duration: {
-        type: durationType,
-        value: duration,
-      },
-      location,
-      coordinates,
-      radius,
-      services: processedServices,
-      budget: {
-        type: budgetType,
-        value: budgetType === "fixed" ? budget : "Negotiable",
-      },
-      isUrgent,
-      targetUsers,
-      jobType,
-      postedBy: userType,
-      createdAt: new Date().toISOString(),
+    // Format job type to match API requirements (lowercase with hyphen)
+    const formattedJobType = jobType.toLowerCase().replace(" ", "-")
+
+    // Format target user to match API requirements
+    let formattedTargetUser = ""
+    if (targetUsers === "Sub-contractors") {
+      formattedTargetUser = "sub_contractor"
+    } else if (targetUsers === "Job Seekers") {
+      formattedTargetUser = "job_seeker"
+    } else {
+      formattedTargetUser = "both"
     }
 
-    // In a real app, you would send this data to your API
-    console.log("Job posting data:", jobData)
+    // Create request body according to API requirements - simplified version
+    const requestBody = {
+      job_title: title,
+      job_location: {
+        coordinates: [coordinates.lng, coordinates.lat], // [longitude, latitude]
+      },
+      job_type: formattedJobType,
+      target_user: formattedTargetUser,
+      services: formattedServices,
+      // Removed: job_priority, budget, project_image, description
+    }
 
-    // Redirect back to dashboard with success message
-    // For demo purposes, we'll just redirect
-    router.push("/")
+    // Keep the detailed logging
+    console.log("=== JOB SUBMISSION DEBUG ===")
+    console.log("Full request body:", JSON.stringify(requestBody, null, 2))
+    console.log("=== FIELD BY FIELD VALIDATION ===")
+    console.log("job_title:", requestBody.job_title, "- type:", typeof requestBody.job_title)
+    console.log(
+      "job_location.coordinates:",
+      requestBody.job_location.coordinates,
+      "- type:",
+      Array.isArray(requestBody.job_location.coordinates) ? "array" : typeof requestBody.job_location.coordinates,
+    )
+    console.log("job_type:", requestBody.job_type, "- type:", typeof requestBody.job_type)
+    console.log("target_user:", requestBody.target_user, "- type:", typeof requestBody.target_user)
+    console.log("services:", requestBody.services)
+    requestBody.services.forEach((service, index) => {
+      console.log(`  Service ${index + 1}:`)
+      console.log(`    service_name: ${service.service_name} - type: ${typeof service.service_name}`)
+      console.log(`    resource_count: ${service.resource_count} - type: ${typeof service.resource_count}`)
+      console.log(`    number_of_days: ${service.number_of_days} - type: ${typeof service.number_of_days}`)
+    })
+    console.log("=== END DEBUG ===")
+
+    try {
+      // Call the API using the RTK Query mutation
+      const result = await postJob(requestBody).unwrap()
+
+      // Show success message
+      setNotification({
+        open: true,
+        message: result.message || "Job posted successfully!",
+        severity: "success",
+      })
+
+      // Redirect back to dashboard after a short delay
+      setTimeout(() => {
+        router.push("/")
+      }, 2000)
+    } catch (error: any) {
+      console.error("Error posting job:", error)
+
+      // Check if it's a forbidden error due to pending admin approval
+      if (error.status === 403 && error.data?.message?.includes("admin approval")) {
+        // Show document submission dialog
+        setShowDocumentDialog(true)
+      } else {
+        // Show generic error notification
+        setNotification({
+          open: true,
+          message: error.data?.error || "Failed to post job. Please try again.",
+          severity: "error",
+        })
+      }
+    }
   }
 
   return (
@@ -417,11 +520,28 @@ export default function PostJob() {
           </Toolbar>
         </AppBar>
 
+        {/* Notification */}
+        <Snackbar
+          open={notification.open}
+          autoHideDuration={6000}
+          onClose={handleCloseNotification}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert onClose={handleCloseNotification} severity={notification.severity} sx={{ width: "100%" }}>
+            {notification.message}
+          </Alert>
+        </Snackbar>
+
         {/* Scrollable Content */}
         <Box sx={{ flexGrow: 1, overflow: "auto", py: 4 }}>
           <Container maxWidth="md">
             <Box component="form" onSubmit={handleSubmit}>
-              <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4, color: "text.primary", textAlign: "center" }}>
+              <Typography
+                variant="h4"
+                component="h1"
+                gutterBottom
+                sx={{ mb: 4, color: "text.primary", textAlign: "center" }}
+              >
                 Create a New Job Posting
               </Typography>
 
@@ -753,8 +873,8 @@ export default function PostJob() {
 
                           <Grid item xs={12}>
                             <FormLabel required sx={{ display: "block", mb: 1 }}>
-                              Number of {service.type === "Other" ? service.customType || "Workers" : service.type + "s"}{" "}
-                              Required
+                              Number of{" "}
+                              {service.type === "Other" ? service.customType || "Workers" : service.type + "s"} Required
                             </FormLabel>
                             <TextField
                               required
@@ -816,13 +936,21 @@ export default function PostJob() {
                 <Button variant="outlined" onClick={() => router.push("/")} size="large">
                   Cancel
                 </Button>
-                <Button type="submit" variant="contained" color="primary" size="large">
-                  Post Job
+                <Button type="submit" variant="contained" color="primary" size="large" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+                      Posting...
+                    </>
+                  ) : (
+                    "Post Job"
+                  )}
                 </Button>
               </Box>
             </Box>
           </Container>
         </Box>
+        <DocumentSubmissionDialog open={showDocumentDialog} onClose={() => setShowDocumentDialog(false)} />
       </Box>
     </ThemeProvider>
   )

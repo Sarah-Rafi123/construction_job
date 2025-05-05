@@ -1,12 +1,10 @@
 "use client"
-
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Briefcase, X } from "lucide-react"
-
+import { Briefcase, Upload, X, FileText } from "lucide-react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
@@ -15,7 +13,10 @@ import FormLabel from "@mui/material/FormLabel"
 import Slider from "@mui/material/Slider"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
-import Chip from "@mui/material/Chip"
+import { useCheckEmailMutation } from "@/store/api/authApi"
+import { useAppDispatch } from "@/store/hooks"
+import { setEmail, setUserType } from "@/store/slices/userSlice"
+import IconButton from "@mui/material/IconButton"
 
 const theme = createTheme({
   palette: {
@@ -32,6 +33,7 @@ const theme = createTheme({
     },
   },
 })
+
 const ErrorMessage = ({ message }: { message: string }) => (
   <Box
     sx={{
@@ -59,10 +61,9 @@ interface UploadedFile {
 }
 
 export default function JobSeekerSignup() {
-  console.log("Component rendered")
-
   const router = useRouter()
-  console.log("Router instance:", router)
+  const dispatch = useAppDispatch()
+  const [checkEmail] = useCheckEmailMutation()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [travelRadius, setTravelRadius] = useState(5) // Default to 5km
@@ -79,7 +80,6 @@ export default function JobSeekerSignup() {
 
   const [formData, setFormData] = useState({
     name: "",
-
     contactNumber: "",
     email: "",
     trade: "",
@@ -90,7 +90,6 @@ export default function JobSeekerSignup() {
   // Update the errors state
   const [errors, setErrors] = useState({
     name: "",
-   
     contactNumber: "",
     email: "",
     trade: "",
@@ -100,28 +99,10 @@ export default function JobSeekerSignup() {
 
   // Effect for navigation after state update
   useEffect(() => {
-    console.log("Navigation effect triggered:", { shouldNavigate, navigationPath })
-
     if (shouldNavigate && navigationPath) {
-      console.log("Attempting to navigate to:", navigationPath)
-      try {
-        router.push(navigationPath)
-        console.log("Router.push called successfully")
-      } catch (error) {
-        console.error("Error during router.push:", error)
-      }
+      router.push(navigationPath)
     }
   }, [shouldNavigate, navigationPath, router])
-
-  // Debug effect to log localStorage on mount
-  useEffect(() => {
-    try {
-      const storedData = localStorage.getItem("signupData")
-      console.log("Current localStorage signupData:", storedData ? JSON.parse(storedData) : "None")
-    } catch (error) {
-      console.error("Error reading localStorage:", error)
-    }
-  }, [])
 
   // Validation functions
   const validateName = (name: string) => {
@@ -172,12 +153,18 @@ export default function JobSeekerSignup() {
       url: URL.createObjectURL(file),
     }
 
-    console.log("ID Document uploaded:", newFile)
     setIdDocument(newFile)
     setErrors((prev) => ({
       ...prev,
       idDocument: "",
     }))
+
+    // Store the file in sessionStorage as base64
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      sessionStorage.setItem("idDocumentFile", reader.result as string)
+    }
+    reader.readAsDataURL(file)
   }
 
   const handleQualificationDocumentUpload = (files: FileList | null) => {
@@ -192,22 +179,39 @@ export default function JobSeekerSignup() {
       url: URL.createObjectURL(file),
     }
 
-    console.log("Qualification Document uploaded:", newFile)
     setQualificationDocument(newFile)
     setErrors((prev) => ({
       ...prev,
       qualificationDocument: "",
     }))
+
+    // Store the file in sessionStorage as base64
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      sessionStorage.setItem("qualificationDocumentFile", reader.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const removeIdDocument = () => {
+    if (idDocument) {
+      URL.revokeObjectURL(idDocument.url || "")
+    }
+    setIdDocument(null)
+    sessionStorage.removeItem("idDocumentFile")
+  }
+
+  const removeQualificationDocument = () => {
+    if (qualificationDocument) {
+      URL.revokeObjectURL(qualificationDocument.url || "")
+    }
+    setQualificationDocument(null)
+    sessionStorage.removeItem("qualificationDocumentFile")
   }
 
   const validateForm = () => {
-    console.log("Validating form with data:", formData)
-    console.log("ID Document:", idDocument)
-    console.log("Qualification Document:", qualificationDocument)
-
     const newErrors = {
       name: "",
-  
       contactNumber: "",
       email: "",
       trade: "",
@@ -225,7 +229,6 @@ export default function JobSeekerSignup() {
       isValid = false
     }
 
-   
     // Validate email
     if (!formData.email) {
       newErrors.email = "Email is required"
@@ -264,43 +267,25 @@ export default function JobSeekerSignup() {
       isValid = false
     }
 
-    console.log("Validation result:", isValid ? "Valid" : "Invalid")
-    console.log("Validation errors:", newErrors)
-
     setErrors(newErrors)
     return isValid
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted")
 
     if (!validateForm()) {
-      console.log("Form validation failed")
       return
     }
 
-    console.log("Form validation passed, proceeding with submission")
     setIsSubmitting(true)
 
     try {
-      console.log("Sending API request to check email:", formData.email)
+      // Check email uniqueness using Redux Toolkit mutation
+      const result = await checkEmail({ email: formData.email }).unwrap()
 
-      const response = await fetch("http://localhost:9000/api/v0/check-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: formData.email }),
-      })
-
-      console.log("API response status:", response.status)
-      const data = await response.json()
-      console.log("API response data:", data)
-
-      if (data.success) {
-        console.log("Email check successful, preparing to navigate")
-
+      // If we get here, the email check was successful (email is unique)
+      if (result.success) {
         const dataToStore = {
           ...formData,
           travelRadius,
@@ -309,78 +294,38 @@ export default function JobSeekerSignup() {
           qualificationDocument: qualificationDocument?.name || "",
         }
 
-        // Store the actual file objects in sessionStorage or as FormData
-        if (idDocument && qualificationDocument) {
-          // Create a FormData object to store the files
-          const formData = new FormData()
+        // Store data in localStorage
+        localStorage.setItem("signupData", JSON.stringify(dataToStore))
 
-          // Get the actual files from the refs
-          const idFile = idDocumentInputRef.current?.files?.[0]
-          const qualificationFile = qualificationDocumentInputRef.current?.files?.[0]
+        // Update Redux state
+        dispatch(setEmail(formData.email))
+        dispatch(setUserType("job-seeker"))
 
-          if (idFile && qualificationFile) {
-            // Store the files in sessionStorage as base64 strings
-            const storeFileAsBase64 = async (file, key) => {
-              return new Promise((resolve) => {
-                const reader = new FileReader()
-                reader.onloadend = () => {
-                  const base64String = reader.result
-                  sessionStorage.setItem(key, base64String)
-                  resolve()
-                }
-                reader.readAsDataURL(file)
-              })
-            }
-
-            // Store both files
-            await storeFileAsBase64(idFile, "idDocumentFile")
-            await storeFileAsBase64(qualificationFile, "qualificationDocumentFile")
-            console.log("Files stored in sessionStorage")
-          }
-        }
-
-        console.log("Storing data in localStorage:", dataToStore)
-
-        try {
-          localStorage.setItem("signupData", JSON.stringify(dataToStore))
-          console.log("Data successfully stored in localStorage")
-        } catch (storageError) {
-          console.error("Error storing data in localStorage:", storageError)
-        }
-
-        console.log("Attempting navigation with router.push")
-        try {
-          router.push("/signup/password")
-          console.log("Router.push called")
-        } catch (routerError) {
-          console.error("Error with router.push:", routerError)
-        }
-
-        console.log("Setting up fallback navigation")
-        setNavigationPath("/signup/password")
-        setShouldNavigate(true)
-
-        console.log("Attempting direct navigation with window.location")
-        setTimeout(() => {
-          console.log("Executing fallback navigation with window.location")
-          window.location.href = "/signup/password"
-        }, 1000)
+        // Navigate to password page
+        router.push("/signup/password")
       } else {
-        console.log("Email already exists or API returned error")
+        // If the API returns success: false, it means the email already exists
         setErrors((prev) => ({
           ...prev,
-          email: data.message || "User with this email already exists",
+          email: result.message || "This email is already registered. Please use a different email.",
         }))
-        setIsSubmitting(false)
       }
-    } catch (error) {
-      console.error("Error during API call:", error)
+    } catch (error: any) {
+      // Handle API errors
       setErrors((prev) => ({
         ...prev,
-        email: "Something went wrong. Please try again.",
+        email: error.data?.message || "This email is already registered or there was an error checking the email.",
       }))
+    } finally {
       setIsSubmitting(false)
     }
+  }
+
+  // Format file size for display
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " bytes"
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB"
+    else return (bytes / 1048576).toFixed(1) + " MB"
   }
 
   return (
@@ -393,15 +338,15 @@ export default function JobSeekerSignup() {
         }}
         className="bg-white"
       >
+        {/* Left side - Signup Form */}
         <Box
           sx={{
             width: { xs: "100%", md: "50%" },
             display: "flex",
             flexDirection: "column",
             p: { xs: 2, sm: 4 },
-            height: "100vh",
-            position: "relative",
-            overflow: "hidden", // Prevent outer container from scrolling
+            overflowY: "auto",
+            maxHeight: "100vh",
           }}
         >
           {/* Logo and brand name */}
@@ -428,17 +373,14 @@ export default function JobSeekerSignup() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "flex-start",
+              justifyContent: "center",
               flex: 1,
-              overflowY: "auto", // Only this container should scroll
-              height: "calc(100vh - 120px)",
-              py: 2,
             }}
           >
             <Box
               sx={{
                 width: "100%",
-                maxWidth: "480px", // Narrower content area like in the image
+                maxWidth: "480px",
               }}
             >
               <Typography variant="h4" fontWeight="bold" sx={{ mb: 1, color: "#333" }}>
@@ -450,198 +392,83 @@ export default function JobSeekerSignup() {
 
               <form onSubmit={handleSubmit}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  <Box sx={{ display: "flex", gap: 2 }}>
-                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                      <FormLabel htmlFor="name" className="text-gray-700">
-                        Name *
-                      </FormLabel>
-                      <TextField
-                        id="name"
-                        variant="outlined"
-                        size="small"
-                        required
-                        fullWidth
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Enter your full name"
-                        className="rounded"
-                        error={!!errors.name}
-                      />
-                      <ErrorMessage message={errors.name} />
-                    </Box>
-                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                      <FormLabel htmlFor="trade" className="text-gray-700">
-                        Trade (Job) *
-                      </FormLabel>
-                      <TextField
-                        id="trade"
-                        select
-                        variant="outlined"
-                        size="small"
-                        required
-                        fullWidth
-                        value={formData.trade}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            trade: e.target.value,
-                          }))
-                        }
-                        className="rounded"
-                        error={!!errors.trade}
-                        SelectProps={{
-                          native: true,
-                        }}
-                      >
-                        <option value="">Select your trade</option>
-                        <option value="Electrician">Electrician</option>
-                        <option value="Plumber">Plumber</option>
-                        <option value="Carpenter">Carpenter</option>
-                        <option value="Painter">Painter</option>
-                        <option value="Construction Manager">Construction Manager</option>
-                        <option value="Project Engineer">Project Engineer</option>
-                        <option value="Site Supervisor">Site Supervisor</option>
-                        <option value="General Contractor">General Contractor</option>
-                        <option value="Construction Laborer">Construction Laborer</option>
-                        <option value="Mason">Mason</option>
-                        <option value="Roofing Contractor">Roofing Contractor</option>
-                        <option value="Heavy Equipment Operator">Heavy Equipment Operator</option>
-                        <option value="Steelworker">Steelworker</option>
-                        <option value="Welder">Welder</option>
-                        <option value="Surveyor">Surveyor</option>
-                        <option value="Architect">Architect</option>
-                        <option value="Structural Engineer">Structural Engineer</option>
-                        <option value="HVAC Technician">HVAC Technician</option>
-                        <option value="Interior Designer">Interior Designer</option>
-                        <option value="Landscape Architect">Landscape Architect</option>
-                        <option value="Safety Officer">Safety Officer</option>
-                        <option value="Drywaller">Drywaller</option>
-                        <option value="Flooring Installer">Flooring Installer</option>
-                        <option value="Insulation Worker">Insulation Worker</option>
-                        <option value="Demolition Worker">Demolition Worker</option>
-                      </TextField>
-                      <ErrorMessage message={errors.trade} />
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: "flex", gap: 2 }}>
-                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                      <FormLabel htmlFor="email" className="text-gray-700">
-                        Email Address *
-                      </FormLabel>
-                      <TextField
-                        id="email"
-                        type="email"
-                        variant="outlined"
-                        size="small"
-                        required
-                        fullWidth
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="example@email.com"
-                        className="rounded"
-                        error={!!errors.email}
-                      />
-                      <ErrorMessage message={errors.email} />
-                    </Box>
-                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                      <FormLabel htmlFor="contactNumber" className="text-gray-700">
-                        Contact Number *
-                      </FormLabel>
-                      <TextField
-                        id="contactNumber"
-                        type="tel"
-                        variant="outlined"
-                        size="small"
-                        required
-                        fullWidth
-                        value={formData.contactNumber}
-                        onChange={handleChange}
-                        placeholder="Enter digits only"
-                        className="rounded"
-                        error={!!errors.contactNumber}
-                        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                      />
-                      <ErrorMessage message={errors.contactNumber} />
-                    </Box>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <FormLabel htmlFor="name" className="text-gray-700">
+                      Full Name *
+                    </FormLabel>
+                    <TextField
+                      id="name"
+                      variant="outlined"
+                      size="small"
+                      required
+                      fullWidth
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="rounded"
+                      placeholder="Enter your full name"
+                      error={!!errors.name}
+                    />
+                    <ErrorMessage message={errors.name} />
                   </Box>
 
-                  {/* Document Upload Section */}
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                      Document Upload *
-                    </Typography>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <FormLabel htmlFor="email" className="text-gray-700">
+                      Email Address *
+                    </FormLabel>
+                    <TextField
+                      id="email"
+                      type="email"
+                      variant="outlined"
+                      size="small"
+                      required
+                      fullWidth
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="rounded"
+                      placeholder="Enter your email address"
+                      error={!!errors.email}
+                    />
+                    <ErrorMessage message={errors.email} />
+                  </Box>
 
-                    {/* ID Document Upload */}
-                    <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <FormLabel className="text-gray-700">ID Document *</FormLabel>
-                      <Box sx={{ mb: 1 }}>
-                        <input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => handleIdDocumentUpload(e.target.files)}
-                          style={{ display: "none" }}
-                          ref={idDocumentInputRef}
-                        />
-                        <Button
-                          variant="outlined"
-                          onClick={() => idDocumentInputRef.current?.click()}
-                          fullWidth
-                          sx={{
-                            textTransform: "none",
-                            borderColor: errors.idDocument ? "error.main" : undefined,
-                          }}
-                        >
-                          Upload ID Document (PDF, JPG, PNG up to 5MB)
-                        </Button>
-                      </Box>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <FormLabel htmlFor="contactNumber" className="text-gray-700">
+                      Contact Number *
+                    </FormLabel>
+                    <TextField
+                      id="contactNumber"
+                      type="tel"
+                      variant="outlined"
+                      size="small"
+                      required
+                      fullWidth
+                      value={formData.contactNumber}
+                      onChange={handleChange}
+                      className="rounded"
+                      placeholder="Enter digits only"
+                      error={!!errors.contactNumber}
+                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                    />
+                    <ErrorMessage message={errors.contactNumber} />
+                  </Box>
 
-                      {/* ID Document preview */}
-                      {idDocument && (
-                        <Chip
-                          label={idDocument.name}
-                          onDelete={() => setIdDocument(null)}
-                          deleteIcon={<X size={16} />}
-                          sx={{ mb: 1, maxWidth: "100%" }}
-                        />
-                      )}
-                      <ErrorMessage message={errors.idDocument} />
-                    </Box>
-
-                    {/* Qualification Document Upload */}
-                    <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <FormLabel className="text-gray-700">Qualification Document *</FormLabel>
-                      <Box sx={{ mb: 1 }}>
-                        <input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => handleQualificationDocumentUpload(e.target.files)}
-                          style={{ display: "none" }}
-                          ref={qualificationDocumentInputRef}
-                        />
-                        <Button
-                          variant="outlined"
-                          onClick={() => qualificationDocumentInputRef.current?.click()}
-                          fullWidth
-                          sx={{
-                            textTransform: "none",
-                            borderColor: errors.qualificationDocument ? "error.main" : undefined,
-                          }}
-                        >
-                          Upload Qualification Document (PDF, JPG, PNG up to 5MB)
-                        </Button>
-                      </Box>
-
-                      {/* Qualification Document preview */}
-                      {qualificationDocument && (
-                        <Chip
-                          label={qualificationDocument.name}
-                          onDelete={() => setQualificationDocument(null)}
-                          deleteIcon={<X size={16} />}
-                          sx={{ mb: 1, maxWidth: "100%" }}
-                        />
-                      )}
-                      <ErrorMessage message={errors.qualificationDocument} />
-                    </Box>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <FormLabel htmlFor="trade" className="text-gray-700">
+                      Trade *
+                    </FormLabel>
+                    <TextField
+                      id="trade"
+                      variant="outlined"
+                      size="small"
+                      required
+                      fullWidth
+                      value={formData.trade}
+                      onChange={handleChange}
+                      className="rounded"
+                      placeholder="Enter your trade (e.g., Electrician, Plumber)"
+                      error={!!errors.trade}
+                    />
+                    <ErrorMessage message={errors.trade} />
                   </Box>
 
                   <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
@@ -670,6 +497,126 @@ export default function JobSeekerSignup() {
                     </Box>
                   </Box>
 
+                  {/* ID Document Upload */}
+                  <Box sx={{ display: "flex", flexDirection: "column", mt: 1 }}>
+                    <FormLabel className="text-gray-700">ID Document *</FormLabel>
+                    <input
+                      type="file"
+                      id="idDocument"
+                      ref={idDocumentInputRef}
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      style={{ display: "none" }}
+                      onChange={(e) => handleIdDocumentUpload(e.target.files)}
+                    />
+                    {!idDocument ? (
+                      <Button
+                        variant="outlined"
+                        component="label"
+                        htmlFor="idDocument"
+                        startIcon={<Upload size={18} />}
+                        fullWidth
+                        sx={{
+                          textTransform: "none",
+                          borderColor: errors.idDocument ? "error.main" : "divider",
+                          color: "text.primary",
+                          py: 1,
+                          "&:hover": {
+                            borderColor: "#D49F2E",
+                            backgroundColor: "rgba(212, 159, 46, 0.04)",
+                          },
+                        }}
+                      >
+                        Upload ID Document
+                      </Button>
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          p: 1.5,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 1,
+                          backgroundColor: "rgba(0, 0, 0, 0.02)",
+                        }}
+                      >
+                        <FileText size={20} className="text-gray-500 mr-2" />
+                        <Box sx={{ flex: 1, ml: 1 }}>
+                          <Typography variant="body2" noWrap>
+                            {idDocument.name}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatFileSize(idDocument.size)}
+                          </Typography>
+                        </Box>
+                        <IconButton size="small" onClick={removeIdDocument} sx={{ color: "text.secondary" }}>
+                          <X size={18} />
+                        </IconButton>
+                      </Box>
+                    )}
+                    <ErrorMessage message={errors.idDocument} />
+                  </Box>
+
+                  {/* Qualification Document Upload */}
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <FormLabel className="text-gray-700">Qualification Document *</FormLabel>
+                    <input
+                      type="file"
+                      id="qualificationDocument"
+                      ref={qualificationDocumentInputRef}
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      style={{ display: "none" }}
+                      onChange={(e) => handleQualificationDocumentUpload(e.target.files)}
+                    />
+                    {!qualificationDocument ? (
+                      <Button
+                        variant="outlined"
+                        component="label"
+                        htmlFor="qualificationDocument"
+                        startIcon={<Upload size={18} />}
+                        fullWidth
+                        sx={{
+                          textTransform: "none",
+                          borderColor: errors.qualificationDocument ? "error.main" : "divider",
+                          color: "text.primary",
+                          py: 1,
+                          "&:hover": {
+                            borderColor: "#D49F2E",
+                            backgroundColor: "rgba(212, 159, 46, 0.04)",
+                          },
+                        }}
+                      >
+                        Upload Qualification Document
+                      </Button>
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          p: 1.5,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 1,
+                          backgroundColor: "rgba(0, 0, 0, 0.02)",
+                        }}
+                      >
+                        <FileText size={20} className="text-gray-500 mr-2" />
+                        <Box sx={{ flex: 1, ml: 1 }}>
+                          <Typography variant="body2" noWrap>
+                            {qualificationDocument.name}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatFileSize(qualificationDocument.size)}
+                          </Typography>
+                        </Box>
+                        <IconButton size="small" onClick={removeQualificationDocument} sx={{ color: "text.secondary" }}>
+                          <X size={18} />
+                        </IconButton>
+                      </Box>
+                    )}
+                    <ErrorMessage message={errors.qualificationDocument} />
+                  </Box>
+
                   <Button
                     type="submit"
                     variant="contained"
@@ -684,7 +631,6 @@ export default function JobSeekerSignup() {
                         bgcolor: "#C08E20",
                       },
                     }}
-                    onClick={() => console.log("Submit button clicked")}
                   >
                     {isSubmitting ? "Submitting..." : "Continue to Set Password"}
                   </Button>

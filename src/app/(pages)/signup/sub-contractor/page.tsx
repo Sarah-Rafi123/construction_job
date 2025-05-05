@@ -13,6 +13,9 @@ import FormLabel from "@mui/material/FormLabel"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
 import { Autocomplete, Chip, Slider } from "@mui/material"
+import { useCheckEmailMutation } from "@/store/api/authApi"
+import { useAppDispatch } from "@/store/hooks"
+import { setEmail, setUserType } from "@/store/slices/userSlice"
 
 const theme = createTheme({
   palette: {
@@ -25,7 +28,7 @@ const theme = createTheme({
       paper: "#ffffff",
     },
     error: {
-      main: "#d32f2f", 
+      main: "#d32f2f",
     },
   },
 })
@@ -33,7 +36,7 @@ const theme = createTheme({
 const ErrorMessage = ({ message }: { message: string }) => (
   <Box
     sx={{
-      height: "20px", 
+      height: "20px",
       mt: 0.5,
       display: "flex",
       alignItems: "center",
@@ -78,6 +81,9 @@ const predefinedServices = [
 
 export default function SubContractorSignup() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
+  const [checkEmail] = useCheckEmailMutation()
+
   const [travelRadius, setTravelRadius] = useState(5) // Default to 5 km
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -211,18 +217,11 @@ export default function SubContractorSignup() {
     setIsSubmitting(true)
 
     try {
+      // Check email uniqueness using Redux Toolkit mutation
+      const result = await checkEmail({ email: formData.email }).unwrap()
 
-      const response = await fetch('http://localhost:9000/api/v0/check-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: formData.email }),
-      });
-  
-      const data = await response.json()
-
-      if (data.success) {
+      if (result.success) {
+        // Email is unique, proceed with signup
         localStorage.setItem(
           "signupData",
           JSON.stringify({
@@ -232,20 +231,26 @@ export default function SubContractorSignup() {
           }),
         )
 
+        // Update Redux state
+        dispatch(setEmail(formData.email))
+        dispatch(setUserType("sub-contractor"))
+
+        // Navigate to password page
         router.push("/signup/password")
       } else {
+        // Email already exists
         setErrors((prev) => ({
           ...prev,
-          email: data.message || "User with this email already exists",
+          email: result.message || "This email is already registered. Please use a different email.",
         }))
-        setIsSubmitting(false)
       }
-    } catch (error) {
-      console.error("Error during registration:", error)
+    } catch (error: any) {
+      console.error("Error during email check:", error)
       setErrors((prev) => ({
         ...prev,
-        email: "Something went wrong. Please try again.",
+        email: error.data?.message || "This email is already registered or there was an error checking the email.",
       }))
+    } finally {
       setIsSubmitting(false)
     }
   }

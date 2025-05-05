@@ -1,10 +1,11 @@
 "use client"
 
 import type { useRouter } from "next/navigation"
-import type { Job } from "@/lib/data/types"
 import JobCard from "./job-card"
 import Image from "next/image"
-import Map from "../../../public/assets/images/Map.png";
+import Map from "../../../public/assets/images/Map.png"
+import type { Job } from "@/store/api/jobsApi"
+
 type Router = ReturnType<typeof useRouter>
 
 interface JobGridProps {
@@ -27,18 +28,13 @@ export default function JobGrid({ jobs, router }: JobGridProps) {
       {/* Job listings column - takes up 2/3 of the space */}
       <div className="lg:col-span-2">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {jobs.slice(0, 6).map((job) => (
-            <JobCard key={job.id} job={job} router={router} />
+          {jobs.map((job) => (
+            <JobCard key={job._id} job={job} router={router} />
           ))}
         </div>
       </div>
       <div className="relative h-[600px] rounded-lg overflow-hidden border border-gray-200">
-        <Image
-          src={Map}
-          alt="Job locations map"
-          fill
-          className="object-cover"
-        />
+        <Image src={Map || "/placeholder.svg"} alt="Job locations map" fill className="object-cover" />
       </div>
     </div>
   )

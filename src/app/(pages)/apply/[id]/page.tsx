@@ -1,18 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useRouter, useParams } from "next/navigation"
-import {
-  type JSXElementConstructor,
-  type Key,
-  type ReactElement,
-  type ReactNode,
-  type ReactPortal,
-  useEffect,
-  useState,
-  useRef,
-} from "react"
+import { useState, useRef } from "react"
 import {
   Box,
   Card,
@@ -32,6 +22,7 @@ import {
   createTheme,
   IconButton,
   Paper,
+  CircularProgress,
 } from "@mui/material"
 import LocationOnIcon from "@mui/icons-material/LocationOn"
 import WorkIcon from "@mui/icons-material/Work"
@@ -39,8 +30,11 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney"
 import CloseIcon from "@mui/icons-material/Close"
 import AddIcon from "@mui/icons-material/Add"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
+import { format } from "date-fns"
+import Navbar from "@/components/layout/navbar"
 
-import { sampleJobs } from "@/lib/sampleJobs"
+import { useGetJobByIdQuery } from "@/store/api/jobsApi"
 
 // Create a custom theme with #D49F2E as the primary color
 const theme = createTheme({
@@ -96,10 +90,12 @@ interface Attachment {
 export default function ApplyJobPage() {
   const router = useRouter()
   const params = useParams()
-  const id = params.id
+  const id = params.id as string
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [job, setJob] = useState<any>(null)
+  const { data, error, isLoading } = useGetJobByIdQuery(id)
+  const job = data?.job
+
   const [openDialog, setOpenDialog] = useState(false)
   const [enquiryTitle, setEnquiryTitle] = useState("")
   const [enquiryText, setEnquiryText] = useState("")
@@ -108,13 +104,6 @@ export default function ApplyJobPage() {
     title: "",
     enquiry: "",
   })
-
-  useEffect(() => {
-    if (id) {
-      const foundJob = sampleJobs.find((j) => j.id === Number(id))
-      setJob(foundJob)
-    }
-  }, [id])
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -175,88 +164,132 @@ export default function ApplyJobPage() {
     }
   }
 
-  if (!job) {
+  const handleGoBack = () => {
+    router.push("/home")
+  }
+
+  if (isLoading) {
     return (
       <ThemeProvider theme={theme}>
-        <Box sx={{ p: 4, bgcolor: "background.default" }}>
-          <Typography>Loading job details...</Typography>
+        <Navbar />
+        <Box
+          sx={{
+            p: 4,
+            bgcolor: "background.default",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "calc(100vh - 64px)",
+          }}
+        >
+          <CircularProgress sx={{ color: "#D49F2E" }} />
+          <Typography sx={{ ml: 2 }}>Loading job details...</Typography>
         </Box>
       </ThemeProvider>
     )
   }
 
+  if (error || !job) {
+    return (
+      <ThemeProvider theme={theme}>
+        <Navbar />
+        <Box sx={{ p: 4, bgcolor: "background.default", textAlign: "center", minHeight: "calc(100vh - 64px)" }}>
+          <Typography variant="h6" color="error" sx={{ mb: 2 }}>
+            Error loading job details
+          </Typography>
+          <Button variant="contained" onClick={handleGoBack}>
+            Go Back
+          </Button>
+        </Box>
+      </ThemeProvider>
+    )
+  }
+
+  // Format the creation date
+  const createdDate = new Date(job.createdAt)
+  const formattedDate = format(createdDate, "MMMM dd, yyyy")
+
+  // Get the first letter of each word in the job title for the avatar
+  const avatarText = job.job_title
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase()
+
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+      <Navbar />
+      <Box sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 64px)" }}>
         <Container maxWidth="md" sx={{ py: 4 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 3, cursor: "pointer" }} onClick={handleGoBack}>
+            <ArrowBackIcon sx={{ mr: 1 }} />
+            <Typography>Back to Jobs</Typography>
+          </Box>
+
           <Card sx={{ mb: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
             <CardContent>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar sx={{ bgcolor: "#D49F2E", mr: 2 }}>{job.logo}</Avatar>
+                <Avatar sx={{ bgcolor: "#D49F2E", mr: 2 }}>{avatarText}</Avatar>
                 <Box>
-                  <Typography variant="h5">{job.title}</Typography>
-                  <Typography color="text.secondary">{job.company}</Typography>
+                  <Typography variant="h5">{job.job_title}</Typography>
+                  <Typography color="text.secondary">
+                    {job.target_user === "subcontractor" ? "For Subcontractors" : "For Job Seekers"}
+                  </Typography>
                 </Box>
               </Box>
 
               <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                 <LocationOnIcon sx={{ mr: 1, color: "#D49F2E" }} />
-                <Typography color="text.secondary">{job.location}</Typography>
+                <Typography color="text.secondary">
+                  {job.job_location
+                    ? `${job.job_location.coordinates[0]}, ${job.job_location.coordinates[1]}`
+                    : "Location not specified"}
+                </Typography>
               </Box>
 
               <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                 <WorkIcon sx={{ mr: 1, color: "#D49F2E" }} />
-                <Typography color="text.secondary">{job.type}</Typography>
+                <Typography color="text.secondary">{job.job_type}</Typography>
               </Box>
 
               <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                 <AttachMoneyIcon sx={{ mr: 1, color: "#D49F2E" }} />
-                <Typography color="text.secondary">{job.budget}</Typography>
+                <Typography color="text.secondary">{job.budget ? `$${job.budget}` : "Budget not specified"}</Typography>
               </Box>
 
-              <Typography variant="body2" sx={{ mt: 2 }}>
-                <strong>Duration:</strong> {job.duration}
-              </Typography>
-
-              <Typography variant="body2">
-                <strong>Travel Radius:</strong> {job.radius} km
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                <strong>Services Required:</strong> {job.services.join(", ")}
-              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                <CalendarTodayIcon sx={{ mr: 1, color: "#D49F2E" }} />
+                <Typography color="text.secondary">Posted on {formattedDate}</Typography>
+              </Box>
 
               <Divider sx={{ my: 2 }} />
 
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                {job.tags.map(
-                  (
-                    tag:
-                      | string
-                      | number
-                      | bigint
-                      | boolean
-                      | ReactElement<unknown, string | JSXElementConstructor<any>>
-                      | Iterable<ReactNode>
-                      | ReactPortal
-                      | Promise<
-                          | string
-                          | number
-                          | bigint
-                          | boolean
-                          | ReactPortal
-                          | ReactElement<unknown, string | JSXElementConstructor<any>>
-                          | Iterable<ReactNode>
-                          | null
-                          | undefined
-                        >
-                      | null
-                      | undefined,
-                    index: Key | null | undefined,
-                  ) => (
-                    <Chip key={index} label={tag} size="small" />
-                  ),
-                )}
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                <strong>Services Required:</strong>
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
+                {job.services.map((service) => (
+                  <Chip
+                    key={service._id}
+                    label={`${service.service_name} ${service.resource_count > 0 ? `(${service.resource_count})` : ""}`}
+                    size="small"
+                  />
+                ))}
               </Box>
+
+              {job.job_priority && (
+                <Chip
+                  label="Priority"
+                  size="small"
+                  sx={{
+                    mt: 2,
+                    bgcolor: "rgba(255, 0, 0, 0.1)",
+                    color: "#ff0000",
+                    fontWeight: "bold",
+                  }}
+                />
+              )}
             </CardContent>
           </Card>
 
@@ -267,8 +300,12 @@ export default function ApplyJobPage() {
                 Job Description
               </Typography>
               <Typography variant="body1">
-                This is a detailed job description for the {job.title} role at {job.company}. Please make sure to have
-                relevant experience and availability to travel within {job.radius} km.
+                This is a detailed job description for the {job.job_title} role.
+                {job.job_type === "Full-Time"
+                  ? " This is a full-time position requiring commitment to the entire project duration."
+                  : " This is a part-time position with flexible hours."}
+                {job.services.length > 0 &&
+                  ` We are looking for professionals with expertise in ${job.services.map((s) => s.service_name).join(", ")}.`}
               </Typography>
             </CardContent>
           </Card>
@@ -279,15 +316,14 @@ export default function ApplyJobPage() {
               <Typography variant="h6" gutterBottom>
                 Contact Information
               </Typography>
-              <Typography variant="body1">Name: John Doe</Typography>
-              <Typography variant="body1">Email: johndoe@{job.company.replace(/\s/g, "").toLowerCase()}.com</Typography>
+              <Typography variant="body1">Name: Project Manager</Typography>
+              <Typography variant="body1">Email: contact@buildconnect.com</Typography>
               <Typography variant="body1">Phone: +1 (123) 456-7890</Typography>
             </CardContent>
           </Card>
 
           {/* Action Buttons */}
           <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
-            <Button variant="outlined">Save Job</Button>
             <Button variant="contained" onClick={() => setOpenDialog(true)}>
               Apply Now
             </Button>
@@ -341,15 +377,19 @@ export default function ApplyJobPage() {
                     mr: 2,
                   }}
                 >
-                  {job.logo}
+                  {avatarText}
                 </Avatar>
                 <Box>
                   <Typography variant="subtitle1" fontWeight="medium">
-                    {job.title}
+                    {job.job_title}
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
                     <LocationOnIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                    <Typography variant="body2">{job.radius} km away</Typography>
+                    <Typography variant="body2">
+                      {job.job_location
+                        ? `${job.job_location.coordinates[0]}, ${job.job_location.coordinates[1]}`
+                        : "Location not specified"}
+                    </Typography>
                   </Box>
                 </Box>
               </Paper>
@@ -457,7 +497,7 @@ export default function ApplyJobPage() {
                 onClick={handleSubmitEnquiry}
                 sx={{
                   py: 1.5,
-                  bgcolor: "#D49F2E", 
+                  bgcolor: "#D49F2E",
                   "&:hover": {
                     bgcolor: "#D49F2E",
                   },

@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { CheckCircle, XCircle, Loader2, Home } from "lucide-react"
@@ -8,13 +7,10 @@ import Image from "next/image"
 import Box from "@mui/material/Box"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
-import AppBar from "@mui/material/AppBar"
-import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
-import IconButton from "@mui/material/IconButton"
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
+import { useVerifyEmailMutation } from "@/store/api/authApi"
 
 // Create a theme instance with mustard and white colors
 const theme = createTheme({
@@ -65,9 +61,10 @@ export default function VerifyEmail() {
 
   const [verificationState, setVerificationState] = useState<"loading" | "success" | "error">("loading")
   const [errorMessage, setErrorMessage] = useState<string>("")
+  const [verifyEmail] = useVerifyEmailMutation()
 
   useEffect(() => {
-    const verifyEmail = async () => {
+    const performVerification = async () => {
       try {
         const email = searchParams.get("email")
         const token = searchParams.get("token")
@@ -77,33 +74,23 @@ export default function VerifyEmail() {
           setErrorMessage("Invalid verification link. Missing email or token.")
           return
         }
-        const response = await fetch("http://localhost:9000/api/v0/verify-email", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: decodeURIComponent(email),
-            token: decodeURIComponent(token),
-          }),
-        })
 
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.message || "Email verification failed")
-        }
+        const result = await verifyEmail({
+          email: decodeURIComponent(email),
+          token: decodeURIComponent(token),
+        }).unwrap()
 
         // If successful, set state to success
         setVerificationState("success")
-      } catch (error) {
+      } catch (error: any) {
         console.error("Verification error:", error)
         setVerificationState("error")
-        setErrorMessage(error instanceof Error ? error.message : "Email verification failed")
+        setErrorMessage(error.data?.message || "Email verification failed")
       }
     }
 
-    verifyEmail()
-  }, [searchParams])
+    performVerification()
+  }, [searchParams, verifyEmail])
 
   const handleGoToHome = () => {
     router.push("/home")
@@ -158,7 +145,7 @@ export default function VerifyEmail() {
                   </svg>
                 </Box>
                 <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-                  Jay
+                  BuildConnect
                 </Typography>
               </Box>
               <Card
@@ -223,7 +210,7 @@ export default function VerifyEmail() {
           <Box
             sx={{
               width: { xs: "100%", md: "50%" },
-              display: { xs: "none", md: "block" }, 
+              display: { xs: "none", md: "block" },
               position: "relative",
               overflow: "hidden",
             }}

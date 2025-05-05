@@ -23,7 +23,9 @@ import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
 import { Briefcase } from "lucide-react"
 import MenuItem from "@mui/material/MenuItem"
-import { loginUser } from "@/api/apiService" // Import the API service
+import { useAppDispatch } from "@/store/hooks"
+import { setUserType } from "@/store/slices/userSlice"
+import { useLoginMutation } from "@/store/api/authApi"
 
 const theme = createTheme({
   palette: {
@@ -62,12 +64,15 @@ const ErrorMessage = ({ message }: { message: string }) => (
 
 export default function LoginPage() {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const dispatch = useAppDispatch()
+  const [login, { isLoading }] = useLoginMutation()
+
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState({
     email: "",
     password: "",
     userType: "",
+    general: "",
   })
 
   const [formData, setFormData] = useState({
@@ -75,7 +80,7 @@ export default function LoginPage() {
     password: "",
   })
 
-  const [userType, setUserType] = useState("")
+  const [userType, setUserTypeState] = useState("")
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -93,11 +98,12 @@ export default function LoginPage() {
     setErrors((prev) => ({
       ...prev,
       [id]: "",
+      general: "",
     }))
   }
 
   const handleUserTypeChange = (e: any) => {
-    setUserType(e.target.value)
+    setUserTypeState(e.target.value)
     // Clear userType error when user selects an option
     setErrors((prev) => ({
       ...prev,
@@ -110,6 +116,7 @@ export default function LoginPage() {
       email: "",
       password: "",
       userType: "",
+      general: "",
     }
     let isValid = true
 
@@ -148,23 +155,26 @@ export default function LoginPage() {
       return
     }
 
-    setIsSubmitting(true)
-    localStorage.setItem("userType", userType)
-
     try {
-      const response = await loginUser(formData.email, formData.password) // Use the API service
-      if (response) {
-        setTimeout(() => {
-          setIsSubmitting(false)
-          router.push("/home") // Redirect to home on successful login
-        }, 1500)
-      }
+      // Use the RTK Query mutation for login
+      const response = await login({
+        email: formData.email,
+        password: formData.password,
+      }).unwrap()
+
+      // Store user type in Redux
+      dispatch(setUserType(userType))
+
+      // Store user type in localStorage as well for persistence
+      localStorage.setItem("userType", userType)
+
+      // Redirect to home page
+      router.push("/home")
     } catch (err: any) {
-      setIsSubmitting(false)
       // Set a general error message
       setErrors((prev) => ({
         ...prev,
-        email: "Login failed. Please check your credentials.",
+        general: err.data?.message || "Login failed. Please check your credentials.",
       }))
     }
   }
@@ -206,7 +216,7 @@ export default function LoginPage() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay
+              BuildConnect
             </Typography>
           </Box>
 
@@ -234,6 +244,14 @@ export default function LoginPage() {
               />
               <form onSubmit={handleSubmit}>
                 <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  {errors.general && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" sx={{ color: "error.main", textAlign: "center" }}>
+                        {errors.general}
+                      </Typography>
+                    </Box>
+                  )}
+
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="user-type" className="text-gray-700">
                       Account Type
@@ -273,7 +291,6 @@ export default function LoginPage() {
                       placeholder="Enter your email address"
                       className="rounded"
                       error={!!errors.email}
-                      // Remove helperText to use our custom error component
                     />
                     <ErrorMessage message={errors.email} />
                   </Box>
@@ -293,7 +310,6 @@ export default function LoginPage() {
                       className="rounded"
                       placeholder="Enter your password"
                       error={!!errors.password}
-                      // Remove helperText to use our custom error component
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -316,7 +332,7 @@ export default function LoginPage() {
                     variant="body2"
                     color="primary"
                     sx={{ textAlign: "right", cursor: "pointer", "&:hover": { textDecoration: "underline" }, mt: 1 }}
-                    className="text-[#90caf9]"
+                    className="text-[#D49F2E]"
                   >
                     Forgot Password?
                   </Typography>
@@ -326,12 +342,12 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={isSubmitting}
+                    disabled={isLoading}
                     fullWidth
                     sx={{ textTransform: "none" }}
-                    className="bg-[#90caf9] hover:bg-[#90caf9]/90 py-2"
+                    className="bg-[#D49F2E] hover:bg-[#C48E1D] py-2"
                   >
-                    {isSubmitting ? "Logging in..." : "Log In"}
+                    {isLoading ? "Logging in..." : "Log In"}
                   </Button>
                   <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
                     <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }} className="text-gray-500">
@@ -342,7 +358,7 @@ export default function LoginPage() {
                         variant="body2"
                         color="primary"
                         sx={{ "&:hover": { textDecoration: "underline" } }}
-                        className="text-[#90caf9]"
+                        className="text-[#D49F2E]"
                       >
                         Sign Up
                       </Typography>
@@ -356,7 +372,7 @@ export default function LoginPage() {
         <Box
           sx={{
             width: "50%",
-            bgcolor: "#F5F5FA", 
+            bgcolor: "#F5F5FA",
             display: { xs: "none", md: "block" },
             position: "relative",
             height: "100vh",
