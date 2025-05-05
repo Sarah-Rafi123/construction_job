@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Search, Filter, ChevronDown } from "lucide-react"
+import { Search, Filter, ChevronDown, MapPin } from "lucide-react"
 import { Slider } from "@mui/material"
 
 interface JobSearchProps {
@@ -11,10 +11,11 @@ interface JobSearchProps {
   setSelectedJobType: (type: string) => void
   selectedServiceType: string
   setSelectedServiceType: (type: string) => void
-  radiusFilter: number[]
-  setRadiusFilter: (radius: number[]) => void
+  radiusFilter: number
+  setRadiusFilter: (radius: number) => void
   sortBy: string
   setSortBy: (sort: string) => void
+  userLocation: { lat: number; lng: number } | null
 }
 
 export default function JobSearch({
@@ -28,6 +29,7 @@ export default function JobSearch({
   setRadiusFilter,
   sortBy,
   setSortBy,
+  userLocation,
 }: JobSearchProps) {
   const [showFilters, setShowFilters] = useState(false)
 
@@ -54,7 +56,7 @@ export default function JobSearch({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md text-black appearance-none focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           >
             <option value="newest">Newest First</option>
             <option value="budget-high">Budget: High to Low</option>
@@ -66,7 +68,7 @@ export default function JobSearch({
         {/* Filter button */}
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+          className="flex items-center justify-center text-black gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
         >
           <Filter size={18} />
           <span>Filters</span>
@@ -103,15 +105,22 @@ export default function JobSearch({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Distance: {radiusFilter[0]} - {radiusFilter[1]} km
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Distance: {radiusFilter} km</label>
+              {!userLocation && (
+                <div className="flex items-center text-amber-600 text-xs">
+                  <MapPin size={12} className="mr-1" />
+                  <span>Enable location to use this filter</span>
+                </div>
+              )}
+            </div>
             <Slider
               value={radiusFilter}
-              onChange={(_, newValue) => setRadiusFilter(newValue as number[])}
+              onChange={(_, newValue) => setRadiusFilter(newValue as number)}
               valueLabelDisplay="auto"
               min={0}
-              max={50}
+              max={40}
+              disabled={!userLocation}
               sx={{
                 color: "#D49F2E",
                 "& .MuiSlider-thumb": {
