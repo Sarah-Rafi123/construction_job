@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import type { Job } from "@/store/api/jobsApi"
 import type { useRouter } from "next/navigation"
@@ -6,11 +6,11 @@ import { MapPin, Clock } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 
 interface JobCardProps {
-  job: Job;
+  job: Job
+  router: ReturnType<typeof useRouter>
 }
 
-export default function JobCard({ job }: JobCardProps) {
-  const router = useRouter();
+export default function JobCard({ job, router }: JobCardProps) {
   const handleViewDetails = () => {
     router.push(`/apply/${job._id}`)
   }
@@ -58,11 +58,14 @@ export default function JobCard({ job }: JobCardProps) {
           {job.job_location ? "Map location" : "Location not specified"}
         </div>
 
-        <button onClick={handleViewDetails} className="text-amber-500 hover:text-amber-600 text-sm font-medium flex items-center">
+        <button
+          onClick={handleViewDetails}
+          className="text-amber-500 hover:text-amber-600 text-sm font-medium flex items-center"
+        >
           View Details
           <span className="ml-1">→</span>
         </button>
       </div>
     </div>
-  );
-}
+  )
+}t add 

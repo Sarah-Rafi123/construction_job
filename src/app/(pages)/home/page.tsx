@@ -115,18 +115,17 @@ export default function Home() {
           <JobGrid jobs={filteredJobs} router={router} />
         </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-gray-600">
-              You've successfully logged in as a{" "}
-              {currentUser.role
-                ?.split("-")
-                .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")}
-              .
-            </p>
-          </div>
-        </main>
-      </div>
-    </ProtectedRoute>
-  );
+        <div className="mt-8 text-center">
+          <p className="text-gray-600">
+            You've successfully logged in as a{" "}
+            {userType
+              ?.split("-")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")}
+            .
+          </p>
+        </div>
+      </main>
+    </div>
+  )
 }
