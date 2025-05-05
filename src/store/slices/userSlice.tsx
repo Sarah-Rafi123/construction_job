@@ -11,7 +11,9 @@ interface User {
   company_number?: string;
   phone_number?: string;
   trade?: string;
-  admin_status?: "string";
+  admin_status?: string;
+  description?: string;
+  profile_picture: string;
 }
 
 const initialState = {

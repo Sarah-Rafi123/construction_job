@@ -27,7 +27,6 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
 
   console.log("current user is", currentUser);
   console.log("inbox is", inbox);
-  console.log("active is", activeConversation);
 
   const filteredInbox = inbox?.filter((conversation) => {
     const otherParticipant = conversation.participants.find((participant) => participant._id !== currentUser.id);

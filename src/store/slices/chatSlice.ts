@@ -4,11 +4,7 @@ import type { Chat } from "../api/chatApi"
 interface EnquiryMessage {
   _id: string
   conversation: string
-  sender: {
-    _id: string
-    email: string
-    role: string
-  }
+  sender: string
   type: "enquiry"
   status: string
   enquiry: {
@@ -24,11 +20,7 @@ interface EnquiryMessage {
 interface TextMessage {
   _id: string
   conversation: string
-  sender: {
-    _id: string
-    email: string
-    role: string
-  }
+  sender:string
   type: "text"
   status: string
   content: string
@@ -64,8 +56,18 @@ const chatSlice = createSlice({
     setMessages: (state, action: PayloadAction<Message[]>) => {
       state.messages = action.payload
     },
+    addMessage: (state, action: PayloadAction<Message>) => {
+      state?.messages?.push(action.payload);
+    },
+    updateConversationInInbox: (state, action: PayloadAction<Chat>) => {
+      if (!state.inbox) return;
+      const index = state.inbox.findIndex(convo => convo._id === action.payload._id);
+      if (index !== -1) {
+        state.inbox[index] = action.payload;
+      }
+    },
   },
 })
 
-export const { setInbox, setActiveConversation, setMessages } = chatSlice.actions
+export const { setInbox, setActiveConversation, setMessages,addMessage,updateConversationInInbox } = chatSlice.actions
 export default chatSlice.reducer

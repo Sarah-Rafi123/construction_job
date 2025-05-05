@@ -1,6 +1,7 @@
 // components/ProtectedRoute.tsx
 "use client";
-
+import socket from "@/lib/socket/connectSocket";
+console.log("called called");
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -32,6 +33,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
           return;
         }
         setLoading(false);
+        socket.connect();
       } catch (error) {
         console.error("Not authenticated:", error);
         dispatch(clearCurrentUser());
@@ -46,6 +48,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
         router.replace("/unauthorized");
       } else {
         setLoading(false);
+        socket.connect();
       }
     }
   }, [allowedRoles, currentUser]);
