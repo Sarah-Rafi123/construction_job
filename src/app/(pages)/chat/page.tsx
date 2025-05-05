@@ -6,19 +6,9 @@ import ChatWindow from "@/components/chat-components/chat-window";
 import UserDetails from "@/components/chat-components/user-details";
 import { conversations, users } from "@/lib/data";
 import type { Conversation, User } from "@/lib/types";
-
 import ProtectedRoute from "@/components/global/ProtectedRoute";
-import { useGetInboxQuery } from "@/store/api/chatApi";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 
 export default function ChatPage() {
-  const { isLoading, isError } = useGetInboxQuery();
-  const inbox = useSelector((state: RootState) => state.chat.inbox);
-  const currentUser = useSelector((state: RootState) => state.user?.currentUser || "");
-
-  console.log("inbox is", inbox);
-  console.log("current user is", currentUser);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(conversations[1]);
   const [activeUser, setActiveUser] = useState<User | null>(users.find((user) => user.id === conversations[1]?.userId) || null);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
@@ -41,14 +31,7 @@ export default function ChatPage() {
   return (
     <ProtectedRoute>
       <div className="flex h-screen bg-gray-50">
-        <ChatSidebar
-          conversations={conversations}
-          activeConversationId={activeConversation?.id}
-          onSelectConversation={handleConversationSelect}
-          isMobileDrawerOpen={isMobileDrawerOpen}
-          toggleMobileDrawer={toggleMobileDrawer}
-          users={users}
-        />
+        <ChatSidebar isMobileDrawerOpen={isMobileDrawerOpen} toggleMobileDrawer={toggleMobileDrawer} />
         <div className="flex-1 flex flex-col h-full overflow-hidden">
           <ChatWindow
             conversation={activeConversation}

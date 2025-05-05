@@ -1,44 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search,Menu, X } from "lucide-react"
-import { Avatar } from "@mui/material"
-import type { Conversation, User } from "@/lib/types"
-import { formatPreviewText } from "@/lib/utils"
+import { useState } from "react";
+import { Search, Menu, X } from "lucide-react";
+import { Avatar } from "@mui/material";
+import type { Conversation, User } from "@/lib/types";
+import { Chat, useGetInboxQuery } from "@/store/api/chatApi";
+import { useSelector, useDispatch } from "react-redux";
+import { setActiveConversation } from "@/store/slices/chatSlice";
+import { RootState } from "@/store";
 
 interface ChatSidebarProps {
-  conversations: Conversation[]
-  activeConversationId: string | undefined
-  onSelectConversation: (conversation: Conversation) => void
-  isMobileDrawerOpen: boolean
-  toggleMobileDrawer: () => void
-  users: User[]
+  isMobileDrawerOpen: boolean;
+  toggleMobileDrawer: () => void;
 }
 
-export default function ChatSidebar({
-  conversations,
-  activeConversationId,
-  onSelectConversation,
-  isMobileDrawerOpen,
-  toggleMobileDrawer,
-  users,
-}: ChatSidebarProps) {
-  const [searchQuery, setSearchQuery] = useState("")
+export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: ChatSidebarProps) {
+  const { isLoading, isError } = useGetInboxQuery();
+  const dispatch = useDispatch();
+  const { inbox, activeConversation } = useSelector((state: RootState) => state.chat);
+  const { currentUser } = useSelector((state: RootState) => state?.user);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredConversations = conversations.filter((conversation) => {
-    const user = users.find((u) => u.id === conversation.userId)
-    return user?.name.toLowerCase().includes(searchQuery.toLowerCase())
-  })
+  const updateActiveConversation = (conversation: Chat) => {
+    dispatch(setActiveConversation(conversation));
+  };
 
-  const activeConversations = filteredConversations.filter((c) => !c.expired)
-  const expiredConversations = filteredConversations.filter((c) => c.expired)
+  console.log("current user is", currentUser);
+  console.log("inbox is", inbox);
+  console.log("active is", activeConversation);
+
+  const filteredInbox = inbox?.filter((conversation) => {
+    const otherParticipant = conversation.participants.find((participant) => participant._id !== currentUser.id);
+    if (!otherParticipant) return false;
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      otherParticipant.full_name?.toLowerCase().includes(searchLower) || otherParticipant.company_name?.toLowerCase().includes(searchLower)
+    );
+  });
 
   return (
     <>
       {/* Mobile overlay */}
-      {isMobileDrawerOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden" onClick={toggleMobileDrawer} />
-      )}
+      {isMobileDrawerOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden" onClick={toggleMobileDrawer} />}
 
       {/* Sidebar */}
       <div
@@ -73,72 +76,34 @@ export default function ChatSidebar({
 
           {/* Conversation list */}
           <div className="flex-1 overflow-y-auto">
-            {activeConversations.map((conversation) => {
-              const user = users.find((u) => u.id === conversation.userId)
-              if (!user) return null
+            {filteredInbox?.map((conversation) => {
+              const user = conversation.participants.find((u) => u._id !== currentUser.id);
+              if (!user) return null;
 
               return (
                 <div
-                  key={conversation.id}
+                  key={conversation._id}
                   className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
-                    conversation.id === activeConversationId ? "bg-gray-100" : ""
+                    conversation._id === activeConversation ? "bg-gray-100" : ""
                   }`}
-                  onClick={() => onSelectConversation(conversation)}
+                  onClick={() => updateActiveConversation(conversation)}
                 >
                   <div className="flex items-start gap-3">
-                    <Avatar src={user.avatar} alt={user.name} sx={{ width: 40, height: 40 }} />
+                    <Avatar src={user.profile_picture} sx={{ width: 40, height: 40 }} />
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center">
-                        <h3 className="font-medium text-gray-900 truncate">{user.name}</h3>
+                        <h3 className="font-medium text-gray-900 truncate">{user.full_name ?? user.company_name}</h3>
                         {conversation.unreadCount > 0 && (
                           <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                             {conversation.unreadCount}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500 truncate">
-                        {conversation.preview.startsWith("You:") ? (
-                          <span>
-                            <span className="font-medium">You:</span>
-                            {formatPreviewText(conversation.preview.substring(4))}
-                          </span>
-                        ) : (
-                          formatPreviewText(conversation.preview)
-                        )}
-                      </p>
+                      <p className="text-gray-600 text-sm truncate">{conversation.lastMessage.content}</p>
                     </div>
                   </div>
                 </div>
-              )
-            })}
-
-            {expiredConversations.length > 0 && (
-              <div className="py-2 px-4 bg-gray-100">
-                <p className="text-sm text-gray-500 font-medium">Expired chats</p>
-              </div>
-            )}
-
-            {expiredConversations.map((conversation) => {
-              const user = users.find((u) => u.id === conversation.userId)
-              if (!user) return null
-
-              return (
-                <div
-                  key={conversation.id}
-                  className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
-                    conversation.id === activeConversationId ? "bg-gray-100" : ""
-                  }`}
-                  onClick={() => onSelectConversation(conversation)}
-                >
-                  <div className="flex items-start gap-3">
-                    <Avatar src={user.avatar} alt={user.name} sx={{ width: 40, height: 40 }} />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 truncate">{user.name}</h3>
-                      <p className="text-sm text-gray-500 truncate">{formatPreviewText(conversation.preview)}</p>
-                    </div>
-                  </div>
-                </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -150,5 +115,5 @@ export default function ChatSidebar({
         <Menu size={24} />
       </button>
     </>
-  )
+  );
 }

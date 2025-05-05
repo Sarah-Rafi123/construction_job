@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
-import { setInbox } from "../slices/chatSlice"
+import { setInbox,setMessages } from "../slices/chatSlice"
+import { Message } from "../slices/chatSlice"
+
 export interface Participant {
     _id: string
     email: string
@@ -31,6 +33,11 @@ export interface Participant {
     data: Chat[]
   }
   
+  export interface MessagesResponse {
+    status: string
+    results: number
+    data: Message[]
+  }
 
 export const chatApi = createApi({
   reducerPath: "chatApi",
@@ -51,8 +58,19 @@ export const chatApi = createApi({
       },
    
     }),
+    getMessagesByConversationId: builder.query<MessagesResponse, string>({
+      query: (conversationId) => `chat?conversationId=${conversationId}`,
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled
+          dispatch(setMessages(data.data))
+        } catch (error) {
+          console.error("Message fetch failed:", error)
+        }
+      },
+    }),
   
   }),
 })
 
-export const { useGetInboxQuery } = chatApi
+export const { useGetInboxQuery,useGetMessagesByConversationIdQuery } = chatApi
