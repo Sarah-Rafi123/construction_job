@@ -34,7 +34,7 @@ export default function UserDetails({ isOpen, togglePanel }: UserDetailsProps) {
           <Avatar src={user?.profile_picture} sx={{ width: 80, height: 80 }} />
 
           <h2 className="mt-4 text-xl font-medium text-center">{user?.full_name ?? user?.company_name}</h2>
-          <p className={`text-sm ${user?.isOnline ? "text-green-500" : "text-gray-500"}`}>{user?.isOnline ? "Online" : "Offline"}</p>
+          {/* <p className={`text-sm ${user?.isOnline ? "text-green-500" : "text-gray-500"}`}>{user?.isOnline ? "Online" : "Offline"}</p> */}
 
           <div className="flex gap-4 mt-4">
             <button className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200">

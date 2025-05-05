@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Search, Menu, X } from "lucide-react";
 import { Avatar } from "@mui/material";
-import type { Conversation, User } from "@/lib/types";
-import { Chat, useGetInboxQuery } from "@/store/api/chatApi";
+import { useGetInboxQuery } from "@/store/api/chatApi";
+import { Chat } from "../../types/chatTypes";
 import { useSelector, useDispatch } from "react-redux";
 import { setActiveConversation } from "@/store/slices/chatSlice";
 import { RootState } from "@/store";
@@ -29,7 +29,7 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
   console.log("inbox is", inbox);
 
   const filteredInbox = inbox?.filter((conversation) => {
-    const otherParticipant = conversation.participants.find((participant) => participant._id !== currentUser.id);
+    const otherParticipant = conversation.participants.find((participant) => participant._id !== currentUser?.id);
     if (!otherParticipant) return false;
     const searchLower = searchQuery.toLowerCase();
     return (
@@ -76,14 +76,14 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
           {/* Conversation list */}
           <div className="flex-1 overflow-y-auto">
             {filteredInbox?.map((conversation) => {
-              const user = conversation.participants.find((u) => u._id !== currentUser.id);
+              const user = conversation.participants.find((u) => u._id !== currentUser?.id);
               if (!user) return null;
 
               return (
                 <div
                   key={conversation._id}
                   className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
-                    conversation._id === activeConversation ? "bg-gray-100" : ""
+                    conversation._id === activeConversation?._id ? "bg-gray-100" : ""
                   }`}
                   onClick={() => updateActiveConversation(conversation)}
                 >
@@ -92,11 +92,11 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center">
                         <h3 className="font-medium text-gray-900 truncate">{user.full_name ?? user.company_name}</h3>
-                        {conversation.unreadCount > 0 && (
+                        {/* {conversation.unreadCount > 0 && (
                           <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                             {conversation.unreadCount}
                           </span>
-                        )}
+                        )} */}
                       </div>
                       <p className="text-gray-600 text-sm truncate">{conversation.lastMessage.content}</p>
                     </div>

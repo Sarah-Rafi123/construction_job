@@ -1,28 +1,14 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { authApi } from "../api/authApi";
+import { UserState, User } from "@/types/userTypes";
 
-interface User {
-  id: string;
-  email: string;
-  role: string;
-  verifyEmail: boolean;
-  full_name?: string;
-  company_name?: string;
-  company_number?: string;
-  phone_number?: string;
-  trade?: string;
-  admin_status?: string;
-  description?: string;
-  profile_picture: string;
-}
-
-const initialState = {
-  email: null as string | null,
-  token: null as string | null,
-  role: null as string | null,
-  isAuthenticated: false as boolean | null,
-  userType: null as string | null,
-  currentUser: null as User | null,
+const initialState: UserState = {
+  email: null,
+  token: null,
+  role: null,
+  isAuthenticated: false,
+  userType: null,
+  currentUser: null,
 };
 
 export const userSlice = createSlice({

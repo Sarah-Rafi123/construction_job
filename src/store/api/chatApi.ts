@@ -1,43 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import { setInbox,setMessages } from "../slices/chatSlice"
-import { Message } from "../slices/chatSlice"
-
-export interface Participant {
-    _id: string
-    email: string
-    role: string
-    company_name: string
-    full_name:string
-  }
-  
-  export interface LastMessage {
-    _id: string
-    sender: Participant
-    content: string
-    type: string
-    updatedAt: string
-  }
-  
-  export interface Chat {
-    _id: string
-    participants: Participant[]
-    lastMessage: LastMessage
-    createdAt: string
-    updatedAt: string
-    __v: number
-  }
-  
-  export interface InboxResponse {
-    status: string
-    results: number
-    data: Chat[]
-  }
-  
-  export interface MessagesResponse {
-    status: string
-    results: number
-    data: Message[]
-  }
+import { InboxResponse ,MessagesResponse} from "@/types/chatTypes"
 
 export const chatApi = createApi({
   reducerPath: "chatApi",

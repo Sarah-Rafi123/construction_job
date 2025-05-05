@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useDispatch } from "react-redux";
 import { addMessage, updateConversationInInbox } from "@/store/slices/chatSlice";
+import { Message, Chat } from "@/types/chatTypes";
 
 const ChatInputForm = () => {
   const { currentUser } = useSelector((state: RootState) => state.user);
@@ -16,7 +17,7 @@ const ChatInputForm = () => {
   const dispatch = useDispatch();
   const [newMessage, setNewMessage] = useState("");
 
-  const sendMessage = (e) => {
+  const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
@@ -27,7 +28,7 @@ const ChatInputForm = () => {
         content: newMessage,
         type: "text",
       },
-      ({ data, error }) => {
+      ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
         if (!error && data) {
           console.log("message sent", data);
           dispatch(addMessage(data.message));
