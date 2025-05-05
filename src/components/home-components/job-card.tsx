@@ -68,4 +68,4 @@ export default function JobCard({ job, router }: JobCardProps) {
       </div>
     </div>
   )
-}t add 
+}
