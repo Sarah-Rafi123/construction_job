@@ -23,6 +23,7 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
 
   const updateActiveConversation = (conversation: Chat) => {
     dispatch(setActiveConversation(conversation));
+    toggleMobileDrawer();
   };
 
   console.log("current user is", currentUser);

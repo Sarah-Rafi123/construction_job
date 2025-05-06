@@ -45,8 +45,19 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
 
   if (!messages || !activeConversation) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
-        <p className="text-gray-500">Select a conversation to start chatting</p>
+      <div className="flex-1 flex flex-col bg-gray-50">
+        <div className="p-4 border-b border-gray-200 bg-white flex items-center justify-between lg:hidden">
+          <div className="flex items-center gap-3">
+            <button className="text-gray-500 hover:text-gray-700" onClick={toggleMobileDrawer}>
+              <Menu size={24} />
+            </button>
+            <h2 className="text-md font-medium text-gray-800">Select a conversation</h2>
+          </div>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-gray-500">Select a conversation to start chatting</p>
+        </div>
       </div>
     );
   }
