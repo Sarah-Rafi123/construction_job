@@ -1,5 +1,5 @@
 "use client";
-
+import socket from "@/lib/socket/connectSocket";
 import type React from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useRef } from "react";
@@ -24,6 +24,7 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
+import { Message, Chat } from "@/types/chatTypes";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import WorkIcon from "@mui/icons-material/Work";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -33,7 +34,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { format } from "date-fns";
 import Navbar from "@/components/layout/navbar";
-
+import axios from "axios";
 import { useGetJobByIdQuery } from "@/store/api/jobsApi";
 import ProtectedRoute from "@/components/global/ProtectedRoute";
 
@@ -96,7 +97,6 @@ export default function ApplyJobPage() {
 
   const { data, error, isLoading } = useGetJobByIdQuery(id);
   const job = data?.job;
-
   const [openDialog, setOpenDialog] = useState(false);
   const [enquiryTitle, setEnquiryTitle] = useState("");
   const [enquiryText, setEnquiryText] = useState("");
@@ -126,7 +126,29 @@ export default function ApplyJobPage() {
     setAttachments(attachments.filter((attachment) => attachment.id !== id));
   };
 
-  const handleSubmitEnquiry = () => {
+  async function uploadAttachments(attachments: { file: File }[]) {
+    const formData = new FormData();
+
+    attachments.forEach((attachment) => {
+      formData.append("files", attachment.file);
+    });
+
+    try {
+      const response = await axios.post("http://localhost:9000/api/v0/upload/multiple", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+      console.log("response is", response);
+      return response.data.files; // array of S3 URLs
+    } catch (error) {
+      console.error("File upload failed", error);
+      throw error;
+    }
+  }
+
+  const handleSubmitEnquiry = async () => {
     const newErrors = {
       title: "",
       enquiry: "",
@@ -147,13 +169,37 @@ export default function ApplyJobPage() {
     setErrors(newErrors);
 
     if (isValid) {
+      const uploadedAttachments = await uploadAttachments(attachments);
+      console.log("uploaded urls", uploadAttachments);
       // Here you would normally send the data to your API
       console.log("Submitting enquiry:", {
         title: enquiryTitle,
         enquiry: enquiryText,
-        attachments: attachments.map((a) => a.name),
+        attachments: uploadedAttachments?.map((file) => file.url),
         jobId: id,
       });
+
+      socket.emit(
+        "sendMessage",
+        {
+          recipientId: job?.created_by?._id,
+          enquiry: {
+            title: enquiryTitle,
+            description: enquiryText,
+            attachments: uploadedAttachments?.map((file) => file.url),
+            jobId: job?._id,
+          },
+          type: "enquiry",
+        },
+        ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
+          if (!error && data) {
+            console.log("message sent", data);
+            router.push(`/chat/${data.conversation._id}`);
+          } else {
+            console.error("Message send failed:", error);
+          }
+        }
+      );
 
       alert("Your enquiry has been submitted!");
       setOpenDialog(false);

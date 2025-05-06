@@ -26,6 +26,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
     skip: !activeConversation,
   });
 
+  console.log("messages", messages);
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
