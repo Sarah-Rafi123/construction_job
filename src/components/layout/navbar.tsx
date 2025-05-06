@@ -1,27 +1,27 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react"
-import Link from "next/link"
-import { Bell, MessageSquare, ChevronDown, Briefcase, Download, Send, User, LogOut } from "lucide-react"
-import Avatar from "@mui/material/Avatar"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { useLogoutMutation } from "@/store/api/authApi"
-import { useAppSelector, useAppDispatch } from "@/store/hooks"
-import { clearUser } from "@/store/slices/userSlice"
+import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { Bell, MessageSquare, ChevronDown, Briefcase, Download, Send, User, LogOut } from "lucide-react";
+import Avatar from "@mui/material/Avatar";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useLogoutMutation } from "@/store/api/authApi";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { clearUser } from "@/store/slices/userSlice";
 
 interface NavbarProps {
-  notificationCount?: number
-  messageCount?: number
+  notificationCount?: number;
+  messageCount?: number;
 }
 
 export default function Navbar({ notificationCount = 0, messageCount = 0 }: NavbarProps) {
-  const router = useRouter()
-  const [logoutMutation] = useLogoutMutation()
+  const router = useRouter();
+  const [logoutMutation] = useLogoutMutation();
 
   // Get user data from Redux store
-  const { email, isAuthenticated, userType } = useAppSelector((state) => state.user)
-  const userName = useAppSelector((state) => state.user?.email?.split("@")[0] || "User")
+  const { currentUser } = useAppSelector((state) => state.user);
+  const userName = useAppSelector((state) => state.user?.email?.split("@")[0] || "User");
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
@@ -29,18 +29,18 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
       .split(" ")
       .map((part) => part.charAt(0))
       .join("")
-      .toUpperCase()
-  }
+      .toUpperCase();
+  };
 
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
-  const [isMessagesOpen, setIsMessagesOpen] = useState(false)
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const notificationsRef = useRef<HTMLDivElement>(null)
-  const messagesRef = useRef<HTMLDivElement>(null)
-  const userMenuRef = useRef<HTMLDivElement>(null)
-  const [quickReply, setQuickReply] = useState("")
-  const [activeChat, setActiveChat] = useState<string | null>(null)
-  const dispatch = useAppDispatch()
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const [quickReply, setQuickReply] = useState("");
+  const [activeChat, setActiveChat] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -49,39 +49,39 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
         setIsNotificationsOpen(false);
       }
       if (messagesRef.current && !messagesRef.current.contains(event.target as Node)) {
-        setIsMessagesOpen(false)
+        setIsMessagesOpen(false);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setIsUserMenuOpen(false)
+        setIsUserMenuOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
       // Call the logout endpoint to clear the cookie on the server
-      await logoutMutation().unwrap()
+      await logoutMutation().unwrap();
 
       // Clear the user state in Redux
-      dispatch(clearUser())
+      dispatch(clearUser());
 
       // Clear local storage
-      localStorage.removeItem("userType")
+      localStorage.removeItem("userType");
 
       // Redirect to login page
-      router.push("/login")
+      router.push("/login");
     } catch (error) {
-      console.error("Logout failed", error)
+      console.error("Logout failed", error);
       // Even if the API call fails, clear Redux state and local storage
-      dispatch(clearUser())
-      localStorage.removeItem("userType")
-      router.push("/login")
+      dispatch(clearUser());
+      localStorage.removeItem("userType");
+      router.push("/login");
     }
-  }
+  };
 
   // Sample notifications data
   const notifications = [
@@ -115,7 +115,7 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
       },
     },
     // Additional notifications removed for brevity
-  ]
+  ];
 
   // Sample messages data
   const messages = [
@@ -144,7 +144,7 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
       unread: true,
     },
     // Additional messages removed for brevity
-  ]
+  ];
 
   const handleSendQuickReply = () => {
     if (quickReply.trim() && activeChat) {
@@ -163,16 +163,16 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
           <span className="text-lg font-semibold text-gray-800">Jay</span>
         </Link>
 
-        {isAuthenticated ? (
+        {currentUser ? (
           <div className="flex items-center space-x-4">
             {/* Notification bell with dropdown */}
             <div className="relative" ref={notificationsRef}>
               <button
                 className="focus:outline-none"
                 onClick={() => {
-                  setIsNotificationsOpen(!isNotificationsOpen)
-                  setIsMessagesOpen(false)
-                  setIsUserMenuOpen(false)
+                  setIsNotificationsOpen(!isNotificationsOpen);
+                  setIsMessagesOpen(false);
+                  setIsUserMenuOpen(false);
                 }}
                 aria-label="Notifications"
               >
@@ -184,13 +184,13 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
                 )}
               </button>
 
-            {/* Notifications dropdown */}
-            {isNotificationsOpen && (
-              <div className="absolute right-0 mt-2 w-[400px] bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
-                  <h2 className="text-xl font-semibold text-gray-800">Notifications</h2>
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">Mark all as read</button>
-                </div>
+              {/* Notifications dropdown */}
+              {isNotificationsOpen && (
+                <div className="absolute right-0 mt-2 w-[400px] bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                  <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
+                    <h2 className="text-xl font-semibold text-gray-800">Notifications</h2>
+                    <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">Mark all as read</button>
+                  </div>
 
                   <div className="max-h-[500px] overflow-y-auto">
                     {notifications.length > 0 ? (
@@ -272,9 +272,9 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
               <button
                 className="focus:outline-none"
                 onClick={() => {
-                  setIsMessagesOpen(!isMessagesOpen)
-                  setIsNotificationsOpen(false)
-                  setIsUserMenuOpen(false)
+                  setIsMessagesOpen(!isMessagesOpen);
+                  setIsNotificationsOpen(false);
+                  setIsUserMenuOpen(false);
                 }}
                 aria-label="Messages"
               >
@@ -286,15 +286,15 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
                 )}
               </button>
 
-            {/* Messages dropdown */}
-            {isMessagesOpen && (
-              <div className="absolute right-0 mt-2 w-[400px] bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
-                  <h2 className="text-xl font-semibold text-gray-800">Messages</h2>
-                  <Link href="/messages" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    View all
-                  </Link>
-                </div>
+              {/* Messages dropdown */}
+              {isMessagesOpen && (
+                <div className="absolute right-0 mt-2 w-[400px] bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                  <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
+                    <h2 className="text-xl font-semibold text-gray-800">Messages</h2>
+                    <Link href="/messages" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                      View all
+                    </Link>
+                  </div>
 
                   <div className="max-h-[500px] overflow-y-auto">
                     {messages.length > 0 ? (
@@ -340,8 +340,8 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
                                     message.user.status === "online"
                                       ? "bg-green-500"
                                       : message.user.status === "away"
-                                        ? "bg-yellow-500"
-                                        : "bg-gray-400"
+                                      ? "bg-yellow-500"
+                                      : "bg-gray-400"
                                   }`}
                                 ></div>
                               </div>
@@ -369,7 +369,7 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
                                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
-                                      handleSendQuickReply()
+                                      handleSendQuickReply();
                                     }
                                   }}
                                 />
@@ -390,23 +390,23 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
                     )}
                   </div>
 
-                <div className="p-3 border-t border-gray-100 text-center">
-                  <Link href="/messages" className="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center">
-                    Open Messages
-                  </Link>
+                  <div className="p-3 border-t border-gray-100 text-center">
+                    <Link href="/messages" className="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center">
+                      Open Messages
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
             {/* User profile with dropdown */}
             <div className="relative" ref={userMenuRef}>
               <button
                 className="flex items-center focus:outline-none"
                 onClick={() => {
-                  setIsUserMenuOpen(!isUserMenuOpen)
-                  setIsNotificationsOpen(false)
-                  setIsMessagesOpen(false)
+                  setIsUserMenuOpen(!isUserMenuOpen);
+                  setIsNotificationsOpen(false);
+                  setIsMessagesOpen(false);
                 }}
               >
                 <Avatar
@@ -428,10 +428,7 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                   <div className="py-1">
-                    <Link
-                      href="/profile"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
+                    <Link href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       <User size={16} className="mr-2" />
                       Profile
                     </Link>
@@ -455,10 +452,7 @@ export default function Navbar({ notificationCount = 0, messageCount = 0 }: Navb
             >
               Login
             </Link>
-            <Link
-              href="/signup"
-              className="px-4 py-2 bg-[#D49F2E] text-white font-medium rounded-lg hover:bg-[#C48E1D] transition-colors"
-            >
+            <Link href="/signup" className="px-4 py-2 bg-[#D49F2E] text-white font-medium rounded-lg hover:bg-[#C48E1D] transition-colors">
               Sign Up
             </Link>
           </div>

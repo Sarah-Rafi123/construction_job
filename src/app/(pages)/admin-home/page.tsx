@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Box,
   Container,
@@ -24,15 +24,15 @@ import {
   MenuItem,
   FormControl,
   type SelectChangeEvent,
-} from "@mui/material"
-import { ThemeProvider, createTheme } from "@mui/material/styles"
-import SearchIcon from "@mui/icons-material/Search"
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import CancelIcon from "@mui/icons-material/Cancel"
-import VisibilityIcon from "@mui/icons-material/Visibility"
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone"
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import SortIcon from "@mui/icons-material/Sort"
+} from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import SearchIcon from "@mui/icons-material/Search";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import SortIcon from "@mui/icons-material/Sort";
 
 // Sample data for contractors
 const contractors = [
@@ -116,7 +116,7 @@ const contractors = [
     verificationCertificate: true,
     status: "pending",
   },
-]
+];
 
 // Create a theme with gold primary color
 const theme = createTheme({
@@ -152,37 +152,31 @@ const theme = createTheme({
       },
     },
   },
-})
+});
 
 export default function ContractorVerification() {
-  const [darkMode, setDarkMode] = useState(false)
-  const [filter, setFilter] = useState("All Contractors")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [contractorData, setContractorData] = useState(contractors)
+  const [darkMode, setDarkMode] = useState(false);
+  const [filter, setFilter] = useState("All Contractors");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [contractorData, setContractorData] = useState(contractors);
 
   const handleFilterChange = (event: SelectChangeEvent) => {
-    setFilter(event.target.value)
-  }
+    setFilter(event.target.value);
+  };
 
   const handleAccept = (id: number) => {
-    setContractorData(
-      contractorData.map((contractor) => (contractor.id === id ? { ...contractor, status: "accepted" } : contractor)),
-    )
-  }
+    setContractorData(contractorData.map((contractor) => (contractor.id === id ? { ...contractor, status: "accepted" } : contractor)));
+  };
 
   const handleDecline = (id: number) => {
-    setContractorData(
-      contractorData.map((contractor) => (contractor.id === id ? { ...contractor, status: "declined" } : contractor)),
-    )
-  }
+    setContractorData(contractorData.map((contractor) => (contractor.id === id ? { ...contractor, status: "declined" } : contractor)));
+  };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value)
-  }
+    setSearchQuery(event.target.value);
+  };
 
-  const filteredContractors = contractorData.filter((contractor) =>
-    contractor.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+  const filteredContractors = contractorData.filter((contractor) => contractor.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <ThemeProvider theme={theme}>
@@ -197,7 +191,7 @@ export default function ContractorVerification() {
               mb: 3,
             }}
           >
-            <Typography className="text-black "variant="h4" component="h1" fontWeight="bold">
+            <Typography className="text-black " variant="h4" component="h1" fontWeight="bold">
               Hi Admin!
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -297,8 +291,8 @@ export default function ContractorVerification() {
                         contractor.status === "accepted"
                           ? "rgba(76, 175, 80, 0.1)"
                           : contractor.status === "declined"
-                            ? "rgba(244, 67, 54, 0.1)"
-                            : "inherit",
+                          ? "rgba(244, 67, 54, 0.1)"
+                          : "inherit",
                     }}
                   >
                     <TableCell component="th" scope="row">
@@ -306,11 +300,7 @@ export default function ContractorVerification() {
                         <Avatar
                           sx={{
                             bgcolor:
-                              contractor.status === "accepted"
-                                ? "#4CAF50"
-                                : contractor.status === "declined"
-                                  ? "#f44336"
-                                  : "#D49F2E",
+                              contractor.status === "accepted" ? "#4CAF50" : contractor.status === "declined" ? "#f44336" : "#D49F2E",
                             width: 36,
                             height: 36,
                             mr: 2,
@@ -332,11 +322,7 @@ export default function ContractorVerification() {
                           </Button>
                         </Box>
                       ) : (
-                        <Chip
-                          label="Missing"
-                          size="small"
-                          sx={{ bgcolor: "rgba(244, 67, 54, 0.1)", color: "#f44336" }}
-                        />
+                        <Chip label="Missing" size="small" sx={{ bgcolor: "rgba(244, 67, 54, 0.1)", color: "#f44336" }} />
                       )}
                     </TableCell>
                     <TableCell align="center">
@@ -348,11 +334,7 @@ export default function ContractorVerification() {
                           </Button>
                         </Box>
                       ) : (
-                        <Chip
-                          label="Missing"
-                          size="small"
-                          sx={{ bgcolor: "rgba(244, 67, 54, 0.1)", color: "#f44336" }}
-                        />
+                        <Chip label="Missing" size="small" sx={{ bgcolor: "rgba(244, 67, 54, 0.1)", color: "#f44336" }} />
                       )}
                     </TableCell>
                     <TableCell align="right">
@@ -378,17 +360,9 @@ export default function ContractorVerification() {
                           </Button>
                         </Box>
                       ) : contractor.status === "accepted" ? (
-                        <Chip
-                          label="Accepted"
-                          size="small"
-                          sx={{ bgcolor: "rgba(76, 175, 80, 0.1)", color: "#4CAF50" }}
-                        />
+                        <Chip label="Accepted" size="small" sx={{ bgcolor: "rgba(76, 175, 80, 0.1)", color: "#4CAF50" }} />
                       ) : (
-                        <Chip
-                          label="Declined"
-                          size="small"
-                          sx={{ bgcolor: "rgba(244, 67, 54, 0.1)", color: "#f44336" }}
-                        />
+                        <Chip label="Declined" size="small" sx={{ bgcolor: "rgba(244, 67, 54, 0.1)", color: "#f44336" }} />
                       )}
                     </TableCell>
                   </TableRow>
@@ -399,5 +373,5 @@ export default function ContractorVerification() {
         </Container>
       </Box>
     </ThemeProvider>
-  )
+  );
 }
