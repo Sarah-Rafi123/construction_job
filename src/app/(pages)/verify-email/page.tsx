@@ -145,7 +145,7 @@ export default function VerifyEmail() {
                   </svg>
                 </Box>
                 <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-                  BuildConnect
+                  Jay Constructions 
                 </Typography>
               </Box>
               <Card

@@ -2,6 +2,8 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { authApi } from "../api/authApi";
 
 interface User {
+  profile_picture: any;
+  description: any;
   id: string;
   email: string;
   role: string;

@@ -72,7 +72,7 @@ const FeaturedJobsSection: React.FC = () => {
 
   return (
     <div className="bg-gray-100 py-12">
-      <div className="max-w-screen px-36 mx-auto ">
+      <div className="max-w-screen px-8 mx-auto ">
         <h2 className="text-3xl font-extrabold text-gray-900 mb-8">Featured Jobs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs.slice(0, 3).map((job, index) => (

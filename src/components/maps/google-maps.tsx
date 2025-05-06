@@ -5,8 +5,6 @@ import { GoogleMap, Marker, Circle, useJsApiLoader, InfoWindow } from "@react-go
 import type { Job } from "@/store/api/jobsApi"
 import LocationPermissionRequest from "./location-permission-request"
 
-// If you need to extend the Job type to include the job_location field, add this:
-// Extend the Job type if it doesn't already include job_location
 declare module "@/store/api/jobsApi" {
   interface Job {
     job_location?: {

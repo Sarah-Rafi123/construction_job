@@ -317,7 +317,7 @@ export default function ApplyJobPage() {
                 Contact Information
               </Typography>
               <Typography variant="body1">Name: Project Manager</Typography>
-              <Typography variant="body1">Email: contact@buildconnect.com</Typography>
+              <Typography variant="body1">Email: contact@jayconstructions.com</Typography>
               <Typography variant="body1">Phone: +1 (123) 456-7890</Typography>
             </CardContent>
           </Card>

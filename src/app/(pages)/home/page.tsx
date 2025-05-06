@@ -9,6 +9,7 @@ import JobGrid from "@/components/home-components/job-grid"
 import { useGetJobsQuery } from "@/store/api/jobsApi"
 import { useAppSelector } from "@/store/hooks"
 import type { Job } from "@/store/api/jobsApi"
+import ProtectedRoute from "@/components/global/ProtectedRoute"
 
 export default function Home() {
   const router = useRouter()
@@ -24,22 +25,16 @@ export default function Home() {
   // Fetch jobs using Redux Toolkit Query
   const { data: jobsData, error, isLoading } = useGetJobsQuery()
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login")
-    }
-  }, [isAuthenticated, router])
-
   // Calculate distance between two points in km using Haversine formula
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371 // Radius of the earth in km
+    const R = 6371
     const dLat = deg2rad(lat2 - lat1)
     const dLon = deg2rad(lon2 - lon1)
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    const distance = R * c // Distance in km
+    const distance = R * c
     return distance
   }
 
@@ -104,10 +99,6 @@ export default function Home() {
     }
   }, [jobsData, searchTerm, selectedJobType, selectedServiceType, radiusFilter, sortBy, userLocation])
 
-  const handlePostJob = () => {
-    router.push("/post-job")
-  }
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -124,50 +115,49 @@ export default function Home() {
     )
   }
 
-  const needsApproval = userType === "main-contractor" || userType === "sub-contractor"
-  const isContractor = userType === "main-contractor" || userType === "sub-contractor"
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar notificationCount={5} messageCount={3} />
-      <MainSection userType={userType} />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar messageCount={3} />
+        <MainSection userType={userType} />
 
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mt-12 mb-8 bg-white p-6 rounded-xl shadow-sm">
-          <JobSearch
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            selectedJobType={selectedJobType}
-            setSelectedJobType={setSelectedJobType}
-            selectedServiceType={selectedServiceType}
-            setSelectedServiceType={setSelectedServiceType}
-            radiusFilter={radiusFilter}
-            setRadiusFilter={setRadiusFilter}
-            setSortBy={setSortBy}
-            sortBy={sortBy}
-            userLocation={userLocation}
-          />
+        <main className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="mt-12 mb-8 bg-white p-6 rounded-xl shadow-sm">
+            <JobSearch
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              selectedJobType={selectedJobType}
+              setSelectedJobType={setSelectedJobType}
+              selectedServiceType={selectedServiceType}
+              setSelectedServiceType={setSelectedServiceType}
+              radiusFilter={radiusFilter}
+              setRadiusFilter={setRadiusFilter}
+              setSortBy={setSortBy}
+              sortBy={sortBy}
+              userLocation={userLocation}
+            />
 
-          <JobGrid
-            jobs={filteredJobs}
-            router={router}
-            userLocation={userLocation}
-            radiusFilter={radiusFilter}
-            onUserLocationChange={setUserLocation}
-          />
-        </div>
+            <JobGrid
+              jobs={filteredJobs}
+              router={router}
+              userLocation={userLocation}
+              radiusFilter={radiusFilter}
+              onUserLocationChange={setUserLocation}
+            />
+          </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">
-            You've successfully logged in as a{" "}
-            {userType
-              ?.split("-")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")}
-            .
-          </p>
-        </div>
-      </main>
-    </div>
+          <div className="mt-8 text-center">
+            <p className="text-gray-600">
+              You've successfully logged in as a{" "}
+              {userType
+                ?.split("-")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
+              .
+            </p>
+          </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   )
 }
