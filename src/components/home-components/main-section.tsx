@@ -1,25 +1,55 @@
-"use client";
+"use client"
 
-import Image from "next/image";
-import Home from "../../../public/assets/images/Home.png";
-import { useRouter } from "next/navigation";
+import Image from "next/image"
+import Home from "../../../public/assets/images/Home.png"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
+
 interface MainSectionProps {
-  userType: string | null;
+  userType: string | null
 }
 
 export default function MainSection({ userType }: MainSectionProps) {
-  const router = useRouter();
-  const isContractor = userType === "main-contractor" || userType === "sub-contractor";
+  const router = useRouter()
+  const { data: userData } = useGetUserProfileQuery()
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    // First priority: Use the role directly from API if available
+    if (userData?.data?.role) {
+      // Convert from underscore to hyphen format if needed
+      const apiRole = userData.data.role.replace("_", "-")
+      setUserRole(apiRole)
+    }
+    // Fallback to the userType prop from Redux
+    else if (userType) {
+      setUserRole(userType)
+    }
+  }, [userData, userType])
+
+  // Check if user is a contractor (either main or sub)
+  const isContractor =
+    userRole === "main-contractor" ||
+    userRole === "sub-contractor" ||
+    userRole === "main_contractor" ||
+    userRole === "sub_contractor"
 
   const handlePostJob = () => {
-    router.push("/post-job");
-  };
+    router.push("/post-job")
+  }
 
   return (
     <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <Image src={Home || "/placeholder.svg"} alt="Construction blueprints background" fill className="object-cover" priority />
+        <Image
+          src={Home || "/placeholder.svg"}
+          alt="Construction blueprints background"
+          fill
+          className="object-cover"
+          priority
+        />
       </div>
 
       {!isContractor ? (
@@ -54,8 +84,8 @@ export default function MainSection({ userType }: MainSectionProps) {
           <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 md:px-8">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Find the Right Job, Built Around You</h1>
             <p className="text-white text-base md:text-xl max-w-3xl">
-              We match you with real opportunities in construction — based on your skills, availability, and goals. No fluff. Just work that
-              works for you.
+              We match you with real opportunities in construction — based on your skills, availability, and goals. No
+              fluff. Just work that works for you.
             </p>
           </div>
         </>
@@ -64,8 +94,8 @@ export default function MainSection({ userType }: MainSectionProps) {
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 md:px-8">
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Post Jobs. Build Crews. Win More Projects.</h1>
           <p className="text-white text-base md:text-xl max-w-3xl mb-8">
-            Whether you're a contractor or subcontractor, we help you post jobs fast, connect with skilled labor, and keep your project on
-            track.
+            Whether you're a contractor or subcontractor, we help you post jobs fast, connect with skilled labor, and
+            keep your project on track.
           </p>
           <button
             onClick={handlePostJob}
@@ -76,5 +106,5 @@ export default function MainSection({ userType }: MainSectionProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

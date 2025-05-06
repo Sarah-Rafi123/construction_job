@@ -76,7 +76,7 @@ export default function SignupPage() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay
+              Jay Constructions
             </Typography>
           </Box>
 

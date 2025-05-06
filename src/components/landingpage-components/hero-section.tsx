@@ -17,8 +17,8 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
   }
 
   return (
-    <section className="py-12 md:py-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-12">
+      <div className="container mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">

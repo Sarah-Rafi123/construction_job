@@ -363,7 +363,7 @@ export default function JobSeekerSignup() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              BuildConnect
+              Jay Constructions 
             </Typography>
           </Box>
 

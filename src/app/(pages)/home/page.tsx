@@ -92,17 +92,29 @@ export default function Home() {
 
       setFilteredJobs(results);
     }
-  }, [jobsData, searchTerm, selectedJobType, selectedServiceType, radiusFilter, sortBy, userLocation]);
+  }, [jobsData, searchTerm, selectedJobType, selectedServiceType, radiusFilter, sortBy, userLocation])
 
-  const handlePostJob = () => {
-    router.push("/post-job");
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-lg font-semibold text-gray-700">Loading jobs...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-lg font-semibold text-red-700">Error loading jobs. Please try again later.</p>
+      </div>
+    )
+  }
 
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-        <Navbar notificationCount={5} messageCount={3} />
-        <MainSection userType={currentUser?.role || null} />
+        <Navbar messageCount={3} />
+        <MainSection userType={userType} />
 
         <main className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="mt-12 mb-8 bg-white p-6 rounded-xl shadow-sm">
@@ -132,8 +144,8 @@ export default function Home() {
           <div className="mt-8 text-center">
             <p className="text-gray-600">
               You've successfully logged in as a{" "}
-              {currentUser?.role
-                ?.split("_")
+              {userType
+                ?.split("-")
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(" ")}
               .
@@ -142,5 +154,5 @@ export default function Home() {
         </main>
       </div>
     </ProtectedRoute>
-  );
+  )
 }

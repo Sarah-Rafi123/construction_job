@@ -17,14 +17,9 @@ import InputAdornment from "@mui/material/InputAdornment"
 import IconButton from "@mui/material/IconButton"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
-import FormControl from "@mui/material/FormControl"
-import Select from "@mui/material/Select"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
 import { Briefcase } from "lucide-react"
-import MenuItem from "@mui/material/MenuItem"
-import { useAppDispatch } from "@/store/hooks"
-import { setUserType } from "@/store/slices/userSlice"
 import { useLoginMutation } from "@/store/api/authApi"
 
 const theme = createTheme({
@@ -38,16 +33,15 @@ const theme = createTheme({
       paper: "#ffffff",
     },
     error: {
-      main: "#d32f2f", // Red color for errors
+      main: "#d32f2f",
     },
   },
 })
 
-// Custom error message component with fixed height to prevent layout shifts
 const ErrorMessage = ({ message }: { message: string }) => (
   <Box
     sx={{
-      height: "20px", // Fixed height for error container
+      height: "20px",
       mt: 0.5,
       mb: 0.5,
       display: "flex",
@@ -64,14 +58,12 @@ const ErrorMessage = ({ message }: { message: string }) => (
 
 export default function LoginPage() {
   const router = useRouter()
-  const dispatch = useAppDispatch()
   const [login, { isLoading }] = useLoginMutation()
 
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState({
     email: "",
     password: "",
-    userType: "",
     general: "",
   })
 
@@ -79,8 +71,6 @@ export default function LoginPage() {
     email: "",
     password: "",
   })
-
-  const [userType, setUserTypeState] = useState("")
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -102,29 +92,13 @@ export default function LoginPage() {
     }))
   }
 
-  const handleUserTypeChange = (e: any) => {
-    setUserTypeState(e.target.value)
-    // Clear userType error when user selects an option
-    setErrors((prev) => ({
-      ...prev,
-      userType: "",
-    }))
-  }
-
   const validateForm = () => {
     const newErrors = {
       email: "",
       password: "",
-      userType: "",
       general: "",
     }
     let isValid = true
-
-    // Validate user type
-    if (!userType) {
-      newErrors.userType = "Please select your account type"
-      isValid = false
-    }
 
     // Validate email
     if (!formData.email) {
@@ -162,15 +136,24 @@ export default function LoginPage() {
         password: formData.password,
       }).unwrap()
 
-      // Store user type in Redux
-      dispatch(setUserType(userType))
+      // Log the entire response for debugging
+      console.log("Login response:", response)
 
-      // Store user type in localStorage as well for persistence
-      localStorage.setItem("userType", userType)
+      // Check if user is an admin - make sure we're accessing the correct property path
+      const isAdmin = response.user?.role === "admin"
+      console.log("User role:", response.user?.role)
+      console.log("Is admin:", isAdmin)
 
-      // Redirect to home page
-      router.push("/home")
+      // Redirect based on role
+      if (isAdmin) {
+        console.log("Admin user detected, redirecting to admin-home")
+        router.push("/admin-home")
+      } else {
+        console.log("Regular user detected, redirecting to home")
+        router.push("/home")
+      }
     } catch (err: any) {
+      console.error("Login error:", err)
       // Set a general error message
       setErrors((prev) => ({
         ...prev,
@@ -216,7 +199,7 @@ export default function LoginPage() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              BuildConnect
+              Jay Constructions
             </Typography>
           </Box>
 
@@ -251,30 +234,6 @@ export default function LoginPage() {
                       </Typography>
                     </Box>
                   )}
-
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <FormLabel htmlFor="user-type" className="text-gray-700">
-                      Account Type
-                    </FormLabel>
-                    <FormControl fullWidth size="small">
-                      <Select
-                        id="user-type"
-                        value={userType}
-                        onChange={handleUserTypeChange}
-                        displayEmpty
-                        className="rounded"
-                        error={!!errors.userType}
-                      >
-                        <MenuItem value="" disabled>
-                          Select account type
-                        </MenuItem>
-                        <MenuItem value="main-contractor">Main Contractor</MenuItem>
-                        <MenuItem value="sub-contractor">Sub Contractor</MenuItem>
-                        <MenuItem value="job-seeker">Job Seeker</MenuItem>
-                      </Select>
-                    </FormControl>
-                    <ErrorMessage message={errors.userType} />
-                  </Box>
 
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="email" className="text-gray-700">

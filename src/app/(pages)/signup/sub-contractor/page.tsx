@@ -288,7 +288,7 @@ export default function SubContractorSignup() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              BuildConnect
+              Jay Constructions 
             </Typography>
           </Box>
           <Box

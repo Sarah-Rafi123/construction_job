@@ -7,6 +7,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  data: any
   token: string
   user: {
     id: string

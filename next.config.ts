@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
 
     return config
   },
+  images: {
+    domains: ["jay-construction-project.s3.amazonaws.com"],
+  },
 }
 
 export default nextConfig
