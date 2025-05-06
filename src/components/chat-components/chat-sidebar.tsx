@@ -1,12 +1,11 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Search, Menu, X } from "lucide-react";
 import { Avatar } from "@mui/material";
 import { useGetInboxQuery } from "@/store/api/chatApi";
 import { Chat } from "../../types/chatTypes";
-import { useSelector, useDispatch } from "react-redux";
-import { setActiveConversation } from "@/store/slices/chatSlice";
+import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 
 interface ChatSidebarProps {
@@ -16,14 +15,13 @@ interface ChatSidebarProps {
 
 export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: ChatSidebarProps) {
   const { isLoading, isError } = useGetInboxQuery();
-  const dispatch = useDispatch();
+  const router = useRouter();
   const { inbox, activeConversation } = useSelector((state: RootState) => state.chat);
   const { currentUser } = useSelector((state: RootState) => state?.user);
   const [searchQuery, setSearchQuery] = useState("");
 
   const updateActiveConversation = (conversation: Chat) => {
-    dispatch(setActiveConversation(conversation));
-    toggleMobileDrawer();
+    router.push(`/chat/${conversation._id}`);
   };
 
   console.log("current user is", currentUser);
