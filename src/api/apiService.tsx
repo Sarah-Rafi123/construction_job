@@ -1,4 +1,6 @@
 import axios from "axios"
+import { clearCurrentUser } from "@/store/slices/userSlice" // Import the action to clear user state
+import { store } from "@/store" // Import your Redux store
 
 // Create an axios instance with default config
 const apiClient = axios.create({
@@ -26,7 +28,19 @@ apiClient.interceptors.response.use(
     // Handle global errors here (e.g., 401 unauthorized, etc.)
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      // Redirect to login if needed
+      console.log("Unauthorized access detected, redirecting to landing page")
+
+      // Clear user data from Redux store
+      store.dispatch(clearCurrentUser())
+
+      // Clear any local storage items related to authentication if you have any
+      localStorage.removeItem("userType")
+
+      // Redirect to landing page
+      if (typeof window !== "undefined") {
+        // Check if we're in the browser environment
+        window.location.href = "/landing-page"
+      }
     }
     return Promise.reject(error)
   },

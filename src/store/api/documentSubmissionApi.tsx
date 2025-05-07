@@ -11,7 +11,7 @@ export const documentSubmissionApi = createApi({
   reducerPath: "documentSubmissionApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:9000/api/v0",
-    credentials: "include", // This is important to send and receive cookies
+    credentials: "include", 
   }),
   endpoints: (builder) => ({
     submitContractorDocuments: builder.mutation<

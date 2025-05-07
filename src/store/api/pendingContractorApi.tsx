@@ -38,7 +38,7 @@ export const contractorApi = createApi({
   reducerPath: "contractorApi",
   baseQuery:fetchBaseQuery({
     baseUrl: "http://localhost:9000/api/v0",
-    credentials: "include", // This is important to send and receive cookies
+    credentials: "include", 
   }),
   tagTypes: ["PendingContractors"],
   endpoints: (builder) => ({

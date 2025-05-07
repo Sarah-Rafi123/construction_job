@@ -51,7 +51,7 @@ export const jobsApi = createApi({
   reducerPath: "jobsApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:9000/api/v0/",
-    credentials: "include", // This is important to send cookies with requests
+    credentials: "include", 
   }),
   endpoints: (builder) => ({
     getJobs: builder.query<JobsResponse, void>({

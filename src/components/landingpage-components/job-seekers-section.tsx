@@ -1,7 +1,29 @@
-import Link from "next/link"
+"use client"
+
+import { useSelector } from "react-redux"
+import { useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
+import type { RootState } from "@/store"
 
 export default function JobSeekersSection() {
+  const router = useRouter()
+
+  // Get authentication state from Redux store
+  const currentUser = useSelector((state: RootState) => state.user?.currentUser)
+  const isAuthenticated = !!currentUser
+
+  // Function to handle navigation when "Find Jobs" is clicked
+  const handleFindJobsClick = () => {
+    // Check if user is authenticated
+    if (isAuthenticated) {
+      // If logged in, navigate to jobs page
+      router.push("/home")
+    } else {
+      // If not logged in, navigate to login page
+      router.push("/login")
+    }
+  }
+
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,17 +71,16 @@ export default function JobSeekersSection() {
             </div>
 
             <div className="mt-8">
-              <Link
-                href="/login"
+              <button
+                onClick={handleFindJobsClick}
                 className="px-32 py-2 bg-[#D49F2E] text-white font-medium rounded-md inline-block hover:bg-[#C48E1D] transition-colors"
               >
                 Find Jobs
-              </Link>
+              </button>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 p-8 hidden md:block">
-          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-8 hidden md:block"></div>
         </div>
       </div>
     </section>

@@ -29,7 +29,7 @@ export const userProfileApi = createApi({
   reducerPath: "userProfileApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:9000/api/v0",
-    credentials: "include", // This is important to send and receive cookies
+    credentials: "include",
   }),
   tagTypes: ["UserProfile"],
   endpoints: (builder) => ({

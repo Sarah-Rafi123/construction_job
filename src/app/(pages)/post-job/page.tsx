@@ -103,20 +103,22 @@ const theme = createTheme({
 interface Service {
   type: string
   count: number
-  customType?: string
+  // customType field is commented out as requested
+  // customType?: string
 }
 
+// Updated service types list as requested
 const serviceTypes = [
+  "Construction Laborer",
   "Electrician",
   "Plumber",
   "Carpenter",
-  "Painter",
-  "HVAC Technician",
   "Mason",
+  "Painter",
+  "Welder",
   "Roofer",
-  "Landscaper",
-  "General Labor",
-  "Other",
+  "Tiler",
+  "Pipe Fitter",
 ]
 
 const jobTypes = ["Full Time", "Part Time", "Contract", "Project-based", "Temporary", "Seasonal"]
@@ -197,21 +199,26 @@ export default function PostJob() {
   const handleServiceTypeChange = (index: number, value: string) => {
     const updatedServices = [...services]
     updatedServices[index].type = value
+    // Custom type handling is commented out as requested
+    /*
     if (value !== "Other") {
       delete updatedServices[index].customType
     } else if (!updatedServices[index].customType) {
       updatedServices[index].customType = ""
     }
+    */
     setServices(updatedServices)
   }
 
-  // Handle custom service type change
+  // Handle custom service type change - commented out as requested
+  /*
   const handleCustomServiceChange = (index: number, value: string) => {
     const updatedServices = [...services]
     updatedServices[index].customType = value
     console.log(`Updated custom service type at index ${index} to: "${value}"`)
     setServices(updatedServices)
   }
+  */
 
   // Handle service count change
   const handleServiceCountChange = (index: number, value: string) => {
@@ -239,6 +246,8 @@ export default function PostJob() {
       return
     }
 
+    // Custom type validation is commented out as requested
+    /*
     // Add this validation for custom service types:
     // Check if any service with type "Other" is missing a custom type
     const missingCustomType = services.some(
@@ -252,14 +261,12 @@ export default function PostJob() {
       })
       return
     }
+    */
 
     // Format services data according to API requirements
     const formattedServices = services.map((service) => {
-      // Determine the service name - use customType if type is "Other"
-      let serviceName = service.type
-      if (service.type === "Other" && service.customType) {
-        serviceName = service.customType
-      }
+      // Determine the service name - custom type handling is removed
+      const serviceName = service.type
 
       // Calculate the number of days based on duration type
       let numberOfDays = 7 // Default to 7 days
@@ -278,7 +285,8 @@ export default function PostJob() {
       }
     })
 
-    // Debug logging for custom services
+    // Debug logging for custom services is commented out
+    /*
     services.forEach((service, index) => {
       if (service.type === "Other") {
         console.log(`Custom service at index ${index}:`)
@@ -287,6 +295,7 @@ export default function PostJob() {
         console.log(`  Formatted service name: ${formattedServices[index].service_name}`)
       }
     })
+    */
 
     // Format job type to match API requirements (lowercase with hyphen)
     const formattedJobType = jobType.toLowerCase().replace(" ", "-")
@@ -637,6 +646,8 @@ export default function PostJob() {
                             </TextField>
                           </Grid>
 
+                          {/* Custom service type input is commented out as requested */}
+                          {/*
                           {service.type === "Other" && (
                             <Grid item xs={12}>
                               <FormLabel required sx={{ display: "block", mb: 1 }}>
@@ -658,11 +669,11 @@ export default function PostJob() {
                               />
                             </Grid>
                           )}
+                          */}
 
                           <Grid item xs={12}>
                             <FormLabel required sx={{ display: "block", mb: 1 }}>
-                              Number of{" "}
-                              {service.type === "Other" ? service.customType || "Workers" : service.type + "s"} Required
+                              Number of {service.type}s Required
                             </FormLabel>
                             <TextField
                               required

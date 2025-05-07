@@ -1,7 +1,10 @@
 "use client"
+
+import { useSelector } from "react-redux"
 import { useRouter } from "next/navigation"
 import { Briefcase, Building2, Users, PlusCircle } from "lucide-react"
 import HouseSvg from "../../../public/assets/svg/HouseSVG"
+import type { RootState } from "@/store"
 
 interface HeroSectionProps {
   companies?: string[]
@@ -10,10 +13,20 @@ interface HeroSectionProps {
 export default function HeroSection({ companies = [] }: HeroSectionProps) {
   const router = useRouter()
 
+  // Get current user from Redux store (set by ProtectedRoute)
+  const currentUser = useSelector((state: RootState) => state.user?.currentUser)
+  const isAuthenticated = !!currentUser
+
   // Function to handle navigation when "Explore More" is clicked
   const handleExploreClick = () => {
-    // Navigate to the desired route - change '/explore' to any route you want
-    router.push("/login")
+    // Check if user is authenticated based on currentUser presence
+    if (isAuthenticated) {
+      // If logged in, navigate to home page
+      router.push("/home")
+    } else {
+      // If not logged in, navigate to login page
+      router.push("/login")
+    }
   }
 
   return (

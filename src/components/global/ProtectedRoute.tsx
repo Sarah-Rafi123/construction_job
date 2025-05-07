@@ -13,9 +13,14 @@ import type { RootState } from "@/store"
 interface ProtectedRouteProps {
   children: React.ReactNode
   allowedRoles?: string[]
+  redirectUnauthenticated?: boolean // New prop to control redirection
 }
 
-const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
+const ProtectedRoute = ({
+  children,
+  allowedRoles,
+  redirectUnauthenticated = true, // Default to true for backward compatibility
+}: ProtectedRouteProps) => {
   const router = useRouter()
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(true)
@@ -58,7 +63,13 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
 
       console.error("Not authenticated:", error)
       dispatch(clearCurrentUser())
-      router.replace("/landing-page")
+
+      // Only redirect if redirectUnauthenticated is true
+      if (redirectUnauthenticated) {
+        router.replace("/landing-page")
+      } else {
+        setLoading(false) // Still need to set loading to false if not redirecting
+      }
     }
   }
 
@@ -90,7 +101,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
       // Don't disconnect socket on unmount as it might be a page navigation
       // If you want to disconnect on logout, handle that separately
     }
-  }, [allowedRoles, currentUser, router, dispatch])
+  }, [allowedRoles, currentUser, router, dispatch, redirectUnauthenticated])
 
   // Handle page refresh
   useEffect(() => {
@@ -116,7 +127,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     // Clean up event listeners
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload)
-      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      window.removeEventListener("visibilitychange", handleVisibilityChange)
     }
   }, [])
 
