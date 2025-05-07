@@ -31,9 +31,9 @@ export default function MainSection({ userType }: MainSectionProps) {
   // Check if user is a contractor (either main or sub)
   const isContractor =
     userRole === "main-contractor" ||
-    userRole === "sub-contractor" ||
+    userRole === "subcontractor" ||
     userRole === "main_contractor" ||
-    userRole === "sub_contractor"
+    userRole === "subcontractor"
 
   const handlePostJob = () => {
     router.push("/post-job")

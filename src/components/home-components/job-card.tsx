@@ -22,7 +22,7 @@ export default function JobCard({ job, router }: JobCardProps) {
     <div className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
       <div className="flex justify-between items-start mb-1">
         <h3 className="text-base font-semibold text-gray-800">{job.job_title}</h3>
-        <span className="text-sm text-gray-400 flex items-center">
+        <span className="text-sm w-28 text-gray-400 flex items-center">
           <Clock className="h-3 w-3 mr-1" />
           {timeAgo}
         </span>
@@ -52,7 +52,7 @@ export default function JobCard({ job, router }: JobCardProps) {
         )}
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex bottom-0 items-center justify-between">
         <div className="flex items-center text-gray-500 text-sm">
           <MapPin className="h-4 w-4 mr-1 text-gray-400" />
           {job.job_location ? "Map location" : "Location not specified"}

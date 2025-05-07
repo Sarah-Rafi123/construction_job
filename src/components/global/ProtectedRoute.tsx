@@ -1,67 +1,149 @@
-// components/ProtectedRoute.tsx
-"use client";
-import socket from "@/lib/socket/connectSocket";
-console.log("called called");
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { setCurrentUser, clearCurrentUser } from "@/store/slices/userSlice";
-import { RootState } from "@/store";
+"use client"
+
+import type React from "react"
+
+import socket from "@/lib/socket/connectSocket"
+import { useEffect, useState, useRef } from "react"
+import { useRouter } from "next/navigation"
+import axios from "axios"
+import { useDispatch, useSelector } from "react-redux"
+import { setCurrentUser, clearCurrentUser } from "@/store/slices/userSlice"
+import type { RootState } from "@/store"
+
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  allowedRoles?: string[];
+  children: React.ReactNode
+  allowedRoles?: string[]
 }
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const router = useRouter();
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
-  const currentUser = useSelector((state: RootState) => state.user?.currentUser || "");
+  const router = useRouter()
+  const dispatch = useDispatch()
+  const [loading, setLoading] = useState(true)
+  const currentUser = useSelector((state: RootState) => state.user?.currentUser || "")
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get("http://localhost:9000/api/v0/get-me", {
-          withCredentials: true,
-        });
-        const user = response.data.data;
-        dispatch(setCurrentUser(user));
+  // Track if component is mounted to prevent state updates after unmount
+  const isMounted = useRef(true)
 
-        if (allowedRoles && !allowedRoles.includes(user.role)) {
-          router.replace("/unauthorized");
-          return;
-        }
-        setLoading(false);
-        socket.connect();
-      } catch (error) {
-        console.error("Not authenticated:", error);
-        dispatch(clearCurrentUser());
-        router.replace("/login");
+  // Track if we've already attempted to reconnect the socket
+  const socketConnected = useRef(false)
+
+  // Function to fetch user data
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get("http://localhost:9000/api/v0/get-me", {
+        withCredentials: true,
+      })
+
+      // Check if component is still mounted before updating state
+      if (!isMounted.current) return
+
+      const user = response.data.data
+      dispatch(setCurrentUser(user))
+
+      if (allowedRoles && !allowedRoles.includes(user.role)) {
+        router.replace("/")
+        return
       }
-    };
+
+      // Connect socket if not already connected
+      if (!socketConnected.current) {
+        socket.connect()
+        socketConnected.current = true
+      }
+
+      setLoading(false)
+    } catch (error) {
+      // Check if component is still mounted before updating state
+      if (!isMounted.current) return
+
+      console.error("Not authenticated:", error)
+      dispatch(clearCurrentUser())
+      router.replace("/landing-page")
+    }
+  }
+
+  // Handle initial authentication and role check
+  useEffect(() => {
+    // Set mounted flag
+    isMounted.current = true
 
     if (!currentUser) {
-      fetchUser();
+      fetchUser()
     } else {
       if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
-        router.replace("/unauthorized");
+        router.replace("/")
       } else {
-        setLoading(false);
-        socket.connect();
+        setLoading(false)
+
+        // Connect socket if not already connected
+        if (!socketConnected.current) {
+          socket.connect()
+          socketConnected.current = true
+        }
       }
     }
-  }, [allowedRoles, currentUser]);
+
+    // Clean up function
+    return () => {
+      isMounted.current = false
+
+      // Don't disconnect socket on unmount as it might be a page navigation
+      // If you want to disconnect on logout, handle that separately
+    }
+  }, [allowedRoles, currentUser, router, dispatch])
+
+  // Handle page refresh
+  useEffect(() => {
+    // Listen for beforeunload event (page refresh)
+    const handleBeforeUnload = () => {
+      // You can optionally do something before the page refreshes
+      // For example, save some state to localStorage
+      localStorage.setItem("lastPath", window.location.pathname)
+    }
+
+    // Listen for visibilitychange event (tab becomes visible again)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // Re-verify authentication when tab becomes visible again
+        fetchUser()
+      }
+    }
+
+    // Add event listeners
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    // Clean up event listeners
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [])
+
+  // Handle back/forward navigation
+  useEffect(() => {
+    // Listen for popstate event (browser back/forward buttons)
+    const handlePopState = () => {
+      // Re-verify authentication on navigation
+      fetchUser()
+    }
+
+    window.addEventListener("popstate", handlePopState)
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState)
+    }
+  }, [])
 
   if (loading) {
     return (
       <div className="h-screen w-screen flex items-center justify-center">
         <div>Loading...</div>
       </div>
-    );
+    )
   }
 
-  return <>{children}</>;
-};
+  return <>{children}</>
+}
 
-export default ProtectedRoute;
+export default ProtectedRoute

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Filter, ChevronDown, MapPin } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { Search, Filter, ChevronDown, MapPin, Check } from "lucide-react"
 import { Slider } from "@mui/material"
 
 interface JobSearchProps {
@@ -16,6 +16,66 @@ interface JobSearchProps {
   sortBy: string
   setSortBy: (sort: string) => void
   userLocation: { lat: number; lng: number } | null
+}
+
+// Custom dropdown component
+interface CustomDropdownProps {
+  options: string[]
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  className?: string
+}
+
+function CustomDropdown({ options, value, onChange, placeholder, className = "" }: CustomDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+  return (
+    <div className={`relative ${className}`} ref={dropdownRef}>
+      <div
+        className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md text-black cursor-pointer flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="text-black">{value || placeholder || "Select an option"}</span>
+        <ChevronDown className="absolute right-3 text-gray-400" size={18} />
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+          {options.map((option) => (
+            <div
+              key={option}
+              className={`px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center justify-between text-black ${
+                value === option ? "bg-amber-50 text-amber-700" : "text-black"
+              }`}
+              onClick={() => {
+                onChange(option)
+                setIsOpen(false)
+              }}
+            >
+              <span>{option}</span>
+              {value === option && <Check size={16} className="text-amber-500" />}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function JobSearch({
@@ -35,6 +95,14 @@ export default function JobSearch({
 
   const jobTypes = ["All Types", "Full-Time", "Part-Time", "Contract", "Temporary"]
   const serviceTypes = ["All Services", "Electrician", "Plumber", "Carpenter", "Painter", "Construction Manager"]
+  const sortOptions = [
+    { value: "newest", label: "Newest First" },
+    { value: "budget-high", label: "Budget: High to Low" },
+    { value: "budget-low", label: "Budget: Low to High" },
+  ]
+
+  // Find the label for the current sort value
+  const currentSortLabel = sortOptions.find((option) => option.value === sortBy)?.label || sortOptions[0].label
 
   return (
     <div className="mb-6">
@@ -51,18 +119,16 @@ export default function JobSearch({
           />
         </div>
 
-        {/* Sort dropdown */}
+        {/* Sort dropdown - using custom dropdown */}
         <div className="relative min-w-[180px]">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md text-black appearance-none focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-          >
-            <option value="newest">Newest First</option>
-            <option value="budget-high">Budget: High to Low</option>
-            <option value="budget-low">Budget: Low to High</option>
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <CustomDropdown
+            options={sortOptions.map((option) => option.label)}
+            value={currentSortLabel}
+            onChange={(label) => {
+              const option = sortOptions.find((opt) => opt.label === label)
+              if (option) setSortBy(option.value)
+            }}
+          />
         </div>
 
         {/* Filter button */}
@@ -78,31 +144,11 @@ export default function JobSearch({
         <div className="bg-gray-50 p-4 rounded-md mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Job Type</label>
-            <select
-              value={selectedJobType}
-              onChange={(e) => setSelectedJobType(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            >
-              {jobTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
+            <CustomDropdown options={jobTypes} value={selectedJobType} onChange={setSelectedJobType} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Service Type</label>
-            <select
-              value={selectedServiceType}
-              onChange={(e) => setSelectedServiceType(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            >
-              {serviceTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
+            <CustomDropdown options={serviceTypes} value={selectedServiceType} onChange={setSelectedServiceType} />
           </div>
           <div>
             <div className="flex items-center justify-between">

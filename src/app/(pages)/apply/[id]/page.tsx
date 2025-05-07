@@ -1,8 +1,8 @@
-"use client";
-import socket from "@/lib/socket/connectSocket";
-import type React from "react";
-import { useRouter, useParams } from "next/navigation";
-import { useState, useRef } from "react";
+"use client"
+import socket from "@/lib/socket/connectSocket"
+import type React from "react"
+import { useRouter, useParams } from "next/navigation"
+import { useState, useRef } from "react"
 import {
   Box,
   Card,
@@ -22,21 +22,20 @@ import {
   createTheme,
   IconButton,
   Paper,
-  CircularProgress,
-} from "@mui/material";
-import { Message, Chat } from "@/types/chatTypes";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import WorkIcon from "@mui/icons-material/Work";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import CloseIcon from "@mui/icons-material/Close";
-import AddIcon from "@mui/icons-material/Add";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import { format } from "date-fns";
-import Navbar from "@/components/layout/navbar";
-import axios from "axios";
-import { useGetJobByIdQuery } from "@/store/api/jobsApi";
-import ProtectedRoute from "@/components/global/ProtectedRoute";
+} from "@mui/material"
+import type { Message, Chat } from "@/types/chatTypes"
+import LocationOnIcon from "@mui/icons-material/LocationOn"
+import WorkIcon from "@mui/icons-material/Work"
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney"
+import CloseIcon from "@mui/icons-material/Close"
+import AddIcon from "@mui/icons-material/Add"
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
+import { format } from "date-fns"
+import Navbar from "@/components/layout/navbar"
+import axios from "axios"
+import { useGetJobByIdQuery } from "@/store/api/jobsApi"
+import ProtectedRoute from "@/components/global/ProtectedRoute"
 
 // Create a custom theme with #D49F2E as the primary color
 const theme = createTheme({
@@ -81,57 +80,57 @@ const theme = createTheme({
       },
     },
   },
-});
+})
 
 interface Attachment {
-  id: string;
-  name: string;
-  file: File;
+  id: string
+  name: string
+  file: File
 }
 
 export default function ApplyJobPage() {
-  const router = useRouter();
-  const params = useParams();
-  const id = params.id as string;
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter()
+  const params = useParams()
+  const id = params.id as string
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const { data, error, isLoading } = useGetJobByIdQuery(id);
-  const job = data?.job;
-  const [openDialog, setOpenDialog] = useState(false);
-  const [enquiryTitle, setEnquiryTitle] = useState("");
-  const [enquiryText, setEnquiryText] = useState("");
-  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const { data, error, isLoading } = useGetJobByIdQuery(id)
+  const job = data?.job
+  const [openDialog, setOpenDialog] = useState(false)
+  const [enquiryTitle, setEnquiryTitle] = useState("")
+  const [enquiryText, setEnquiryText] = useState("")
+  const [attachments, setAttachments] = useState<Attachment[]>([])
   const [errors, setErrors] = useState({
     title: "",
     enquiry: "",
-  });
+  })
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
+      const file = event.target.files[0]
       const newAttachment: Attachment = {
         id: Math.random().toString(36).substring(2, 9),
         name: file.name,
         file: file,
-      };
-      setAttachments([...attachments, newAttachment]);
+      }
+      setAttachments([...attachments, newAttachment])
     }
     // Reset the input value so the same file can be selected again
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = ""
     }
-  };
+  }
 
   const removeAttachment = (id: string) => {
-    setAttachments(attachments.filter((attachment) => attachment.id !== id));
-  };
+    setAttachments(attachments.filter((attachment) => attachment.id !== id))
+  }
 
   async function uploadAttachments(attachments: { file: File }[]) {
-    const formData = new FormData();
+    const formData = new FormData()
 
     attachments.forEach((attachment) => {
-      formData.append("files", attachment.file);
-    });
+      formData.append("files", attachment.file)
+    })
 
     try {
       const response = await axios.post("http://localhost:9000/api/v0/upload/multiple", formData, {
@@ -139,12 +138,12 @@ export default function ApplyJobPage() {
           "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
-      });
-      console.log("response is", response);
-      return response.data.files; // array of S3 URLs
+      })
+      console.log("response is", response)
+      return response.data.files // array of S3 URLs
     } catch (error) {
-      console.error("File upload failed", error);
-      throw error;
+      console.error("File upload failed", error)
+      throw error
     }
   }
 
@@ -152,32 +151,32 @@ export default function ApplyJobPage() {
     const newErrors = {
       title: "",
       enquiry: "",
-    };
+    }
 
-    let isValid = true;
+    let isValid = true
 
     if (!enquiryTitle.trim()) {
-      newErrors.title = "Please enter a title for your enquiry";
-      isValid = false;
+      newErrors.title = "Please enter a title for your enquiry"
+      isValid = false
     }
 
     if (enquiryText.trim().length < 20) {
-      newErrors.enquiry = "Please provide more details in your enquiry (minimum 20 characters)";
-      isValid = false;
+      newErrors.enquiry = "Please provide more details in your enquiry (minimum 20 characters)"
+      isValid = false
     }
 
-    setErrors(newErrors);
+    setErrors(newErrors)
 
     if (isValid) {
-      const uploadedAttachments = await uploadAttachments(attachments);
-      console.log("uploaded urls", uploadAttachments);
+      const uploadedAttachments = await uploadAttachments(attachments)
+      console.log("uploaded urls", uploadAttachments)
       // Here you would normally send the data to your API
       console.log("Submitting enquiry:", {
         title: enquiryTitle,
         enquiry: enquiryText,
         attachments: uploadedAttachments?.map((file) => file.url),
         jobId: id,
-      });
+      })
 
       socket.emit(
         "sendMessage",
@@ -193,30 +192,30 @@ export default function ApplyJobPage() {
         },
         ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
           if (!error && data) {
-            console.log("message sent", data);
-            router.push(`/chat/${data.conversation._id}`);
+            console.log("message sent", data)
+            router.push(`/chat/${data.conversation._id}`)
           } else {
-            console.error("Message send failed:", error);
+            console.error("Message send failed:", error)
           }
-        }
-      );
+        },
+      )
 
-      alert("Your enquiry has been submitted!");
-      setOpenDialog(false);
+      alert("Your enquiry has been submitted!")
+      setOpenDialog(false)
 
       // Reset form
-      setEnquiryTitle("");
-      setEnquiryText("");
-      setAttachments([]);
+      setEnquiryTitle("")
+      setEnquiryText("")
+      setAttachments([])
     }
-  };
+  }
 
   const handleGoBack = () => {
-    router.push("/home");
-  };
+    router.push("/home")
+  }
 
   if (isLoading) {
-    return;
+    return
   }
 
   if (error) {
@@ -232,12 +231,12 @@ export default function ApplyJobPage() {
           </Button>
         </Box>
       </ThemeProvider>
-    );
+    )
   }
 
   // Format the creation date
-  const createdDate = new Date(job.createdAt);
-  const formattedDate = format(createdDate, "MMMM dd, yyyy");
+  const createdDate = new Date(job.createdAt)
+  const formattedDate = format(createdDate, "MMMM dd, yyyy")
 
   // Get the first letter of each word in the job title for the avatar
   const avatarText = job.job_title
@@ -245,7 +244,7 @@ export default function ApplyJobPage() {
     .map((word) => word[0])
     .join("")
     .substring(0, 2)
-    .toUpperCase();
+    .toUpperCase()
 
   return (
     <ProtectedRoute>
@@ -253,10 +252,7 @@ export default function ApplyJobPage() {
         <Navbar />
         <Box sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 64px)" }}>
           <Container maxWidth="md" sx={{ py: 4 }}>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 3, cursor: "pointer" }} onClick={handleGoBack}>
-              <ArrowBackIcon sx={{ mr: 1 }} />
-              <Typography>Back to Jobs</Typography>
-            </Box>
+            {/* Removed the back button from here */}
 
             <Card sx={{ mb: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
               <CardContent>
@@ -273,7 +269,9 @@ export default function ApplyJobPage() {
                 <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                   <LocationOnIcon sx={{ mr: 1, color: "#D49F2E" }} />
                   <Typography color="text.secondary">
-                    {job.job_location ? `${job.job_location.coordinates[0]}, ${job.job_location.coordinates[1]}` : "Location not specified"}
+                    {job.job_location
+                      ? `${job.job_location.coordinates[0]}, ${job.job_location.coordinates[1]}`
+                      : "Location not specified"}
                   </Typography>
                 </Box>
 
@@ -284,7 +282,9 @@ export default function ApplyJobPage() {
 
                 <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                   <AttachMoneyIcon sx={{ mr: 1, color: "#D49F2E" }} />
-                  <Typography color="text.secondary">{job.budget ? `$${job.budget}` : "Budget not specified"}</Typography>
+                  <Typography color="text.secondary">
+                    {job.budget ? `$${job.budget}` : "Budget not specified"}
+                  </Typography>
                 </Box>
 
                 <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -351,8 +351,14 @@ export default function ApplyJobPage() {
               </CardContent>
             </Card>
 
-            {/* Action Buttons */}
+            {/* Action Buttons - Repositioned as requested */}
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+              {/* Back to Jobs button in the position of Apply Now */}
+              <Button variant="contained" startIcon={<ArrowBackIcon />} onClick={handleGoBack}>
+                Back 
+              </Button>
+
+              {/* Apply Now button moved to the extreme right */}
               <Button variant="contained" onClick={() => setOpenDialog(true)}>
                 Apply Now
               </Button>
@@ -540,5 +546,5 @@ export default function ApplyJobPage() {
         </Box>
       </ThemeProvider>
     </ProtectedRoute>
-  );
+  )
 }

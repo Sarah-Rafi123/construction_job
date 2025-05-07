@@ -31,7 +31,7 @@ export default function Header() {
             <span className="text-xl font-bold text-black">Jay Constructions</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Link
+            {/* <Link
               href="/login"
               className="px-4 py-2 text-[#D49F2E] font-medium border border-[#D2D2D0] rounded-lg hover:bg-gray-50 transition-colors"
             >
@@ -42,7 +42,7 @@ export default function Header() {
               className="px-4 py-2 bg-[#D49F2E] text-white font-medium rounded-lg hover:bg-[#C48E1D] transition-colors"
             >
               Sign Up
-            </Link>
+            </Link> */}
             <button
               onClick={handleLogout}
               disabled={isLoading}

@@ -5,9 +5,9 @@ import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import CircularProgress from "@mui/material/CircularProgress"
-import MyLocationIcon from "@mui/icons-material/MyLocation"
 import IconButton from "@mui/material/IconButton"
 import Tooltip from "@mui/material/Tooltip"
+import MyLocationIcon from "@mui/icons-material/MyLocation"
 
 interface JobLocationMapProps {
   onLocationSelect: (coordinates: { lat: number; lng: number }, address: string) => void
@@ -24,18 +24,49 @@ const defaultCenter = {
   lng: 77.5946, // Default to Bangalore
 }
 
+// Load API key from environment
+const getGoogleMapsApiKey = async () => {
+  try {
+    const response = await fetch("/api/environment")
+    const data = await response.json()
+    return data.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
+  } catch (error) {
+    console.error("Failed to load Google Maps API key:", error)
+    return ""
+  }
+}
+
+// Declare google variable
+declare global {
+  interface Window {
+    google: any
+  }
+}
+
 export default function JobLocationMap({ onLocationSelect, initialCoordinates }: JobLocationMapProps) {
   const [markerPosition, setMarkerPosition] = useState<google.maps.LatLngLiteral | null>(initialCoordinates || null)
   const [map, setMap] = useState<google.maps.Map | null>(null)
   const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral | null>(null)
-  const [permissionRequested, setPermissionRequested] = useState(false)
   const [isLocating, setIsLocating] = useState(false)
   const mapRef = useRef<google.maps.Map | null>(null)
+  const [apiKey, setApiKey] = useState<string>("")
+  const [isKeyLoading, setIsKeyLoading] = useState(true)
 
-  // Load Google Maps API
-  const { isLoaded } = useJsApiLoader({
+  // Load API key on component mount
+  useEffect(() => {
+    const loadApiKey = async () => {
+      const key = await getGoogleMapsApiKey()
+      setApiKey(key)
+      setIsKeyLoading(false)
+    }
+
+    loadApiKey()
+  }, [])
+
+  // Use the useJsApiLoader hook to load the Google Maps API
+  const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey: apiKey,
     libraries: ["places"],
   })
 
@@ -51,13 +82,32 @@ export default function JobLocationMap({ onLocationSelect, initialCoordinates }:
             lng: position.coords.longitude,
           }
           setUserLocation(userPos)
-          setIsLocating(false)
+
+          // Set marker at user location
+          setMarkerPosition(userPos)
 
           // If map exists, center it on user location
           if (mapRef.current) {
             mapRef.current.panTo(userPos)
             mapRef.current.setZoom(15)
           }
+
+          // Reverse geocode to get address
+          if (window.google && window.google.maps) {
+            const geocoder = new window.google.maps.Geocoder()
+            geocoder.geocode({ location: userPos }, (results, status) => {
+              if (status === "OK" && results && results[0]) {
+                const address = results[0].formatted_address
+                onLocationSelect(userPos, address)
+              } else {
+                onLocationSelect(userPos, `${userPos.lat}, ${userPos.lng}`)
+              }
+            })
+          } else {
+            onLocationSelect(userPos, `${userPos.lat}, ${userPos.lng}`)
+          }
+
+          setIsLocating(false)
         },
         (error) => {
           console.error("Error getting user location:", error)
@@ -68,15 +118,7 @@ export default function JobLocationMap({ onLocationSelect, initialCoordinates }:
     } else {
       setIsLocating(false)
     }
-  }, [])
-
-  // Request user's location when component mounts
-  useEffect(() => {
-    if (!permissionRequested) {
-      setPermissionRequested(true)
-      requestUserLocation()
-    }
-  }, [permissionRequested, requestUserLocation])
+  }, [onLocationSelect])
 
   // Handle map click to set marker
   const handleMapClick = useCallback(
@@ -89,7 +131,7 @@ export default function JobLocationMap({ onLocationSelect, initialCoordinates }:
         setMarkerPosition(newPosition)
 
         // Reverse geocode to get address
-        const geocoder = new (window as any).google.maps.Geocoder()
+        const geocoder = new window.google.maps.Geocoder()
         geocoder.geocode({ location: newPosition }, (results, status) => {
           if (status === "OK" && results && results[0]) {
             const address = results[0].formatted_address
@@ -131,6 +173,48 @@ export default function JobLocationMap({ onLocationSelect, initialCoordinates }:
       setMarkerPosition(initialCoordinates)
     }
   }, [initialCoordinates])
+
+  if (isKeyLoading) {
+    return (
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <CircularProgress size={40} color="primary" />
+        <Typography variant="body1">Loading API key...</Typography>
+      </Box>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 2,
+          p: 3,
+        }}
+      >
+        <Typography variant="body1" color="error" align="center">
+          Error loading Google Maps: {loadError.message}
+        </Typography>
+        <Typography variant="body2" align="center">
+          Please check your API key configuration and make sure the Google Maps JavaScript API is enabled in your Google
+          Cloud Console.
+        </Typography>
+      </Box>
+    )
+  }
 
   if (!isLoaded) {
     return (
@@ -177,13 +261,13 @@ export default function JobLocationMap({ onLocationSelect, initialCoordinates }:
               strokeWeight: 1,
               strokeColor: "#FFFFFF",
               scale: 2,
-              anchor: new (window as any).google.maps.Point(12, 22),
+              anchor: new google.maps.Point(12, 22),
             }}
           />
         )}
 
-        {/* User location marker - always visible */}
-        {userLocation && (
+        {/* User location marker - only visible after getting location */}
+        {userLocation && userLocation !== markerPosition && (
           <Marker
             position={userLocation}
             icon={{
@@ -193,7 +277,7 @@ export default function JobLocationMap({ onLocationSelect, initialCoordinates }:
               strokeWeight: 1,
               strokeColor: "#FFFFFF",
               scale: 1.5,
-              anchor: new (window as any).google.maps.Point(12, 12),
+              anchor: new google.maps.Point(12, 12),
             }}
             title="Your current location"
             zIndex={1} // Lower zIndex so it appears below the selected marker
@@ -210,7 +294,7 @@ export default function JobLocationMap({ onLocationSelect, initialCoordinates }:
           zIndex: 10,
         }}
       >
-        <Tooltip title="Go to my location">
+        <Tooltip title="Use my current location">
           <IconButton
             onClick={requestUserLocation}
             disabled={isLocating}

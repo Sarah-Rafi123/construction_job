@@ -93,7 +93,7 @@ export default function VerifyEmail() {
   }, [searchParams, verifyEmail])
 
   const handleGoToHome = () => {
-    router.push("/home")
+    router.push("/login")
   }
 
   return (
@@ -174,7 +174,7 @@ export default function VerifyEmail() {
                           className="flex items-center justify-center bg-[#D49F2E] hover:bg-[#C48E1D] text-white font-medium py-2 px-6 rounded-md transition duration-300"
                         >
                           <Home className="mr-2 h-5 w-5" />
-                          Go to Home Page
+                          Go to Login Page
                         </button>
                       </div>
                     )}
