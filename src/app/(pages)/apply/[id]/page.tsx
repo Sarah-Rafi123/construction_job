@@ -36,6 +36,7 @@ import Navbar from "@/components/layout/navbar"
 import axios from "axios"
 import { useGetJobByIdQuery } from "@/store/api/jobsApi"
 import ProtectedRoute from "@/components/global/ProtectedRoute"
+import Footer from "@/components/layout/footer"
 
 // Create a custom theme with #D49F2E as the primary color
 const theme = createTheme({
@@ -167,7 +168,8 @@ export default function ApplyJobPage() {
 
     setErrors(newErrors)
 
-    if (isValid) {
+    if (isValid && job) {
+      // Add null check for job
       try {
         // Upload attachments and get the array of file URLs
         const uploadedFiles = await uploadAttachments(attachments)
@@ -181,15 +183,18 @@ export default function ApplyJobPage() {
           jobId: id,
         })
 
+        // Check if created_by exists and has _id property
+        const createdById = job.created_by 
+
         socket.emit(
           "sendMessage",
           {
-            recipientId: job?.created_by?._id,
+            recipientId: createdById, // Use optional chaining and ensure created_by is an object
             enquiry: {
               title: enquiryTitle,
               description: enquiryText,
               attachments: uploadedFiles, // Use the array of URLs directly
-              jobId: job?._id,
+              jobId: job._id,
             },
             type: "enquiry",
           },
@@ -222,10 +227,20 @@ export default function ApplyJobPage() {
   }
 
   if (isLoading) {
-    return
+    return (
+      <ThemeProvider theme={theme}>
+        <Navbar />
+        <Box sx={{ p: 4, bgcolor: "background.default", textAlign: "center", minHeight: "calc(100vh - 64px)" }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Loading job details...
+          </Typography>
+        </Box>
+      </ThemeProvider>
+    )
   }
 
-  if (error) {
+  if (error || !job) {
+    // Add check for job being undefined
     return (
       <ThemeProvider theme={theme}>
         <Navbar />
@@ -256,8 +271,10 @@ export default function ApplyJobPage() {
   return (
     <ProtectedRoute>
       <ThemeProvider theme={theme}>
-        <Navbar />
-        <Box sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 64px)" }}>
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+          <Navbar messageCount={3} />
+        </div>
+        <Box sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 64px)", mt: 6 }}>
           <Container maxWidth="md" sx={{ py: 4 }}>
             {/* Removed the back button from here */}
 
@@ -552,6 +569,7 @@ export default function ApplyJobPage() {
           </Container>
         </Box>
       </ThemeProvider>
+      <Footer />
     </ProtectedRoute>
   )
 }

@@ -10,6 +10,7 @@ import JobGrid from "@/components/home-components/job-grid"
 import { useGetJobsQuery } from "@/store/api/jobsApi"
 import { useAppSelector } from "@/store/hooks"
 import type { Job } from "@/store/api/jobsApi"
+import Footer from "@/components/layout/footer"
 
 export default function Home() {
   const router = useRouter()
@@ -143,6 +144,7 @@ export default function Home() {
           </div>
         </main>
       </div>
+      <Footer/>
     </ProtectedRoute>
   )
 }

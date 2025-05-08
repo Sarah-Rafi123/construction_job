@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useSubmitContractorDocumentsMutation } from "@/store/api/documentSubmissionApi"
+import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
 
 // MUI Components
 import Dialog from "@mui/material/Dialog"
@@ -18,6 +19,7 @@ import CircularProgress from "@mui/material/CircularProgress"
 import CloudUploadIcon from "@mui/icons-material/CloudUpload"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { styled } from "@mui/material/styles"
+import ProtectedRoute from "../global/ProtectedRoute"
 
 // Styled components for file upload
 const VisuallyHiddenInput = styled("input")({
@@ -50,6 +52,8 @@ export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubm
 
   // API mutation hook
   const [submitDocuments, { isLoading }] = useSubmitContractorDocumentsMutation()
+
+  const { refetch } = useGetUserProfileQuery()
 
   // Handle file selection for compliance certificate
   const handleComplianceFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,6 +88,9 @@ export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubm
       // Submit documents
       const result = await submitDocuments(formData).unwrap()
 
+      // Refetch user data to update admin_status
+      await refetch()
+
       // Show success message
       setSuccess(true)
 
@@ -112,99 +119,101 @@ export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubm
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontSize: "1.5rem", fontWeight: "bold", color: "#D49F2E" }}>
-        Admin Approval Required
-      </DialogTitle>
+    <ProtectedRoute>
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontSize: "1.5rem", fontWeight: "bold", color: "#D49F2E" }}>
+          Admin Approval Required
+        </DialogTitle>
 
-      <DialogContent>
-        {success ? (
-          <Box sx={{ textAlign: "center", py: 4 }}>
-            <CheckCircleIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
-            <Typography variant="h6" gutterBottom>
-              Documents Submitted Successfully!
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Your documents have been submitted for review. You will be notified once approved.
-            </Typography>
-          </Box>
-        ) : (
-          <>
-            <Typography variant="body1" paragraph>
-              Before you can post jobs, you need admin approval. Please upload your compliance and verification
-              certificates.
-            </Typography>
-
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: "medium" }}>
-                Compliance Certificate
+        <DialogContent>
+          {success ? (
+            <Box sx={{ textAlign: "center", py: 4 }}>
+              <CheckCircleIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Documents Submitted Successfully!
               </Typography>
-              <Button
-                component="label"
-                variant={complianceCertificate ? "outlined" : "contained"}
-                startIcon={<CloudUploadIcon />}
-                sx={{ mt: 1, mb: 1 }}
-                fullWidth
-                color={complianceCertificate ? "success" : "primary"}
-              >
-                {complianceCertificate ? complianceCertificate.name : "Upload Compliance Certificate"}
-                <VisuallyHiddenInput
-                  type="file"
-                  onChange={handleComplianceFileChange}
-                  accept=".pdf,.jpg,.jpeg,.png,.webp"
-                />
-              </Button>
-              <Typography variant="caption" color="text.secondary">
-                Accepted formats: PDF, JPG, PNG, WEBP (Max size: 5MB)
+              <Typography variant="body1" color="text.secondary">
+                Your documents have been submitted for review. You will be notified once approved.
               </Typography>
             </Box>
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: "medium" }}>
-                Verification Certificate
+          ) : (
+            <>
+              <Typography variant="body1" paragraph>
+                Before you can post jobs, you need admin approval. Please upload your compliance and verification
+                certificates.
               </Typography>
-              <Button
-                component="label"
-                variant={verificationCertificate ? "outlined" : "contained"}
-                startIcon={<CloudUploadIcon />}
-                sx={{ mt: 1, mb: 1 }}
-                fullWidth
-                color={verificationCertificate ? "success" : "primary"}
-              >
-                {verificationCertificate ? verificationCertificate.name : "Upload Verification Certificate"}
-                <VisuallyHiddenInput
-                  type="file"
-                  onChange={handleVerificationFileChange}
-                  accept=".pdf,.jpg,.jpeg,.png,.webp"
-                />
-              </Button>
-              <Typography variant="caption" color="text.secondary">
-                Accepted formats: PDF, JPG, PNG, WEBP (Max size: 5MB)
-              </Typography>
-            </Box>
-          </>
-        )}
-      </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 3 }}>
-        <Button onClick={handleClose} disabled={isLoading} variant="outlined">
-          Cancel
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={isLoading || success || !complianceCertificate || !verificationCertificate}
-          variant="contained"
-          startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
-        >
-          {isLoading ? "Submitting..." : "Submit Documents"}
-        </Button>
-      </DialogActions>
-    </Dialog>
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: "medium" }}>
+                  Compliance Certificate
+                </Typography>
+                <Button
+                  component="label"
+                  variant={complianceCertificate ? "outlined" : "contained"}
+                  startIcon={<CloudUploadIcon />}
+                  sx={{ mt: 1, mb: 1 }}
+                  fullWidth
+                  color={complianceCertificate ? "success" : "primary"}
+                >
+                  {complianceCertificate ? complianceCertificate.name : "Upload Compliance Certificate"}
+                  <VisuallyHiddenInput
+                    type="file"
+                    onChange={handleComplianceFileChange}
+                    accept=".pdf,.jpg,.jpeg,.png,.webp"
+                  />
+                </Button>
+                <Typography variant="caption" color="text.secondary">
+                  Accepted formats: PDF, JPG, PNG, WEBP (Max size: 5MB)
+                </Typography>
+              </Box>
+
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: "medium" }}>
+                  Verification Certificate
+                </Typography>
+                <Button
+                  component="label"
+                  variant={verificationCertificate ? "outlined" : "contained"}
+                  startIcon={<CloudUploadIcon />}
+                  sx={{ mt: 1, mb: 1 }}
+                  fullWidth
+                  color={verificationCertificate ? "success" : "primary"}
+                >
+                  {verificationCertificate ? verificationCertificate.name : "Upload Verification Certificate"}
+                  <VisuallyHiddenInput
+                    type="file"
+                    onChange={handleVerificationFileChange}
+                    accept=".pdf,.jpg,.jpeg,.png,.webp"
+                  />
+                </Button>
+                <Typography variant="caption" color="text.secondary">
+                  Accepted formats: PDF, JPG, PNG, WEBP (Max size: 5MB)
+                </Typography>
+              </Box>
+            </>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button onClick={handleClose} disabled={isLoading} variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={isLoading || success || !complianceCertificate || !verificationCertificate}
+            variant="contained"
+            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+          >
+            {isLoading ? "Submitting..." : "Submit Documents"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </ProtectedRoute>
   )
 }

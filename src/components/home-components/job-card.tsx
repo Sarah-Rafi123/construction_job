@@ -1,9 +1,36 @@
 "use client"
 
-import type { Job } from "@/store/api/jobsApi"
 import type { useRouter } from "next/navigation"
 import { MapPin, Clock } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+
+// Define a more accurate Job type that matches your actual data structure
+interface JobService {
+  _id: string
+  service_name: string
+  resource_count: number
+}
+
+interface JobLocation {
+  type: string
+  coordinates: number[]
+}
+
+interface Job {
+  _id: string
+  job_title: string
+  job_type: string
+  target_user: string
+  services: JobService[]
+  job_priority: boolean
+  budget: number | null
+  project_image: string | null
+  job_location: JobLocation | null
+  created_by: any | null
+  createdAt: string
+  updatedAt: string
+  __v: number
+}
 
 interface JobCardProps {
   job: Job
@@ -21,8 +48,8 @@ export default function JobCard({ job, router }: JobCardProps) {
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
       <div className="flex justify-between items-start mb-1">
-        <h3 className="text-base font-semibold text-gray-800">{job.job_title}</h3>
-        <span className="text-sm w-28 text-gray-400 flex items-center">
+        <h3 className="text-base  font-semibold text-gray-800">{job.job_title}</h3>
+        <span className="text-sm text-gray-400 flex items-center">
           <Clock className="h-3 w-3 mr-1" />
           {timeAgo}
         </span>
@@ -36,16 +63,17 @@ export default function JobCard({ job, router }: JobCardProps) {
         <span className="inline-block px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded">
           {job.job_type}
         </span>
-        {job.services.slice(0, 2).map((service) => (
-          <span
-            key={service._id}
-            className="inline-block px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded"
-          >
-            {service.service_name}
-            {service.resource_count > 0 && ` (${service.resource_count})`}
-          </span>
-        ))}
-        {job.services.length > 2 && (
+        {job.services &&
+          job.services.slice(0, 2).map((service) => (
+            <span
+              key={service._id}
+              className="inline-block px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded"
+            >
+              {service.service_name}
+              {service.resource_count > 0 && ` (${service.resource_count})`}
+            </span>
+          ))}
+        {job.services && job.services.length > 2 && (
           <span className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 rounded">
             +{job.services.length - 2} more
           </span>

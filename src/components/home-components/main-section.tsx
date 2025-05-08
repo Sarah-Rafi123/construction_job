@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
 import { useCookies } from "react-cookie"
-
+import DocumentSubmissionDialog from "@/components/widgets/document-submission-dialog"
 interface MainSectionProps {
   userType: string | null
 }
@@ -17,7 +17,7 @@ export default function MainSection({ userType }: MainSectionProps) {
   const [isAdminVerified, setIsAdminVerified] = useState<boolean>(true)
   const [showVerificationMessage, setShowVerificationMessage] = useState<boolean>(false)
   const [userRole, setUserRole] = useState<string | null>(null)
-
+  const [showDocumentDialog, setShowDocumentDialog] = useState<boolean>(false)
   useEffect(() => {
     // First priority: Use the role directly from API if available
     if (userData?.data?.role) {
@@ -32,7 +32,7 @@ export default function MainSection({ userType }: MainSectionProps) {
   }, [userData, userType])
 
   useEffect(() => {
-    if (userData?.data?.admin_status === "pending") {
+    if (userData?.data?.admin_status === "pending" || userData?.data?.admin_status === "not-verified") {
       setIsAdminVerified(false)
     } else {
       setIsAdminVerified(true)
@@ -40,18 +40,19 @@ export default function MainSection({ userType }: MainSectionProps) {
   }, [userData])
 
   const handlePostJob = () => {
-    // Check if admin_status is pending
+    // Check if admin_status is pending or not-verified
     if (userData?.data?.admin_status === "pending") {
       setShowVerificationMessage(true)
       // Hide the message after 5 seconds
       setTimeout(() => {
         setShowVerificationMessage(false)
       }, 5000)
+    } else if (userData?.data?.admin_status === "not-verified") {
+      setShowDocumentDialog(true)
     } else {
       router.push("/post-job")
     }
   }
-
   // Check if user is a contractor (either main or sub)
   const isContractor =
     userRole === "main-contractor" ||
@@ -123,6 +124,7 @@ export default function MainSection({ userType }: MainSectionProps) {
       >
         Post A Job
       </button>
+      <DocumentSubmissionDialog open={showDocumentDialog} onClose={() => setShowDocumentDialog(false)} />
       {showVerificationMessage && (
         <div className="absolute bottom-10 left-0 right-0 mx-auto w-full max-w-md bg-white/90 backdrop-blur-sm border-l-4 border-yellow-500 text-gray-800 px-4 py-3 rounded shadow-md mt-4 text-center">
           <p className="font-medium">Your documents are under verification by admin.</p>
