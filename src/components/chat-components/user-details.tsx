@@ -32,7 +32,7 @@ export default function UserDetails({ isOpen, togglePanel }: UserDetailsProps) {
         <div className="p-6 flex flex-col items-center border-b border-gray-200">
           <Avatar src={user?.profile_picture} sx={{ width: 80, height: 80 }} />
 
-          <h2 className="mt-4 text-xl font-medium text-center">{user?.full_name ?? user?.company_name}</h2>
+          <h2 className="mt-4 text-xl text-black font-medium text-center">{user?.full_name ?? user?.company_name}</h2>
           {/* <p className={`text-sm ${user?.isOnline ? "text-green-500" : "text-gray-500"}`}>{user?.isOnline ? "Online" : "Offline"}</p> */}
 
           {/* <div className="flex gap-4 mt-4">
@@ -50,9 +50,20 @@ export default function UserDetails({ isOpen, togglePanel }: UserDetailsProps) {
           <div className="grid grid-cols-2 gap-y-3">
             <div className="text-sm text-gray-500">Email</div>
             <div className="text-sm text-gray-900 font-medium">{user?.email}</div>
-
+            <div className="text-sm text-gray-500">Company Name</div>
+            <div className="text-sm text-gray-900 font-medium">{user?.company_name}</div>
             <div className="text-sm text-gray-500">Role</div>
-            <div className="text-sm text-gray-900 font-medium">{user?.role}</div>
+            <div className="text-sm text-gray-900 font-medium">
+            {user?.role === "main_contractor"
+              ? "Main Contractor"
+              : user?.role === "subcontractor"
+                ? "Sub Contractor"
+                : user?.role === "job_seeker"
+                  ? "Job Seeker"
+                  : user?.role}
+          </div>
+          <div className="text-sm text-gray-500">Description</div>
+          <div className="text-sm text-gray-900 font-medium">{user?.description}</div>
           </div>
         </div>
 

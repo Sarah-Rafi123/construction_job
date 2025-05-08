@@ -168,45 +168,52 @@ export default function ApplyJobPage() {
     setErrors(newErrors)
 
     if (isValid) {
-      const uploadedAttachments = await uploadAttachments(attachments)
-      console.log("uploaded urls", uploadAttachments)
-      // Here you would normally send the data to your API
-      console.log("Submitting enquiry:", {
-        title: enquiryTitle,
-        enquiry: enquiryText,
-        attachments: uploadedAttachments?.map((file) => file.url),
-        jobId: id,
-      })
+      try {
+        // Upload attachments and get the array of file URLs
+        const uploadedFiles = await uploadAttachments(attachments)
+        console.log("Uploaded files:", uploadedFiles)
 
-      socket.emit(
-        "sendMessage",
-        {
-          recipientId: job?.created_by?._id,
-          enquiry: {
-            title: enquiryTitle,
-            description: enquiryText,
-            attachments: uploadedAttachments?.map((file) => file.url),
-            jobId: job?._id,
+        // Here you would normally send the data to your API
+        console.log("Submitting enquiry:", {
+          title: enquiryTitle,
+          enquiry: enquiryText,
+          attachments: uploadedFiles, // This is already an array of URLs
+          jobId: id,
+        })
+
+        socket.emit(
+          "sendMessage",
+          {
+            recipientId: job?.created_by?._id,
+            enquiry: {
+              title: enquiryTitle,
+              description: enquiryText,
+              attachments: uploadedFiles, // Use the array of URLs directly
+              jobId: job?._id,
+            },
+            type: "enquiry",
           },
-          type: "enquiry",
-        },
-        ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
-          if (!error && data) {
-            console.log("message sent", data)
-            router.push(`/chat/${data.conversation._id}`)
-          } else {
-            console.error("Message send failed:", error)
-          }
-        },
-      )
+          ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
+            if (!error && data) {
+              console.log("message sent", data)
+              router.push(`/chat/${data.conversation._id}`)
+            } else {
+              console.error("Message send failed:", error)
+            }
+          },
+        )
 
-      alert("Your enquiry has been submitted!")
-      setOpenDialog(false)
+        alert("Your enquiry has been submitted!")
+        setOpenDialog(false)
 
-      // Reset form
-      setEnquiryTitle("")
-      setEnquiryText("")
-      setAttachments([])
+        // Reset form
+        setEnquiryTitle("")
+        setEnquiryText("")
+        setAttachments([])
+      } catch (error) {
+        console.error("Error submitting enquiry:", error)
+        alert("Failed to submit your enquiry. Please try again.")
+      }
     }
   }
 
@@ -355,7 +362,7 @@ export default function ApplyJobPage() {
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
               {/* Back to Jobs button in the position of Apply Now */}
               <Button variant="contained" startIcon={<ArrowBackIcon />} onClick={handleGoBack}>
-                Back 
+                Back
               </Button>
 
               {/* Apply Now button moved to the extreme right */}

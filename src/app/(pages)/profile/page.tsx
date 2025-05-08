@@ -118,9 +118,11 @@ export default function ProfilePage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex flex-col bg-gray-50">
-        <Navbar messageCount={3} />
+        <div className="sticky top-0 z-50 w-full">
+          <Navbar messageCount={3} />
+        </div>
 
-        <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl">
+        <main className="flex-grow container mx-auto px-4 pt-4 pb-8 max-w-5xl">
           <h1 className="text-3xl text-black font-bold mb-8">My Profile</h1>
 
           {currentUser ? (
@@ -175,41 +177,57 @@ export default function ProfilePage() {
                     <Mail size={18} className="text-gray-500" />
                     <span>{currentUser.email}</span>
                   </div>
-                  <div className="flex text-black items-center gap-3">
-                    <Shield size={18} className="text-gray-500" />
-                    <span>
-                      Status:{" "}
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(currentUser.admin_status)}`}
-                      >
-                        {currentUser.admin_status}
+                  {currentUser.role !== "job_seeker" && (
+                    <div className="flex text-black items-center gap-3">
+                      <Shield size={18} className="text-gray-500" />
+                      <span>
+                        Status:{" "}
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(currentUser.admin_status)}`}
+                        >
+                          {currentUser.admin_status}
+                        </span>
                       </span>
-                    </span>
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Company Information and Description */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 md:col-span-2">
                 <div className="p-6 border-b border-gray-100">
-                  <h2 className="text-xl text-black font-semibold">Company Information</h2>
+                  <h2 className="text-xl text-black font-semibold">
+                    {currentUser.role === "job_seeker" ? "User Information" : "Company Information"}
+                  </h2>
                 </div>
                 <div className="p-6 space-y-6">
                   <div className="space-y-4">
-                    <div className="flex text-black items-center gap-3">
-                      <Building size={18} className="text-gray-500" />
-                      <div>
-                        <p className="text-sm text-gray-500">Company Name</p>
-                        <p className="font-medium">{currentUser.company_name || "Not provided"}</p>
+                    {currentUser.role === "job_seeker" ? (
+                      <div className="flex text-black items-center gap-3">
+                        <Briefcase size={18} className="text-gray-500" />
+                        <div>
+                          <p className="text-sm text-gray-500">Trade</p>
+                          <p className="font-medium">{currentUser.trade || "Not provided"}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex text-black items-center gap-3">
-                      <Hash size={18} className="text-gray-500" />
-                      <div>
-                        <p className="text-sm text-gray-500">Company Number</p>
-                        <p className="font-medium">{currentUser.company_number || "Not provided"}</p>
-                      </div>
-                    </div>
+                    ) : (
+                      <>
+                        <div className="flex text-black items-center gap-3">
+                          <Building size={18} className="text-gray-500" />
+                          <div>
+                            <p className="text-sm text-gray-500">Company Name</p>
+                            <p className="font-medium">{currentUser.company_name || "Not provided"}</p>
+                          </div>
+                        </div>
+                        <div className="flex text-black items-center gap-3">
+                          <Hash size={18} className="text-gray-500" />
+                          <div>
+                            <p className="text-sm text-gray-500">Contact Number</p>
+                            <p className="font-medium">{currentUser.company_number || "Not provided"}</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div>
@@ -221,7 +239,7 @@ export default function ProfilePage() {
                       {!isEditingDescription && (
                         <button
                           onClick={handleEditDescription}
-                          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+                          className="text-[#D49F2E] hover:text-[#D49F2E] flex items-center gap-1 text-sm"
                         >
                           <Edit size={16} />
                           Edit
@@ -234,7 +252,7 @@ export default function ProfilePage() {
                         <textarea
                           value={description}
                           onChange={(e) => setDescription(e.target.value)}
-                          className="w-full text-black p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full text-black p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D49F2E]"
                           rows={4}
                           placeholder="Write something about yourself or your company..."
                         />
@@ -249,7 +267,7 @@ export default function ProfilePage() {
                           </button>
                           <button
                             onClick={handleSaveDescription}
-                            className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-1"
+                            className="px-3 py-1.5 bg-[#D49F2E] text-white rounded-md hover:bg-[#D49F2E] flex items-center gap-1"
                             disabled={isUpdating}
                           >
                             {isUpdating ? (

@@ -85,7 +85,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
         </div>
         <div className="hidden items-center gap-2 lg:flex">
           <button className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 lg" onClick={toggleDetailsPanel}>
-            <X size={24} />
+         <text className="underline text-[#D49F2E] hover">View Profile </text>
           </button>
         </div>
       </div>
@@ -103,8 +103,8 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
                 <div className={`flex ${!isUser && "items-end"} gap-2 max-w-[80%]`}>
                   {!isUser && <div className="w-8" />}
                   <div>
-                    <div className="bg-gray-100 text-gray-600 rounded-lg p-3 text-sm space-y-1">
-                      <p>{message.type === "text" ? message.content : message.enquiry.description}</p>
+                    <div className="bg-[#F2E2A0] text-gray-600 rounded-lg p-3 text-sm space-y-1">
+                      <p>{message.type === "text" ? message.content : message.enquiry.description && message.enquiry.title}</p>
                       <p className="text-xs text-right text-gray-500">{formatTime(message.updatedAt)}</p>
                     </div>
                   </div>

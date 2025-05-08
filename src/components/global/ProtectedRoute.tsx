@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import socket from "@/lib/socket/connectSocket"
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
@@ -13,18 +12,14 @@ import type { RootState } from "@/store"
 interface ProtectedRouteProps {
   children: React.ReactNode
   allowedRoles?: string[]
-  redirectUnauthenticated?: boolean // New prop to control redirection
+  redirectUnauthenticated?: boolean
 }
 
-const ProtectedRoute = ({
-  children,
-  allowedRoles,
-  redirectUnauthenticated = true, // Default to true for backward compatibility
-}: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children, allowedRoles, redirectUnauthenticated = true }: ProtectedRouteProps) => {
   const router = useRouter()
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(true)
-  const currentUser = useSelector((state: RootState) => state.user?.currentUser || "")
+  const currentUser = useSelector((state: RootState) => state.user?.currentUser)
 
   // Track if component is mounted to prevent state updates after unmount
   const isMounted = useRef(true)
@@ -32,8 +27,16 @@ const ProtectedRoute = ({
   // Track if we've already attempted to reconnect the socket
   const socketConnected = useRef(false)
 
+  // Track if we've already authenticated for this session
+  const hasAuthenticated = useRef(false)
+
   // Function to fetch user data
   const fetchUser = async () => {
+    // If we've already authenticated or are not mounted, don't fetch again
+    if (hasAuthenticated.current || !isMounted.current) {
+      return
+    }
+
     try {
       const response = await axios.get("http://localhost:9000/api/v0/get-me", {
         withCredentials: true,
@@ -44,6 +47,9 @@ const ProtectedRoute = ({
 
       const user = response.data.data
       dispatch(setCurrentUser(user))
+
+      // Mark that we've authenticated
+      hasAuthenticated.current = true
 
       if (allowedRoles && !allowedRoles.includes(user.role)) {
         router.replace("/")
@@ -64,6 +70,9 @@ const ProtectedRoute = ({
       console.error("Not authenticated:", error)
       dispatch(clearCurrentUser())
 
+      // Mark that we've attempted authentication
+      hasAuthenticated.current = true
+
       // Only redirect if redirectUnauthenticated is true
       if (redirectUnauthenticated) {
         router.replace("/landing-page")
@@ -73,14 +82,20 @@ const ProtectedRoute = ({
     }
   }
 
-  // Handle initial authentication and role check
+  // Handle initial authentication and role check - only runs once on mount
   useEffect(() => {
     // Set mounted flag
     isMounted.current = true
 
+    // Reset authentication state on mount
+    hasAuthenticated.current = false
+
     if (!currentUser) {
       fetchUser()
     } else {
+      // We already have a user in Redux, so mark as authenticated
+      hasAuthenticated.current = true
+
       if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
         router.replace("/")
       } else {
@@ -97,54 +112,19 @@ const ProtectedRoute = ({
     // Clean up function
     return () => {
       isMounted.current = false
-
-      // Don't disconnect socket on unmount as it might be a page navigation
-      // If you want to disconnect on logout, handle that separately
     }
-  }, [allowedRoles, currentUser, router, dispatch, redirectUnauthenticated])
+  }, []) // Empty dependency array means this only runs once on mount
 
-  // Handle page refresh
+  // Handle changes to currentUser or allowedRoles without re-fetching
   useEffect(() => {
-    // Listen for beforeunload event (page refresh)
-    const handleBeforeUnload = () => {
-      // You can optionally do something before the page refreshes
-      // For example, save some state to localStorage
-      localStorage.setItem("lastPath", window.location.pathname)
-    }
-
-    // Listen for visibilitychange event (tab becomes visible again)
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        // Re-verify authentication when tab becomes visible again
-        fetchUser()
+    if (currentUser) {
+      if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
+        router.replace("/")
+      } else {
+        setLoading(false)
       }
     }
-
-    // Add event listeners
-    window.addEventListener("beforeunload", handleBeforeUnload)
-    document.addEventListener("visibilitychange", handleVisibilityChange)
-
-    // Clean up event listeners
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
-      window.removeEventListener("visibilitychange", handleVisibilityChange)
-    }
-  }, [])
-
-  // Handle back/forward navigation
-  useEffect(() => {
-    // Listen for popstate event (browser back/forward buttons)
-    const handlePopState = () => {
-      // Re-verify authentication on navigation
-      fetchUser()
-    }
-
-    window.addEventListener("popstate", handlePopState)
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState)
-    }
-  }, [])
+  }, [currentUser, allowedRoles, router])
 
   if (loading) {
     return (

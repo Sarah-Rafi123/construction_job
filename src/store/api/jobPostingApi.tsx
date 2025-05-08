@@ -33,7 +33,7 @@ export interface PostJobResponse {
 export const jobPostingApi = createApi({
   reducerPath: "jobPostingApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:9000/api/v0",
+    baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
     credentials: "include", 
   }),
   endpoints: (builder) => ({

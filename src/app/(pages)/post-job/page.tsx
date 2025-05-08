@@ -39,6 +39,7 @@ import Snackbar from "@mui/material/Snackbar"
 import Alert from "@mui/material/Alert"
 import DocumentSubmissionDialog from "@/components/widgets/document-submission-dialog"
 import JobLocationMap from "@/components/maps/job-location-map"
+import "leaflet/dist/leaflet.css" // Add this import for Leaflet CSS
 
 const theme = createTheme({
   palette: {
@@ -364,7 +365,6 @@ export default function PostJob() {
 
       // Check if it's a forbidden error due to pending admin approval
       if (error.status === 403 && error.data?.message?.includes("admin approval")) {
-        // Show document submission dialog
         setShowDocumentDialog(true)
       } else {
         // Show generic error notification

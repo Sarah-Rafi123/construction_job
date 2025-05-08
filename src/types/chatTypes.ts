@@ -4,6 +4,7 @@ export interface Participant {
     role: string
     company_name: string
     full_name:string
+    description: string
     profile_picture:string
   }
   

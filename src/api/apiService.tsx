@@ -4,7 +4,7 @@ import { store } from "@/store" // Import your Redux store
 
 // Create an axios instance with default config
 const apiClient = axios.create({
-  baseURL: "http://localhost:9000/api/v0",
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(
       // Redirect to landing page
       if (typeof window !== "undefined") {
         // Check if we're in the browser environment
-        window.location.href = "/landing-page"
+        window.location.href = "/login"
       }
     }
     return Promise.reject(error)

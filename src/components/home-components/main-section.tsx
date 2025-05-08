@@ -5,6 +5,7 @@ import Home from "../../../public/assets/images/Home.png"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
+import { useCookies } from "react-cookie"
 
 interface MainSectionProps {
   userType: string | null
@@ -13,6 +14,8 @@ interface MainSectionProps {
 export default function MainSection({ userType }: MainSectionProps) {
   const router = useRouter()
   const { data: userData } = useGetUserProfileQuery()
+  const [isAdminVerified, setIsAdminVerified] = useState<boolean>(true)
+  const [showVerificationMessage, setShowVerificationMessage] = useState<boolean>(false)
   const [userRole, setUserRole] = useState<string | null>(null)
 
   useEffect(() => {
@@ -28,16 +31,33 @@ export default function MainSection({ userType }: MainSectionProps) {
     }
   }, [userData, userType])
 
+  useEffect(() => {
+    if (userData?.data?.admin_status === "pending") {
+      setIsAdminVerified(false)
+    } else {
+      setIsAdminVerified(true)
+    }
+  }, [userData])
+
+  const handlePostJob = () => {
+    // Check if admin_status is pending
+    if (userData?.data?.admin_status === "pending") {
+      setShowVerificationMessage(true)
+      // Hide the message after 5 seconds
+      setTimeout(() => {
+        setShowVerificationMessage(false)
+      }, 5000)
+    } else {
+      router.push("/post-job")
+    }
+  }
+
   // Check if user is a contractor (either main or sub)
   const isContractor =
     userRole === "main-contractor" ||
     userRole === "subcontractor" ||
     userRole === "main_contractor" ||
     userRole === "subcontractor"
-
-  const handlePostJob = () => {
-    router.push("/post-job")
-  }
 
   return (
     <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
@@ -54,7 +74,6 @@ export default function MainSection({ userType }: MainSectionProps) {
 
       {!isContractor ? (
         <>
-          {/* Tabs at the top - For job seekers */}
           <div className="relative z-10 w-full pt-6 md:pt-10 px-4">
             <div className="flex flex-col gap-x-20 md:flex-row justify-center items-center gap-4">
               <div className="bg-white/30 backdrop-blur-sm px-4 py-2 rounded-md text-sm md:text-base">
@@ -98,11 +117,18 @@ export default function MainSection({ userType }: MainSectionProps) {
             keep your project on track.
           </p>
           <button
-            onClick={handlePostJob}
-            className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-medium px-6 py-3 rounded-md transition-colors"
-          >
-            Post A Job
-          </button>
+        className="bg-[#D49F2E] hover:bg-[#D49F2E] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        type="button"
+        onClick={handlePostJob}
+      >
+        Post A Job
+      </button>
+      {showVerificationMessage && (
+        <div className="absolute bottom-10 left-0 right-0 mx-auto w-full max-w-md bg-white/90 backdrop-blur-sm border-l-4 border-yellow-500 text-gray-800 px-4 py-3 rounded shadow-md mt-4 text-center">
+          <p className="font-medium">Your documents are under verification by admin.</p>
+          <p className="text-sm">You'll be able to post jobs once verified.</p>
+        </div>
+      )}
         </div>
       )}
     </div>

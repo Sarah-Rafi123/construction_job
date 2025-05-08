@@ -363,7 +363,7 @@ export default function JobSeekerSignup() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions 
+              Jay Constructions
             </Typography>
           </Box>
 
@@ -392,83 +392,87 @@ export default function JobSeekerSignup() {
 
               <form onSubmit={handleSubmit}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <FormLabel htmlFor="name" className="text-gray-700">
-                      Full Name *
-                    </FormLabel>
-                    <TextField
-                      id="name"
-                      variant="outlined"
-                      size="small"
-                      required
-                      fullWidth
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="rounded"
-                      placeholder="Enter your full name"
-                      error={!!errors.name}
-                    />
-                    <ErrorMessage message={errors.name} />
+                  <Box sx={{ display: "flex", gap: 2 }}>
+                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                      <FormLabel htmlFor="name" className="text-gray-700">
+                        Full Name *
+                      </FormLabel>
+                      <TextField
+                        id="name"
+                        variant="outlined"
+                        size="small"
+                        required
+                        fullWidth
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="rounded"
+                        placeholder="Enter your full name"
+                        error={!!errors.name}
+                      />
+                      <ErrorMessage message={errors.name} />
+                    </Box>
+
+                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                      <FormLabel htmlFor="email" className="text-gray-700">
+                        Email Address *
+                      </FormLabel>
+                      <TextField
+                        id="email"
+                        type="email"
+                        variant="outlined"
+                        size="small"
+                        required
+                        fullWidth
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="rounded"
+                        placeholder="Enter your email address"
+                        error={!!errors.email}
+                      />
+                      <ErrorMessage message={errors.email} />
+                    </Box>
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <FormLabel htmlFor="email" className="text-gray-700">
-                      Email Address *
-                    </FormLabel>
-                    <TextField
-                      id="email"
-                      type="email"
-                      variant="outlined"
-                      size="small"
-                      required
-                      fullWidth
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="rounded"
-                      placeholder="Enter your email address"
-                      error={!!errors.email}
-                    />
-                    <ErrorMessage message={errors.email} />
-                  </Box>
+                  <Box sx={{ display: "flex", gap: 2 }}>
+                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                      <FormLabel htmlFor="contactNumber" className="text-gray-700">
+                        Contact Number *
+                      </FormLabel>
+                      <TextField
+                        id="contactNumber"
+                        type="tel"
+                        variant="outlined"
+                        size="small"
+                        required
+                        fullWidth
+                        value={formData.contactNumber}
+                        onChange={handleChange}
+                        className="rounded"
+                        placeholder="Enter digits only"
+                        error={!!errors.contactNumber}
+                        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                      />
+                      <ErrorMessage message={errors.contactNumber} />
+                    </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <FormLabel htmlFor="contactNumber" className="text-gray-700">
-                      Contact Number *
-                    </FormLabel>
-                    <TextField
-                      id="contactNumber"
-                      type="tel"
-                      variant="outlined"
-                      size="small"
-                      required
-                      fullWidth
-                      value={formData.contactNumber}
-                      onChange={handleChange}
-                      className="rounded"
-                      placeholder="Enter digits only"
-                      error={!!errors.contactNumber}
-                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                    />
-                    <ErrorMessage message={errors.contactNumber} />
-                  </Box>
-
-                  <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <FormLabel htmlFor="trade" className="text-gray-700">
-                      Trade *
-                    </FormLabel>
-                    <TextField
-                      id="trade"
-                      variant="outlined"
-                      size="small"
-                      required
-                      fullWidth
-                      value={formData.trade}
-                      onChange={handleChange}
-                      className="rounded"
-                      placeholder="Enter your trade (e.g., Electrician, Plumber)"
-                      error={!!errors.trade}
-                    />
-                    <ErrorMessage message={errors.trade} />
+                    <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                      <FormLabel htmlFor="trade" className="text-gray-700">
+                        Trade *
+                      </FormLabel>
+                      <TextField
+                        id="trade"
+                        variant="outlined"
+                        size="small"
+                        required
+                        fullWidth
+                        value={formData.trade}
+                        onChange={handleChange}
+                        className="rounded"
+                        placeholder="Enter your trade (e.g., Electrician, Plumber)"
+                        error={!!errors.trade}
+                      />
+                      <ErrorMessage message={errors.trade} />
+                    </Box>
                   </Box>
 
                   <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>

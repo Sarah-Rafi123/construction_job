@@ -21,20 +21,16 @@ export default function Home() {
   const [sortBy, setSortBy] = useState("newest")
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([])
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
-
-  // Fetch jobs using Redux Toolkit Query
   const { data: jobsData, error, isLoading } = useGetJobsQuery()
-
-  // Calculate distance between two points in km using Haversine formula
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371 // Radius of the earth in km
+    const R = 6371
     const dLat = deg2rad(lat2 - lat1)
     const dLon = deg2rad(lon2 - lon1)
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    const distance = R * c // Distance in km
+    const distance = R * c 
     return distance
   }
 
@@ -45,23 +41,15 @@ export default function Home() {
   useEffect(() => {
     if (jobsData?.data?.jobs) {
       let results = [...jobsData.data.jobs]
-
-      // Apply search filter
       if (searchTerm) {
         results = results.filter((job) => job.job_title.toLowerCase().includes(searchTerm.toLowerCase()))
       }
-
-      // Apply job type filter
       if (selectedJobType !== "All Types") {
         results = results.filter((job) => job.job_type.toLowerCase() === selectedJobType.toLowerCase())
       }
-
-      // Apply service type filter
       if (selectedServiceType !== "All Services") {
         results = results.filter((job) => job.services?.some((service) => service.service_name === selectedServiceType))
       }
-
-      // Apply radius filter if user location is available
       if (userLocation && radiusFilter > 0) {
         results = results.filter((job) => {
           if (
@@ -74,11 +62,9 @@ export default function Home() {
             const distance = calculateDistance(userLocation.lat, userLocation.lng, jobLat, jobLng)
             return distance <= radiusFilter
           }
-          return true // Include jobs without location data
+          return true 
         })
       }
-
-      // Sort jobs
       if (sortBy === "newest") {
         results = results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       } else if (sortBy === "budget-high") {
@@ -108,22 +94,17 @@ export default function Home() {
   }
 
   if (error) {
-    // Redirect to landing page when there's an error
     router.push("/landing-page")
-    return null // Return null while redirecting
+    return null 
   }
 
   return (
     <ProtectedRoute>
-      {/* Fixed navbar wrapper */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
         <Navbar messageCount={3} />
       </div>
-
-      {/* Add padding to the top to account for the fixed navbar */}
       <div className="min-h-screen bg-gray-50 pt-16">
         {" "}
-        {/* Adjust pt-16 based on your navbar height */}
         <MainSection userType={currentUser?.role} />
         <main className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="mt-12 mb-8 bg-white p-6 rounded-xl shadow-sm">

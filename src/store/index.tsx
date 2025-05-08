@@ -9,6 +9,7 @@ import { documentSubmissionApi } from "./api/documentSubmissionApi"
 import { userProfileApi } from "./api/userProfileApi"
 import userReducer from "./slices/userSlice"
 import chatReducer from "./slices/chatSlice"
+import { adminStatusApi } from "./api/adminStatusApi"
 import { contractorApi } from "./api/pendingContractorApi"
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     [documentSubmissionApi.reducerPath]: documentSubmissionApi.reducer,
     [userProfileApi.reducerPath]: userProfileApi.reducer,
     [contractorApi.reducerPath]: contractorApi.reducer,
+    [adminStatusApi.reducerPath]: adminStatusApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

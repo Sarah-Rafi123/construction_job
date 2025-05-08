@@ -5,7 +5,7 @@ import { InboxResponse ,MessagesResponse} from "@/types/chatTypes"
 export const chatApi = createApi({
   reducerPath: "chatApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:9000/api/v0/",
+    baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
     credentials: "include",
   }),
   endpoints: (builder) => ({

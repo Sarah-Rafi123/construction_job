@@ -45,9 +45,9 @@ const ChatInputForm = () => {
   return (
     <div className="p-4 border-t border-gray-200 bg-white">
       <form onSubmit={sendMessage} className="flex items-center gap-2">
-        <IconButton color="default" aria-label="attach file">
+        {/* <IconButton color="default" aria-label="attach file">
           <Paperclip size={20} />
-        </IconButton>
+        </IconButton> */}
         <TextField
           fullWidth
           placeholder="Reply..."
@@ -57,7 +57,7 @@ const ChatInputForm = () => {
           onChange={(e) => setNewMessage(e.target.value)}
           sx={{
             "& .MuiOutlinedInput-root": {
-              borderRadius: "24px",
+              borderRadius: "10px",
             },
           }}
         />

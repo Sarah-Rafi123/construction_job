@@ -65,7 +65,7 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
               <input
                 type="text"
                 placeholder="Quick search"
-                className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 rounded-md border text-black border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#D49F2E]"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

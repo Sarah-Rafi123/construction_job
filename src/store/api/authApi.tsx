@@ -20,7 +20,7 @@ export interface RegisterRequest {
   email: string
   password: string
   role: string
-  [key: string]: any // For additional fields based on role
+  [key: string]: any 
 }
 
 export interface RegisterResponse {
@@ -60,7 +60,7 @@ export interface VerifyEmailResponse {
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:9000/api/v0",
+    baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
     credentials: "include", 
   }),
   endpoints: (builder) => ({

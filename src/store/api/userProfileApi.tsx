@@ -16,6 +16,7 @@ export interface User {
   company_name: string
   company_number: string
   admin_status: string
+  trade: string
 }
 
 export interface UpdateUserProfileResponse {
@@ -28,7 +29,7 @@ export interface UpdateUserProfileResponse {
 export const userProfileApi = createApi({
   reducerPath: "userProfileApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:9000/api/v0",
+    baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
     credentials: "include",
   }),
   tagTypes: ["UserProfile"],

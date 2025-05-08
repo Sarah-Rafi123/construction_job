@@ -5,6 +5,7 @@ import ChatSidebar from "@/components/chat-components/chat-sidebar";
 import ChatWindow from "@/components/chat-components/chat-window";
 import UserDetails from "@/components/chat-components/user-details";
 import ProtectedRoute from "@/components/global/ProtectedRoute";
+import Navbar from "@/components/layout/navbar";
 
 export default function ChatPage() {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
@@ -20,7 +21,8 @@ export default function ChatPage() {
 
   return (
     <ProtectedRoute>
-      <div className="flex h-screen bg-gray-50">
+      <Navbar/>
+      <div className="flex h-screen  bg-gray-50">
         <ChatSidebar isMobileDrawerOpen={isMobileDrawerOpen} toggleMobileDrawer={toggleMobileDrawer} />
         <div className="flex-1 flex flex-col h-full overflow-hidden">
           <ChatWindow toggleMobileDrawer={toggleMobileDrawer} toggleDetailsPanel={toggleDetailsPanel} />
