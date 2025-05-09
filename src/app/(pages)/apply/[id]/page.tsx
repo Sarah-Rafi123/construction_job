@@ -2,7 +2,7 @@
 import socket from "@/lib/socket/connectSocket"
 import type React from "react"
 import { useRouter, useParams } from "next/navigation"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import {
   Box,
   Card,
@@ -31,10 +31,12 @@ import CloseIcon from "@mui/icons-material/Close"
 import AddIcon from "@mui/icons-material/Add"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
+import InfoIcon from "@mui/icons-material/Info"
 import { format } from "date-fns"
 import Navbar from "@/components/layout/navbar"
 import axios from "axios"
 import { useGetJobByIdQuery } from "@/store/api/jobsApi"
+import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
 import ProtectedRoute from "@/components/global/ProtectedRoute"
 import Footer from "@/components/layout/footer"
 
@@ -96,15 +98,74 @@ export default function ApplyJobPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { data, error, isLoading } = useGetJobByIdQuery(id)
+  const { data: userData } = useGetUserProfileQuery()
   const job = data?.job
   const [openDialog, setOpenDialog] = useState(false)
+  const [openDisclaimerDialog, setOpenDisclaimerDialog] = useState(false)
   const [enquiryTitle, setEnquiryTitle] = useState("")
   const [enquiryText, setEnquiryText] = useState("")
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [errors, setErrors] = useState({
     title: "",
     enquiry: "",
+    attachments: "",
   })
+  const [isMainContractor, setIsMainContractor] = useState(false)
+
+  useEffect(() => {
+    if (userData?.data?.role) {
+      // Check if user is a main contractor
+      const userRole = userData.data.role
+      setIsMainContractor(userRole === "main_contractor" || userRole === "main-contractor")
+    }
+  }, [userData])
+
+  const validateForm = () => {
+    const newErrors = {
+      title: "",
+      enquiry: "",
+      attachments: "",
+    }
+
+    let isValid = true
+
+    // Validate title
+    if (!enquiryTitle.trim()) {
+      newErrors.title = "Title is required"
+      isValid = false
+    } else if (enquiryTitle.trim().length < 5) {
+      newErrors.title = "Title must be at least 5 characters"
+      isValid = false
+    }
+
+    // Validate enquiry text
+    if (!enquiryText.trim()) {
+      newErrors.enquiry = "Enquiry details are required"
+      isValid = false
+    } else if (enquiryText.trim().length < 20) {
+      newErrors.enquiry = "Please provide more details (minimum 20 characters)"
+      isValid = false
+    }
+
+    // Validate attachments
+    if (attachments.length === 0) {
+      newErrors.attachments = "At least one attachment is required"
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEnquiryTitle(e.target.value)
+    if (errors.title) validateForm()
+  }
+
+  const handleEnquiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEnquiryText(e.target.value)
+    if (errors.enquiry) validateForm()
+  }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -114,7 +175,13 @@ export default function ApplyJobPage() {
         name: file.name,
         file: file,
       }
-      setAttachments([...attachments, newAttachment])
+      const newAttachments = [...attachments, newAttachment]
+      setAttachments(newAttachments)
+
+      // Clear attachment error if we now have attachments
+      if (newAttachments.length > 0 && errors.attachments) {
+        setErrors({ ...errors, attachments: "" })
+      }
     }
     // Reset the input value so the same file can be selected again
     if (fileInputRef.current) {
@@ -134,7 +201,7 @@ export default function ApplyJobPage() {
     })
 
     try {
-      const response = await axios.post("http://localhost:9000/api/v0/upload/multiple", formData, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}upload/multiple`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -145,6 +212,14 @@ export default function ApplyJobPage() {
     } catch (error) {
       console.error("File upload failed", error)
       throw error
+    }
+  }
+
+  const handleApplyNowClick = () => {
+    if (isMainContractor) {
+      setOpenDisclaimerDialog(true)
+    } else {
+      setOpenDialog(true)
     }
   }
 
@@ -168,57 +243,46 @@ export default function ApplyJobPage() {
 
     setErrors(newErrors)
 
-    if (isValid && job) {
-      // Add null check for job
-      try {
-        // Upload attachments and get the array of file URLs
-        const uploadedFiles = await uploadAttachments(attachments)
-        console.log("Uploaded files:", uploadedFiles)
+    if (isValid) {
+      const uploadedAttachments = await uploadAttachments(attachments)
+      console.log("uploaded urls", uploadAttachments)
+      // Here you would normally send the data to your API
+      console.log("Submitting enquiry:", {
+        title: enquiryTitle,
+        enquiry: enquiryText,
+        attachments: uploadedAttachments?.map((file) => file.url),
+        jobId: id,
+      })
 
-        // Here you would normally send the data to your API
-        console.log("Submitting enquiry:", {
-          title: enquiryTitle,
-          enquiry: enquiryText,
-          attachments: uploadedFiles, // This is already an array of URLs
-          jobId: id,
-        })
-
-        // Check if created_by exists and has _id property
-        const createdById = job.created_by 
-
-        socket.emit(
-          "sendMessage",
-          {
-            recipientId: createdById, // Use optional chaining and ensure created_by is an object
-            enquiry: {
-              title: enquiryTitle,
-              description: enquiryText,
-              attachments: uploadedFiles, // Use the array of URLs directly
-              jobId: job._id,
-            },
-            type: "enquiry",
+      socket.emit(
+        "sendMessage",
+        {
+          recipientId: job?.created_by?._id,
+          enquiry: {
+            title: enquiryTitle,
+            description: enquiryText,
+            attachments: uploadedAttachments?.map((file) => file.url),
+            jobId: job?._id,
           },
-          ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
-            if (!error && data) {
-              console.log("message sent", data)
-              router.push(`/chat/${data.conversation._id}`)
-            } else {
-              console.error("Message send failed:", error)
-            }
-          },
-        )
+          type: "enquiry",
+        },
+        ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
+          if (!error && data) {
+            console.log("message sent", data)
+            router.push(`/chat/${data.conversation._id}`)
+          } else {
+            console.error("Message send failed:", error)
+          }
+        },
+      )
 
-        alert("Your enquiry has been submitted!")
-        setOpenDialog(false)
+      alert("Your enquiry has been submitted!")
+      setOpenDialog(false)
 
-        // Reset form
-        setEnquiryTitle("")
-        setEnquiryText("")
-        setAttachments([])
-      } catch (error) {
-        console.error("Error submitting enquiry:", error)
-        alert("Failed to submit your enquiry. Please try again.")
-      }
+      // Reset form
+      setEnquiryTitle("")
+      setEnquiryText("")
+      setAttachments([])
     }
   }
 
@@ -383,10 +447,64 @@ export default function ApplyJobPage() {
               </Button>
 
               {/* Apply Now button moved to the extreme right */}
-              <Button variant="contained" onClick={() => setOpenDialog(true)}>
+              <Button variant="contained" onClick={handleApplyNowClick}>
                 Apply Now
               </Button>
             </Box>
+
+            {/* Disclaimer Dialog for Main Contractors */}
+            <Dialog
+              open={openDisclaimerDialog}
+              onClose={() => setOpenDisclaimerDialog(false)}
+              fullWidth
+              maxWidth="sm"
+              PaperProps={{
+                sx: {
+                  borderRadius: "8px",
+                },
+              }}
+            >
+              <DialogTitle
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  p: 2,
+                  borderBottom: "1px solid #eee",
+                  color: "#D49F2E",
+                }}
+              >
+                <InfoIcon sx={{ mr: 1 }} />
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  Application Restricted
+                </Typography>
+              </DialogTitle>
+
+              <DialogContent sx={{ p: 3, mt: 2 }}>
+                <Typography variant="body1" paragraph>
+                  As a Main Contractor, you cannot apply to this job posting.
+                </Typography>
+                <Typography variant="body1" paragraph>
+                  This job is only available for Sub Contractors and Job Seekers to apply.
+                </Typography>
+                <Typography variant="body1">
+                  If you wish to apply for jobs, please create a separate account with a Sub Contractor or Job Seeker
+                  role.
+                </Typography>
+              </DialogContent>
+
+              <DialogActions sx={{ p: 2, borderTop: "1px solid #eee" }}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={() => setOpenDisclaimerDialog(false)}
+                  sx={{
+                    py: 1.5,
+                  }}
+                >
+                  I Understand
+                </Button>
+              </DialogActions>
+            </Dialog>
 
             {/* Enquiry Dialog */}
             <Dialog
@@ -461,10 +579,11 @@ export default function ApplyJobPage() {
                       Title
                     </Typography>
                     <TextField
+                      required
                       fullWidth
                       placeholder="Interest in providing services"
                       value={enquiryTitle}
-                      onChange={(e) => setEnquiryTitle(e.target.value)}
+                      onChange={handleTitleChange}
                       error={!!errors.title}
                       helperText={errors.title}
                       size="small"
@@ -482,12 +601,13 @@ export default function ApplyJobPage() {
                       Enquiry
                     </Typography>
                     <TextField
+                      required
                       fullWidth
                       multiline
                       rows={5}
                       placeholder="Describe your skills, expertise, and experience relevant to this job..."
                       value={enquiryText}
-                      onChange={(e) => setEnquiryText(e.target.value)}
+                      onChange={handleEnquiryChange}
                       error={!!errors.enquiry}
                       helperText={errors.enquiry}
                       sx={{
@@ -527,6 +647,12 @@ export default function ApplyJobPage() {
                       </Box>
                     ))}
 
+                    {errors.attachments && (
+                      <Typography color="error" variant="caption" sx={{ display: "block", mt: 1 }}>
+                        {errors.attachments}
+                      </Typography>
+                    )}
+
                     {/* Add Attachment Button */}
                     <Button
                       variant="outlined"
@@ -554,6 +680,7 @@ export default function ApplyJobPage() {
                   variant="contained"
                   fullWidth
                   onClick={handleSubmitEnquiry}
+                  disabled={!enquiryTitle.trim() || enquiryText.trim().length < 20 || attachments.length === 0}
                   sx={{
                     py: 1.5,
                     bgcolor: "#D49F2E",

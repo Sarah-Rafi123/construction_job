@@ -38,7 +38,7 @@ const ProtectedRoute = ({ children, allowedRoles, redirectUnauthenticated = true
     }
 
     try {
-      const response = await axios.get("http://localhost:9000/api/v0/get-me", {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}get-me`, {
         withCredentials: true,
       })
 

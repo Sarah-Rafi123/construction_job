@@ -14,7 +14,7 @@ export async function uploadMultipleFiles(files: File[]) {
   })
 
   try {
-    const response = await axios.post("http://localhost:9000/api/v0/upload/multiple", formData, {
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}upload/multiple`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -39,7 +39,7 @@ export async function uploadSingleFile(file: File) {
   formData.append("file", file)
 
   try {
-    const response = await axios.post("http://localhost:9000/api/v0/upload/single", formData, {
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}upload/single`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
