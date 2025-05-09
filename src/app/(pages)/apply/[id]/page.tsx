@@ -40,19 +40,18 @@ import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
 import ProtectedRoute from "@/components/global/ProtectedRoute"
 import Footer from "@/components/layout/footer"
 
-// Create a custom theme with #D49F2E as the primary color
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#D49F2E", // Gold color
+      main: "#D49F2E", 
     },
     background: {
-      default: "#ffffff", // White background
-      paper: "#ffffff", // White card background
+      default: "#ffffff", 
+      paper: "#ffffff", 
     },
     text: {
-      primary: "#333333", // Dark text for better contrast with white background
-      secondary: "#666666", // Medium gray for secondary text
+      primary: "#333333", 
+      secondary: "#666666", 
     },
   },
   components: {
@@ -61,7 +60,7 @@ const theme = createTheme({
         contained: {
           backgroundColor: "#D49F2E",
           "&:hover": {
-            backgroundColor: "#C08E20", // Slightly darker gold for hover state
+            backgroundColor: "#C08E20", 
           },
         },
         outlined: {
@@ -428,7 +427,7 @@ export default function ApplyJobPage() {
             </Card>
 
             {/* Contact Info */}
-            <Card sx={{ mb: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
+            {/* <Card sx={{ mb: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Contact Information
@@ -437,7 +436,7 @@ export default function ApplyJobPage() {
                 <Typography variant="body1">Email: contact@buildconnect.com</Typography>
                 <Typography variant="body1">Phone: +1 (123) 456-7890</Typography>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Action Buttons - Repositioned as requested */}
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>

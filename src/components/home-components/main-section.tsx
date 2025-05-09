@@ -111,6 +111,31 @@ export default function MainSection({ userType }: MainSectionProps) {
         </>
       ) : (
         /* Content for contractors */
+        <>
+        <div className="relative z-10 w-full pt-6 md:pt-10 px-4">
+            <div className="flex flex-col gap-x-20 md:flex-row justify-center items-center gap-4">
+              <div className="bg-white/30 backdrop-blur-sm px-4 py-2 rounded-md text-sm md:text-base">
+                <span className="flex items-center">
+                  <span className="text-yellow-500 mr-2">⚙️</span>
+                  Leading Construction Recruitment Platform
+                </span>
+              </div>
+
+              <div className="bg-white/30 backdrop-blur-sm px-4 py-2 rounded-md text-sm md:text-base">
+                <span className="flex items-center">
+                  <span className="text-yellow-500 mr-2">🔰</span>
+                  Trusted by Top Contractors & Builders
+                </span>
+              </div>
+
+              <div className="bg-white/30 backdrop-blur-sm px-4 py-2 rounded-md text-sm md:text-base">
+                <span className="flex items-center">
+                  <span className="text-yellow-500 mr-2">🛠️</span>
+                  Skilled Workers, Real Projects, Faster Connections
+                </span>
+              </div>
+            </div>
+          </div>
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 md:px-8">
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Post Jobs. Build Crews. Win More Projects.</h1>
           <p className="text-white text-base md:text-xl max-w-3xl mb-8">
@@ -132,6 +157,7 @@ export default function MainSection({ userType }: MainSectionProps) {
         </div>
       )}
         </div>
+        </>
       )}
     </div>
   )

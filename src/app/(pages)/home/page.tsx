@@ -9,7 +9,7 @@ import JobSearch from "@/components/home-components/job-search"
 import JobGrid from "@/components/home-components/job-grid"
 import { useGetJobsQuery } from "@/store/api/jobsApi"
 import { useAppSelector } from "@/store/hooks"
-import type { Job } from "@/store/api/jobsApi"
+import type { Job } from "@/types/jobTypes"
 import Footer from "@/components/layout/footer"
 
 export default function Home() {
@@ -22,7 +22,23 @@ export default function Home() {
   const [sortBy, setSortBy] = useState("newest")
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([])
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
-  const { data: jobsData, error, isLoading } = useGetJobsQuery()
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [totalPages, setTotalPages] = useState(1)
+
+  // Use the updated query with pagination
+  const {
+    data: jobsData,
+    error,
+    isLoading,
+    isFetching,
+  } = useGetJobsQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+  })
+
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371
     const dLat = deg2rad(lat2 - lat1)
@@ -31,7 +47,7 @@ export default function Home() {
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    const distance = R * c 
+    const distance = R * c
     return distance
   }
 
@@ -39,9 +55,27 @@ export default function Home() {
     return deg * (Math.PI / 180)
   }
 
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    // Scroll to top when changing pages
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   useEffect(() => {
-    if (jobsData?.data?.jobs) {
+    if (jobsData?.data) {
+      // Update pagination information from the API response
+      const { pagination } = jobsData.data
+      setTotalPages(pagination.totalPages)
+      setItemsPerPage(pagination.limit)
+
+      // If we're on a page that no longer exists after filtering, go back to page 1
+      if (currentPage > pagination.totalPages && pagination.totalPages > 0) {
+        setCurrentPage(1)
+      }
+
       let results = [...jobsData.data.jobs]
+
       if (searchTerm) {
         results = results.filter((job) => job.job_title.toLowerCase().includes(searchTerm.toLowerCase()))
       }
@@ -63,7 +97,7 @@ export default function Home() {
             const distance = calculateDistance(userLocation.lat, userLocation.lng, jobLat, jobLng)
             return distance <= radiusFilter
           }
-          return true 
+          return true
         })
       }
       if (sortBy === "newest") {
@@ -84,19 +118,16 @@ export default function Home() {
 
       setFilteredJobs(results)
     }
-  }, [jobsData, searchTerm, selectedJobType, selectedServiceType, radiusFilter, sortBy, userLocation])
+  }, [jobsData, searchTerm, selectedJobType, selectedServiceType, radiusFilter, sortBy, userLocation, currentPage])
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-lg font-semibold text-gray-700">Loading jobs...</p>
-      </div>
-    )
-  }
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, selectedJobType, selectedServiceType, radiusFilter, sortBy])
 
   if (error) {
     router.push("/landing-page")
-    return null 
+    return null
   }
 
   return (
@@ -129,10 +160,14 @@ export default function Home() {
               userLocation={userLocation}
               radiusFilter={radiusFilter}
               onUserLocationChange={setUserLocation}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              isLoading={isLoading || isFetching}
             />
           </div>
 
-          <div className="mt-8 text-center">
+          {/* <div className="mt-8 text-center">
             <p className="text-gray-600">
               You've successfully logged in as a{" "}
               {currentUser?.role
@@ -141,10 +176,10 @@ export default function Home() {
                 .join(" ")}
               .
             </p>
-          </div>
+          </div> */}
         </main>
       </div>
-      <Footer/>
+      <Footer />
     </ProtectedRoute>
   )
 }
