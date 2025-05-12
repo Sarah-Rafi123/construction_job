@@ -47,9 +47,11 @@ export default function JobCard({ job, router }: JobCardProps) {
 
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
-      <div className="flex justify-between items-start mb-1">
-        <h3 className="text-base  font-semibold text-gray-800">{job.job_title}</h3>
-        <span className="text-sm text-gray-400 flex items-center">
+     <div className="flex justify-between items-start mb-1">
+        <h3 className="text-base font-semibold text-gray-800 truncate max-w-[70%]" title={job.job_title}>
+          {job.job_title.length > 20 ? `${job.job_title.substring(0, 20)}...` : job.job_title}
+        </h3>
+        <span className="text-sm text-gray-400 flex items-center flex-shrink-0 ml-2">
           <Clock className="h-3 w-3 mr-1" />
           {timeAgo}
         </span>

@@ -13,7 +13,7 @@ import { clearCurrentUser } from "@/store/slices/userSlice"
 
 interface NavbarProps {
   messageCount?: number
-  requireAuth?: boolean // New prop to control whether authentication is required
+  requireAuth?: boolean
 }
 
 export default function Navbar({ messageCount = 0, requireAuth = false }: NavbarProps) {
@@ -22,25 +22,17 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation()
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
-
-  // Get authentication state and user info from Redux
   const isAuthenticated = useSelector((state: RootState) => state.user?.isAuthenticated)
   const currentUser = useSelector((state: RootState) => state.user?.currentUser)
-
-  // Use Redux data directly instead of fetching again
   const user = currentUser
-  const isLoading = false // We don't need this anymore since we're using Redux
-
-  // Display user's name or company name if available, otherwise fallback to "Account"
+  const isLoading = false
   const displayName = user?.full_name || user?.company_name || "Account"
-
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false)
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside)
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
@@ -50,32 +42,21 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
   const handleLogout = async () => {
     try {
       await logout().unwrap()
-
-      // Close the menu
       setIsUserMenuOpen(false)
-
-      // Clear Redux state
       dispatch(clearCurrentUser())
-
-      // Clear any local storage items related to authentication
       localStorage.removeItem("userType")
-
-      // Redirect to landing page after successful logout
-      router.push("/landing-page")
+      // Replace router.push with window.location.href to force a full page refresh
+      window.location.href = "/landing-page"
     } catch (error) {
       console.error("Logout failed:", error)
-
-      // Even if the API call fails, still clear state and redirect
       dispatch(clearCurrentUser())
       localStorage.removeItem("userType")
-      router.push("/landing-page")
+      // Also replace router.push in the error handler
+      window.location.href = "/landing-page"
     }
   }
 
-  // Determine if user is authenticated based on Redux state
   const isUserAuthenticated = isAuthenticated
-
-  // Render the navbar content
   const renderNavbarContent = () => (
     <nav className="bg-white">
       <div className="max-w-7xl mx-auto px-4 ">
@@ -98,11 +79,6 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
                 >
                   <MessageSquare size={20} className="mr-1" />
                   <span className="text-sm font-medium">Chat</span>
-                  {/* {messageCount > 0 && (
-                    <span className="ml-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                      {messageCount}
-                    </span>
-                  )} */}
                 </Link>
                 <div className="relative" ref={userMenuRef}>
                   <button
@@ -121,9 +97,6 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
                       <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         Your Profile
                       </Link>
-                      {/* <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        Settings
-                      </Link> */}
                       <div className="border-t border-gray-100"></div>
                       <button
                         onClick={handleLogout}
@@ -164,12 +137,9 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
       </div>
     </nav>
   )
-
-  // If authentication is required, wrap in ProtectedRoute, otherwise render directly
   return requireAuth ? (
     <ProtectedRoute redirectUnauthenticated={true}>{renderNavbarContent()}</ProtectedRoute>
   ) : (
-    // For public pages, don't redirect on authentication failure
     <ProtectedRoute redirectUnauthenticated={false}>{renderNavbarContent()}</ProtectedRoute>
   )
 }

@@ -17,9 +17,10 @@ import InputAdornment from "@mui/material/InputAdornment"
 import IconButton from "@mui/material/IconButton"
 import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
+import Divider from "@mui/material/Divider"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
-import { Briefcase } from "lucide-react"
+import { Briefcase, Facebook, Twitter, Linkedin, Github } from "lucide-react"
 import { useLoginMutation } from "@/store/api/authApi"
 
 const theme = createTheme({
@@ -72,6 +73,7 @@ export default function LoginPage() {
     password: "",
   })
 
+
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
@@ -83,8 +85,6 @@ export default function LoginPage() {
       ...prev,
       [id]: value,
     }))
-
-    // Clear the specific error when user starts typing
     setErrors((prev) => ({
       ...prev,
       [id]: "",
@@ -99,8 +99,6 @@ export default function LoginPage() {
       general: "",
     }
     let isValid = true
-
-    // Validate email
     if (!formData.email) {
       newErrors.email = "Email is required"
       isValid = false
@@ -108,8 +106,6 @@ export default function LoginPage() {
       newErrors.email = "Please enter a valid email address"
       isValid = false
     }
-
-    // Validate password
     if (!formData.password) {
       newErrors.password = "Password is required"
       isValid = false
@@ -130,21 +126,14 @@ export default function LoginPage() {
     }
 
     try {
-      // Use the RTK Query mutation for login
       const response = await login({
         email: formData.email,
         password: formData.password,
       }).unwrap()
-
-      // Log the entire response for debugging
       console.log("Login response:", response)
-
-      // Check if user is an admin - make sure we're accessing the correct property path
       const isAdmin = response.user?.role === "admin"
       console.log("User role:", response.user?.role)
       console.log("Is admin:", isAdmin)
-
-      // Redirect based on role
       if (isAdmin) {
         console.log("Admin user detected, redirecting to admin-home")
         router.push("/admin-home")
@@ -154,7 +143,6 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error("Login error:", err)
-      // Set a general error message
       setErrors((prev) => ({
         ...prev,
         general: err.data?.message || "Login failed. Please check your credentials.",
@@ -164,6 +152,9 @@ export default function LoginPage() {
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword)
+  }
+  const navigateToHome = () => {
+    router.push("/")
   }
 
   return (
@@ -176,7 +167,6 @@ export default function LoginPage() {
         }}
         className="bg-white"
       >
-        {/* Left side - Login Form */}
         <Box
           sx={{
             width: { xs: "100%", md: "50%" },
@@ -185,8 +175,16 @@ export default function LoginPage() {
             p: { xs: 2, sm: 4 },
           }}
         >
-          {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mt: 4,
+              ml: 4,
+              cursor: "pointer",
+            }}
+            onClick={navigateToHome}
+          >
             <Box
               sx={{
                 color: "#D49F2E",
@@ -287,14 +285,16 @@ export default function LoginPage() {
                     <ErrorMessage message={errors.password} />
                   </Box>
 
-                  <Typography
-                    variant="body2"
-                    color="primary"
-                    sx={{ textAlign: "right", cursor: "pointer", "&:hover": { textDecoration: "underline" }, mt: 1 }}
-                    className="text-[#D49F2E]"
-                  >
-                    Forgot Password?
-                  </Typography>
+                  <Link href="/forgot-password" style={{ textDecoration: "none", alignSelf: "flex-end" }}>
+                    <Typography
+                      variant="body2"
+                      color="primary"
+                      sx={{ textAlign: "right", cursor: "pointer", "&:hover": { textDecoration: "underline" }, mt: 1 }}
+                      className="text-[#D49F2E]"
+                    >
+                      Forgot Password?
+                    </Typography>
+                  </Link>
                 </CardContent>
 
                 <CardActions sx={{ flexDirection: "column", gap: 1, p: 2 }}>
@@ -308,6 +308,7 @@ export default function LoginPage() {
                   >
                     {isLoading ? "Logging in..." : "Log In"}
                   </Button>
+
                   <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
                     <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }} className="text-gray-500">
                       Don't have an account?

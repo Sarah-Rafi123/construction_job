@@ -1,6 +1,15 @@
 import { Briefcase, Facebook, Twitter, Linkedin, Instagram } from "lucide-react"
-
+import Link from "next/link"
 export default function Footer() {
+  const socialLoginUrls = {
+    facebook: "https://www.facebook.com/login",
+    twitter: "https://twitter.com/i/flow/login",
+    linkedin: "https://www.linkedin.com/login",
+    instagram: "https://www.instagram.com/accounts/login",
+  }
+  const handleSocialLogin = (provider: string) => {
+    window.location.href = socialLoginUrls[provider as keyof typeof socialLoginUrls]
+  }
   return (
     <footer className="py-12 bg-gray-900 text-white">
       <div className="mx-auto max-w-7xl px-4">
@@ -15,16 +24,16 @@ export default function Footer() {
               construction projects.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a   onClick={() => handleSocialLogin("facebook")} href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a  onClick={() => handleSocialLogin("twitter")} href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a  onClick={() => handleSocialLogin("linkedin")} href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Linkedin className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a onClick={() => handleSocialLogin("instagram")} href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
             </div>
@@ -34,59 +43,22 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4">About</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Companies
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Pricing
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/terms-and-conditions" className="text-gray-400 hover:text-white transition-colors">
                   Terms and Conditions
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <a href="/contact-us" className="text-gray-400 hover:text-white transition-colors">
                   Contact Us
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="/privacy-policy" className="text-gray-400 hover:text-white transition-colors">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
-
-          {/* <div>
-            <h4 className="text-lg font-semibold mb-4">Resources</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Help Docs
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Guide
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Updates
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Contact Us
-                </a>
-              </li>
-            </ul>
-          </div> */}
-
           <div>
             <h4 className="text-lg font-semibold mb-4">Get job notifications</h4>
             <p className="text-gray-400 mb-4">The latest job news, articles, sent to your inbox weekly.</p>
