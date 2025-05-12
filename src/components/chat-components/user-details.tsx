@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import { Avatar } from "@mui/material";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { Avatar } from "@mui/material"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store"
 interface UserDetailsProps {
-  isOpen: boolean;
-  togglePanel: () => void;
+  isOpen: boolean
+  togglePanel: () => void
 }
 
 export default function UserDetails({ isOpen, togglePanel }: UserDetailsProps) {
-  const { currentUser } = useSelector((state: RootState) => state.user);
-  const { activeConversation } = useSelector((state: RootState) => state.chat);
-  const user = activeConversation?.participants.find((u) => u._id !== currentUser?.id);
+  const { currentUser } = useSelector((state: RootState) => state.user)
+  const { activeConversation } = useSelector((state: RootState) => state.chat)
+  const user = activeConversation?.participants.find((u) => u._id !== currentUser?.id)
 
-  if (!activeConversation) return;
+  if (!activeConversation) return null
 
   return (
     <div
@@ -47,23 +47,34 @@ export default function UserDetails({ isOpen, togglePanel }: UserDetailsProps) {
 
         {/* User details */}
         <div className="p-4 border-b border-gray-200">
-          <div className="grid grid-cols-2 gap-y-3">
-            <div className="text-sm text-gray-500">Email</div>
-            <div className="text-sm text-gray-900 font-medium">{user?.email}</div>
-            <div className="text-sm text-gray-500">Company Name</div>
-            <div className="text-sm text-gray-900 font-medium">{user?.company_name}</div>
-            <div className="text-sm text-gray-500">Role</div>
-            <div className="text-sm text-gray-900 font-medium">
-            {user?.role === "main_contractor"
-              ? "Main Contractor"
-              : user?.role === "subcontractor"
-                ? "Sub Contractor"
-                : user?.role === "job_seeker"
-                  ? "Job Seeker"
-                  : user?.role}
-          </div>
-          <div className="text-sm text-gray-500">Description</div>
-          <div className="text-sm text-gray-900 font-medium">{user?.description}</div>
+          <div className="space-y-4">
+            <div>
+              <div className="text-sm text-gray-500 font-medium mb-1">Email</div>
+              <div className="text-sm text-gray-900">{user?.email}</div>
+            </div>
+
+            <div>
+              <div className="text-sm text-gray-500 font-medium mb-1">Company Name</div>
+              <div className="text-sm text-gray-900">{user?.company_name}</div>
+            </div>
+
+            <div>
+              <div className="text-sm text-gray-500 font-medium mb-1">Role</div>
+              <div className="text-sm text-gray-900">
+                {user?.role === "main_contractor"
+                  ? "Main Contractor"
+                  : user?.role === "subcontractor"
+                    ? "Sub Contractor"
+                    : user?.role === "job_seeker"
+                      ? "Job Seeker"
+                      : user?.role}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-sm text-gray-500 font-medium mb-1">Description</div>
+              <div className="text-sm text-gray-900">{user?.description}</div>
+            </div>
           </div>
         </div>
 
@@ -73,5 +84,5 @@ export default function UserDetails({ isOpen, togglePanel }: UserDetailsProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

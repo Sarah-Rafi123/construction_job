@@ -45,13 +45,11 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
       setIsUserMenuOpen(false)
       dispatch(clearCurrentUser())
       localStorage.removeItem("userType")
-      // Replace router.push with window.location.href to force a full page refresh
       window.location.href = "/landing-page"
     } catch (error) {
       console.error("Logout failed:", error)
       dispatch(clearCurrentUser())
       localStorage.removeItem("userType")
-      // Also replace router.push in the error handler
       window.location.href = "/landing-page"
     }
   }

@@ -149,6 +149,7 @@ export default function MainSection({ userType }: MainSectionProps) {
       >
         Post A Job
       </button>
+
       <DocumentSubmissionDialog open={showDocumentDialog} onClose={() => setShowDocumentDialog(false)} />
       {showVerificationMessage && (
         <div className="absolute bottom-10 left-0 right-0 mx-auto w-full max-w-md bg-white/90 backdrop-blur-sm border-l-4 border-yellow-500 text-gray-800 px-4 py-3 rounded shadow-md mt-4 text-center">
@@ -156,9 +157,17 @@ export default function MainSection({ userType }: MainSectionProps) {
           <p className="text-sm">You'll be able to post jobs once verified.</p>
         </div>
       )}
+      <button
+                    className=" bg-white border border-[#D49F2E] mt-4 hover:bg-gray-50 text-[#D49F2E] font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    type="button"
+                    onClick={() => router.push("/my-posted-jobs")}
+                  >
+                    View Your Posted Jobs
+                  </button>
         </div>
         </>
       )}
+      
     </div>
   )
 }

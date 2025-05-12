@@ -4,6 +4,14 @@ import { useEffect, useState, useCallback } from "react"
 import { GoogleMap, Marker, Circle, useJsApiLoader, InfoWindow } from "@react-google-maps/api"
 import type { Job } from "@/store/api/jobsApi"
 import LocationPermissionRequest from "./location-permission-request"
+import Script from "next/script"
+import { Crosshair, X } from "lucide-react"
+
+declare global {
+  interface Window {
+    google: any
+  }
+}
 
 declare module "@/store/api/jobsApi" {
   interface Job {
@@ -44,6 +52,8 @@ const mapContainerStyle = {
   borderRadius: "0.5rem",
 }
 
+const libraries: ("places" | "drawing" | "geometry" | "localContext" | "visualization")[] = ["places"]
+
 export default function GoogleMapComponent({
   jobs,
   userLocation,
@@ -55,12 +65,37 @@ export default function GoogleMapComponent({
   const [showPermissionRequest, setShowPermissionRequest] = useState(true)
   const [map, setMap] = useState<google.maps.Map | null>(null)
   const [selectedJob, setSelectedJob] = useState<Job | null>(null)
+  const [mapError, setMapError] = useState<string | null>(null)
+  const [isManualLocationMode, setIsManualLocationMode] = useState(false)
+  const [locationSource, setLocationSource] = useState<"browser" | "manual">("browser")
+
+  // Get API key from environment variable
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
 
   // Use the useJsApiLoader hook to load the Google Maps API
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    googleMapsApiKey: apiKey,
+    libraries,
   })
+
+  // Handle load errors
+  useEffect(() => {
+    if (loadError) {
+      console.error("Google Maps loading error:", loadError)
+      setMapError("Failed to load Google Maps. Please check your API key and network connection.")
+    }
+  }, [loadError])
+
+  // Check if API key is missing
+  useEffect(() => {
+    if (!apiKey) {
+      console.error("Google Maps API key is missing")
+      setMapError(
+        "Google Maps API key is missing. Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your environment variables.",
+      )
+    }
+  }, [apiKey])
 
   // Function to request user location
   const requestUserLocation = useCallback(() => {
@@ -77,6 +112,8 @@ export default function GoogleMapComponent({
           setMapCenter(userPos)
           setPermissionStatus("granted")
           setShowPermissionRequest(false)
+          setLocationSource("browser")
+          setIsManualLocationMode(false)
 
           // Center map on user location
           if (map) {
@@ -99,22 +136,27 @@ export default function GoogleMapComponent({
 
   // Check for existing permission on component mount
   useEffect(() => {
-    if (navigator.permissions && navigator.permissions.query) {
-      navigator.permissions.query({ name: "geolocation" }).then((result) => {
-        if (result.state === "granted") {
-          requestUserLocation()
-        } else if (result.state === "prompt") {
-          setShowPermissionRequest(true)
-        } else {
-          setPermissionStatus("denied")
-          setShowPermissionRequest(false)
-        }
-      })
-    } else {
-      // Fallback for browsers that don't support permissions API
-      setShowPermissionRequest(true)
-    }
+    // Automatically request user location when component mounts
+    requestUserLocation()
+    // No need to show permission request dialog
+    setShowPermissionRequest(false)
   }, [requestUserLocation])
+
+  // Function to handle map clicks to set location
+  const handleMapClick = useCallback(
+    (e: google.maps.MapMouseEvent) => {
+      if (e.latLng) {
+        const newLocation = {
+          lat: e.latLng.lat(),
+          lng: e.latLng.lng(),
+        }
+        onUserLocationChange(newLocation)
+        setLocationSource("manual")
+        // No need to toggle manual mode off since we're allowing direct clicks
+      }
+    },
+    [onUserLocationChange],
+  )
 
   const getJobCoordinates = (job: Job) => {
     // Check if job has location data in the GeoJSON format
@@ -147,12 +189,25 @@ export default function GoogleMapComponent({
     }
   }
 
+  // If there's an error, display it
+  if (mapError) {
+    return (
+      <div className="flex items-center justify-center h-full w-full bg-gray-100 rounded-lg">
+        <div className="text-center p-4">
+          <div className="text-red-500 mb-2">⚠️ Map Error</div>
+          <p className="text-gray-700">{mapError}</p>
+          <p className="text-sm text-gray-500 mt-2">Check the console for more details.</p>
+        </div>
+      </div>
+    )
+  }
+
   // Only render the map when the Google Maps API is loaded
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center h-full w-full bg-gray-100 rounded-lg">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#D49F2E] mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading map...</p>
         </div>
       </div>
@@ -161,6 +216,44 @@ export default function GoogleMapComponent({
 
   return (
     <div className="relative h-full w-full">
+      {/* Add a fallback script to ensure Google Maps loads */}
+      <Script
+        src={`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`}
+        strategy="beforeInteractive"
+        onError={() => {
+          console.error("Failed to load Google Maps script")
+          setMapError("Failed to load Google Maps. Please check your API key and network connection.")
+        }}
+      />
+
+      {/* Location control buttons at the bottom left */}
+      <div className="absolute bottom-4 left-4 z-10">
+        <div className="flex gap-2 bg-white p-1 rounded-lg shadow-md">
+          <button
+            onClick={requestUserLocation}
+            className="flex items-center gap-1 py-1.5 px-3 rounded-md text-xs font-medium bg-[#D49F2E] text-white hover:bg-amber-600"
+            title="Reset to my current location"
+          >
+            <Crosshair size={14} />
+            <span>Reset to My Location</span>
+          </button>
+
+          {userLocation && (
+            <button
+              onClick={() => {
+                onUserLocationChange(null)
+                setLocationSource("browser")
+              }}
+              className="flex items-center gap-1 py-1.5 px-3 rounded-md text-xs font-medium bg-white text-gray-700 hover:bg-gray-50"
+              title="Clear location"
+            >
+              <X size={14} />
+              <span>Clear</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         center={mapCenter}
@@ -170,6 +263,9 @@ export default function GoogleMapComponent({
           streetViewControl: false,
           mapTypeControl: false,
           zoomControl: true,
+          zoomControlOptions: {
+            position: (window.google && window.google.maps.ControlPosition.RIGHT_BOTTOM) || 3,
+          },
           styles: [
             {
               featureType: "poi",
@@ -179,6 +275,7 @@ export default function GoogleMapComponent({
           ],
         }}
         onLoad={(map) => setMap(map)}
+        onClick={handleMapClick}
       >
         {jobs.map((job) => {
           const position = getJobCoordinates(job)
@@ -195,7 +292,7 @@ export default function GoogleMapComponent({
                 strokeColor: "#FFFFFF",
                 rotation: 0,
                 scale: 2,
-                anchor: new google.maps.Point(12, 22),
+                anchor: new window.google.maps.Point(12, 22),
               }}
               onClick={() => {
                 setSelectedJob(job)
@@ -231,10 +328,10 @@ export default function GoogleMapComponent({
                 </div>
               )}
               <button
-                className="mt-2 text-xs bg-amber-500 text-white px-3 py-1 rounded-md font-medium hover:bg-amber-600 transition-colors w-full"
+                className="mt-2 text-xs bg-[#D49F2E] text-white px-3 py-1 rounded-md font-medium hover:bg-amber-600 transition-colors w-full"
                 onClick={() => {
                   // Navigate to job details page
-                  window.location.href = `/jobs/${selectedJob._id}`
+                  window.location.href = `/apply/${selectedJob._id}`
                 }}
               >
                 View Details
@@ -255,7 +352,7 @@ export default function GoogleMapComponent({
                 strokeWeight: 1,
                 strokeColor: "#FFFFFF",
                 scale: 1.5,
-                anchor: new google.maps.Point(12, 12),
+                anchor: new window.google.maps.Point(12, 12),
               }}
               zIndex={1000}
               title="Your location"

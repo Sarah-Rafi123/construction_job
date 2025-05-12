@@ -34,7 +34,7 @@ export default function JobGrid({
   if (isLoading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-500 mx-auto"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#D49F2E] mx-auto"></div>
         <p className="mt-2 text-gray-600">Loading jobs...</p>
       </div>
     )

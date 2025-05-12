@@ -14,8 +14,11 @@ export const jobsApi = createApi({
   }),
   endpoints: (builder) => ({
     getJobs: builder.query<JobsResponse, PaginationParams | void>({
-      query: (params = { page: 1, limit: 10 }) => {
-        const { page = 1, limit = 10 } = params
+      query: (params?: PaginationParams) => {
+        // Use default parameters if params is undefined or void
+        const page = params?.page ?? 1
+        const limit = params?.limit ?? 10
+
         return `jobs?page=${page}&limit=${limit}`
       },
     }),

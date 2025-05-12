@@ -262,7 +262,6 @@ export default function ProfilePage() {
                             className="px-3 py-1.5 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center gap-1"
                             disabled={isUpdating}
                           >
-                            <X size={16} />
                             Cancel
                           </button>
                           <button
@@ -274,7 +273,6 @@ export default function ProfilePage() {
                               "Saving..."
                             ) : (
                               <>
-                                <Check size={16} />
                                 Save
                               </>
                             )}

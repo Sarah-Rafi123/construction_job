@@ -1,59 +1,73 @@
-"use client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Search, Menu, X } from "lucide-react";
-import { Avatar } from "@mui/material";
-import { useGetInboxQuery } from "@/store/api/chatApi";
-import { Chat } from "../../types/chatTypes";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+"use client"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { Search, Menu, X, ArrowLeft } from "lucide-react"
+import { Avatar } from "@mui/material"
+import { useGetInboxQuery } from "@/store/api/chatApi"
+import type { Chat } from "../../types/chatTypes"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store"
 
 interface ChatSidebarProps {
-  isMobileDrawerOpen: boolean;
-  toggleMobileDrawer: () => void;
+  isMobileDrawerOpen: boolean
+  toggleMobileDrawer: () => void
 }
 
 export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: ChatSidebarProps) {
-  const { isLoading, isError } = useGetInboxQuery();
-  const router = useRouter();
-  const { inbox, activeConversation } = useSelector((state: RootState) => state.chat);
-  const { currentUser } = useSelector((state: RootState) => state?.user);
-  const [searchQuery, setSearchQuery] = useState("");
+  const { isLoading, isError } = useGetInboxQuery()
+  const router = useRouter()
+  const { inbox, activeConversation } = useSelector((state: RootState) => state.chat)
+  const { currentUser } = useSelector((state: RootState) => state?.user)
+  const [searchQuery, setSearchQuery] = useState("")
 
   const updateActiveConversation = (conversation: Chat) => {
-    router.push(`/chat/${conversation._id}`);
-  };
+    router.push(`/chat/${conversation._id}`)
+  }
 
-  console.log("current user is", currentUser);
-  console.log("inbox is", inbox);
+  const navigateToHome = () => {
+    router.push("/home")
+  }
+
+  console.log("current user is", currentUser)
+  console.log("inbox is", inbox)
 
   const filteredInbox = inbox?.filter((conversation) => {
-    const otherParticipant = conversation.participants.find((participant) => participant._id !== currentUser?.id);
-    if (!otherParticipant) return false;
-    const searchLower = searchQuery.toLowerCase();
+    const otherParticipant = conversation.participants.find((participant) => participant._id !== currentUser?.id)
+    if (!otherParticipant) return false
+    const searchLower = searchQuery.toLowerCase()
     return (
-      otherParticipant.full_name?.toLowerCase().includes(searchLower) || otherParticipant.company_name?.toLowerCase().includes(searchLower)
-    );
-  });
+      otherParticipant.full_name?.toLowerCase().includes(searchLower) ||
+      otherParticipant.company_name?.toLowerCase().includes(searchLower)
+    )
+  })
 
   return (
     <>
       {/* Mobile overlay */}
-      {isMobileDrawerOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden" onClick={toggleMobileDrawer} />}
+      {isMobileDrawerOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden" onClick={toggleMobileDrawer} />
+      )}
 
       {/* Sidebar */}
       <div
         className={`
-        fixed lg:static w-80 h-full bg-white z-30 border-r border-gray-200
+        fixed lg:static w-80 h-screen border-b border-gray-300 bg-white z-30 
         transform transition-transform duration-300 ease-in-out
         ${isMobileDrawerOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col border-b border-gray-300 h-full">
           {/* Header */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gray-300">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-gray-800">Conversations</h1>
+              {/* Back button with Conversations text */}
+              <button
+                onClick={navigateToHome}
+                className="flex items-center text-gray-800 hover:text-[#D49F2E] transition-colors"
+              >
+                <ArrowLeft size={20} className="mr-2" />
+                <h1 className="text-2xl font-bold">Conversations</h1>
+              </button>
               <button className="lg:hidden text-gray-500 hover:text-gray-700" onClick={toggleMobileDrawer}>
                 <X size={24} />
               </button>
@@ -75,8 +89,8 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
           {/* Conversation list */}
           <div className="flex-1 overflow-y-auto">
             {filteredInbox?.map((conversation) => {
-              const user = conversation.participants.find((u) => u._id !== currentUser?.id);
-              if (!user) return null;
+              const user = conversation.participants.find((u) => u._id !== currentUser?.id)
+              if (!user) return null
 
               return (
                 <div
@@ -101,7 +115,7 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
                     </div>
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
@@ -113,5 +127,5 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
         <Menu size={24} />
       </button>
     </>
-  );
+  )
 }

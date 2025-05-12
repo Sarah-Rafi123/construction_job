@@ -19,13 +19,10 @@ export default function ChatPage() {
   const toggleDetailsPanel = () => {
     setIsDetailsPanelOpen(!isDetailsPanelOpen);
   };
-
   return (
     <ProtectedRoute>
-     <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-        <Navbar />
-      </div>
-      <div className="flex min-h-full pt-4 bg-gray-50">
+      <Navbar/>
+      <div className="flex min-h-full pt-4 bg-white">
         <ChatSidebar isMobileDrawerOpen={isMobileDrawerOpen} toggleMobileDrawer={toggleMobileDrawer} />
         <div className="flex-1 flex flex-col h-full overflow-hidden">
           <ChatWindow toggleMobileDrawer={toggleMobileDrawer} toggleDetailsPanel={toggleDetailsPanel} />
@@ -33,6 +30,7 @@ export default function ChatPage() {
 
         <UserDetails isOpen={isDetailsPanelOpen} togglePanel={toggleDetailsPanel} />
       </div>
+      <Footer/>
     </ProtectedRoute>
   );
 }

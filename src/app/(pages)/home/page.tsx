@@ -167,7 +167,7 @@ export default function Home() {
             />
           </div>
 
-          {/* <div className="mt-8 text-center">
+           <div className="mt-8 text-center">
             <p className="text-gray-600">
               You've successfully logged in as a{" "}
               {currentUser?.role
@@ -176,7 +176,7 @@ export default function Home() {
                 .join(" ")}
               .
             </p>
-          </div> */}
+          </div> 
         </main>
       </div>
       <Footer />

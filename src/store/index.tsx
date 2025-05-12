@@ -12,6 +12,7 @@ import chatReducer from "./slices/chatSlice"
 import { adminStatusApi } from "./api/adminStatusApi"
 import { contractorApi } from "./api/pendingContractorApi"
 import { passwordResetApi } from "./api/passwordResetApi"
+import { userPostedJobsApi } from "./api/userPostedJobsApi"
 export const store = configureStore({
   reducer: {
     user: userReducer,
@@ -26,6 +27,7 @@ export const store = configureStore({
     [contractorApi.reducerPath]: contractorApi.reducer,
     [adminStatusApi.reducerPath]: adminStatusApi.reducer,
     [passwordResetApi.reducerPath]: passwordResetApi.reducer,
+    [userPostedJobsApi.reducerPath]: userPostedJobsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -38,6 +40,7 @@ export const store = configureStore({
       userProfileApi.middleware,
       contractorApi.middleware,
       passwordResetApi.middleware,
+      userPostedJobsApi.middleware,
     ),
 })
 setupListeners(store.dispatch)

@@ -17,8 +17,6 @@ interface JobSearchProps {
   setSortBy: (sort: string) => void
   userLocation: { lat: number; lng: number } | null
 }
-
-// Custom dropdown component
 interface CustomDropdownProps {
   options: string[]
   value: string
@@ -30,8 +28,6 @@ interface CustomDropdownProps {
 function CustomDropdown({ options, value, onChange, placeholder, className = "" }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -48,7 +44,7 @@ function CustomDropdown({ options, value, onChange, placeholder, className = "" 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <div
-        className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md text-black cursor-pointer flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+        className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md text-black cursor-pointer flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[#D49F2E] focus:border-transparent"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="text-black">{value || placeholder || "Select an option"}</span>
@@ -61,7 +57,7 @@ function CustomDropdown({ options, value, onChange, placeholder, className = "" 
             <div
               key={option}
               className={`px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center justify-between text-black ${
-                value === option ? "bg-amber-50 text-amber-700" : "text-black"
+                value === option ? "bg-amber-50 text-[#D49F2E]" : "text-black"
               }`}
               onClick={() => {
                 onChange(option)
@@ -69,7 +65,7 @@ function CustomDropdown({ options, value, onChange, placeholder, className = "" 
               }}
             >
               <span>{option}</span>
-              {value === option && <Check size={16} className="text-amber-500" />}
+              {value === option && <Check size={16} className="text-[#D49F2E]" />}
             </div>
           ))}
         </div>
@@ -101,6 +97,14 @@ export default function JobSearch({
     { value: "budget-low", label: "Budget: Low to High" },
   ]
 
+  const resetFilters = () => {
+    setSearchTerm("")
+    setSelectedJobType("All Types")
+    setSelectedServiceType("All Services")
+    setRadiusFilter(0)
+    setSortBy("newest")
+  }
+
   // Find the label for the current sort value
   const currentSortLabel = sortOptions.find((option) => option.value === sortBy)?.label || sortOptions[0].label
 
@@ -115,7 +119,7 @@ export default function JobSearch({
             placeholder="Search jobs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#D49F2E] focus:border-transparent"
           />
         </div>
 
@@ -154,7 +158,7 @@ export default function JobSearch({
             <div className="flex items-center justify-between">
               <label className="block text-sm font-medium text-gray-700 mb-2">Distance: {radiusFilter} km</label>
               {!userLocation && (
-                <div className="flex items-center text-amber-600 text-xs">
+                <div className="flex items-center text-[#D49F2E] text-xs">
                   <MapPin size={12} className="mr-1" />
                   <span>Enable location to use this filter</span>
                 </div>
@@ -177,6 +181,14 @@ export default function JobSearch({
                 },
               }}
             />
+          </div>
+          <div className="md:col-span-3 flex justify-end mt-4">
+            <button
+              onClick={resetFilters}
+              className="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center gap-2 text-sm font-medium transition-colors"
+            >
+              Reset All Filters
+            </button>
           </div>
         </div>
       )}

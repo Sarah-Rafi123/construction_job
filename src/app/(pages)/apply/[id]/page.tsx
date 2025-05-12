@@ -43,15 +43,15 @@ import Footer from "@/components/layout/footer"
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#D49F2E", 
+      main: "#D49F2E",
     },
     background: {
-      default: "#ffffff", 
-      paper: "#ffffff", 
+      default: "#ffffff",
+      paper: "#ffffff",
     },
     text: {
-      primary: "#333333", 
-      secondary: "#666666", 
+      primary: "#333333",
+      secondary: "#666666",
     },
   },
   components: {
@@ -60,7 +60,7 @@ const theme = createTheme({
         contained: {
           backgroundColor: "#D49F2E",
           "&:hover": {
-            backgroundColor: "#C08E20", 
+            backgroundColor: "#C08E20",
           },
         },
         outlined: {
@@ -103,7 +103,8 @@ export default function ApplyJobPage() {
   const [openDisclaimerDialog, setOpenDisclaimerDialog] = useState(false)
   const [enquiryTitle, setEnquiryTitle] = useState("")
   const [enquiryText, setEnquiryText] = useState("")
-  const [attachments, setAttachments] = useState<Attachment[]>([])
+  // Replace the attachments array with a single attachment
+  const [attachment, setAttachment] = useState<Attachment | null>(null)
   const [errors, setErrors] = useState({
     title: "",
     enquiry: "",
@@ -147,8 +148,8 @@ export default function ApplyJobPage() {
     }
 
     // Validate attachments
-    if (attachments.length === 0) {
-      newErrors.attachments = "At least one attachment is required"
+    if (!attachment) {
+      newErrors.attachments = "An attachment is required"
       isValid = false
     }
 
@@ -174,11 +175,10 @@ export default function ApplyJobPage() {
         name: file.name,
         file: file,
       }
-      const newAttachments = [...attachments, newAttachment]
-      setAttachments(newAttachments)
+      setAttachment(newAttachment)
 
-      // Clear attachment error if we now have attachments
-      if (newAttachments.length > 0 && errors.attachments) {
+      // Clear attachment error if we now have an attachment
+      if (errors.attachments) {
         setErrors({ ...errors, attachments: "" })
       }
     }
@@ -188,16 +188,15 @@ export default function ApplyJobPage() {
     }
   }
 
-  const removeAttachment = (id: string) => {
-    setAttachments(attachments.filter((attachment) => attachment.id !== id))
+  const removeAttachment = () => {
+    setAttachment(null)
   }
 
-  async function uploadAttachments(attachments: { file: File }[]) {
-    const formData = new FormData()
+  async function uploadAttachments(attachmentToUpload: Attachment | null) {
+    if (!attachmentToUpload) return []
 
-    attachments.forEach((attachment) => {
-      formData.append("files", attachment.file)
-    })
+    const formData = new FormData()
+    formData.append("files", attachmentToUpload.file)
 
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}upload/multiple`, formData, {
@@ -226,6 +225,7 @@ export default function ApplyJobPage() {
     const newErrors = {
       title: "",
       enquiry: "",
+      attachments: "",
     }
 
     let isValid = true
@@ -240,16 +240,23 @@ export default function ApplyJobPage() {
       isValid = false
     }
 
+    if (!attachment) {
+      newErrors.attachments = "An attachment is required"
+      isValid = false
+    }
+
     setErrors(newErrors)
 
     if (isValid) {
-      const uploadedAttachments = await uploadAttachments(attachments)
-      console.log("uploaded urls", uploadAttachments)
+      // Upload the single attachment
+      const uploadedAttachments = await uploadAttachments(attachment)
+      console.log("uploaded urls", uploadedAttachments)
+
       // Here you would normally send the data to your API
       console.log("Submitting enquiry:", {
         title: enquiryTitle,
         enquiry: enquiryText,
-        attachments: uploadedAttachments?.map((file) => file.url),
+        attachments: uploadedAttachments?.map((file: { url: any }) => file.url),
         jobId: id,
       })
 
@@ -260,7 +267,7 @@ export default function ApplyJobPage() {
           enquiry: {
             title: enquiryTitle,
             description: enquiryText,
-            attachments: uploadedAttachments?.map((file) => file.url),
+            attachments: uploadedAttachments?.map((file: { url: any }) => file.url),
             jobId: job?._id,
           },
           type: "enquiry",
@@ -281,7 +288,7 @@ export default function ApplyJobPage() {
       // Reset form
       setEnquiryTitle("")
       setEnquiryText("")
-      setAttachments([])
+      setAttachment(null)
     }
   }
 
@@ -326,7 +333,7 @@ export default function ApplyJobPage() {
   // Get the first letter of each word in the job title for the avatar
   const avatarText = job.job_title
     .split(" ")
-    .map((word) => word[0])
+    .map((word: any[]) => word[0])
     .join("")
     .substring(0, 2)
     .toUpperCase()
@@ -385,13 +392,15 @@ export default function ApplyJobPage() {
                   <strong>Services Required:</strong>
                 </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
-                  {job.services.map((service) => (
-                    <Chip
-                      key={service._id}
-                      label={`${service.service_name} ${service.resource_count > 0 ? `(${service.resource_count})` : ""}`}
-                      size="small"
-                    />
-                  ))}
+                  {job.services.map(
+                    (service: { _id: React.Key | null | undefined; service_name: any; resource_count: number }) => (
+                      <Chip
+                        key={service._id}
+                        label={`${service.service_name} ${service.resource_count > 0 ? `(${service.resource_count})` : ""}`}
+                        size="small"
+                      />
+                    ),
+                  )}
                 </Box>
 
                 {job.job_priority && (
@@ -421,7 +430,7 @@ export default function ApplyJobPage() {
                     ? " This is a full-time position requiring commitment to the entire project duration."
                     : " This is a part-time position with flexible hours."}
                   {job.services.length > 0 &&
-                    ` We are looking for professionals with expertise in ${job.services.map((s) => s.service_name).join(", ")}.`}
+                    ` We are looking for professionals with expertise in ${job.services.map((s: { service_name: any }) => s.service_name).join(", ")}.`}
                 </Typography>
               </CardContent>
             </Card>
@@ -604,7 +613,7 @@ export default function ApplyJobPage() {
                       fullWidth
                       multiline
                       rows={5}
-                      placeholder="Describe your skills, expertise, and experience relevant to this job..."
+                      placeholder="Describe your skills, expertise, and experience relevant to this job in alteast 20 characters..."
                       value={enquiryText}
                       onChange={handleEnquiryChange}
                       error={!!errors.enquiry}
@@ -620,13 +629,12 @@ export default function ApplyJobPage() {
                   {/* Attachments Section */}
                   <Box sx={{ mb: 3 }}>
                     <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                      Attachments
+                      Attachment
                     </Typography>
 
-                    {/* Attachment List */}
-                    {attachments.map((attachment) => (
+                    {/* Single Attachment */}
+                    {attachment && (
                       <Box
-                        key={attachment.id}
                         sx={{
                           display: "flex",
                           alignItems: "center",
@@ -640,11 +648,11 @@ export default function ApplyJobPage() {
                         <Typography variant="body2" noWrap sx={{ maxWidth: "80%" }}>
                           {attachment.name}
                         </Typography>
-                        <IconButton size="small" onClick={() => removeAttachment(attachment.id)}>
+                        <IconButton size="small" onClick={removeAttachment}>
                           <CloseIcon fontSize="small" />
                         </IconButton>
                       </Box>
-                    ))}
+                    )}
 
                     {errors.attachments && (
                       <Typography color="error" variant="caption" sx={{ display: "block", mt: 1 }}>
@@ -652,23 +660,25 @@ export default function ApplyJobPage() {
                       </Typography>
                     )}
 
-                    {/* Add Attachment Button */}
-                    <Button
-                      variant="outlined"
-                      startIcon={<AddIcon />}
-                      onClick={() => fileInputRef.current?.click()}
-                      sx={{
-                        textTransform: "none",
-                        borderColor: "#ddd",
-                        color: "#D49F2E",
-                        "&:hover": {
-                          borderColor: "#D49F2E",
-                          bgcolor: "rgba(212, 159, 46, 0.04)",
-                        },
-                      }}
-                    >
-                      Add another attachment
-                    </Button>
+                    {/* Add Attachment Button - only show if no attachment exists */}
+                    {!attachment && (
+                      <Button
+                        variant="outlined"
+                        startIcon={<AddIcon />}
+                        onClick={() => fileInputRef.current?.click()}
+                        sx={{
+                          textTransform: "none",
+                          borderColor: "#ddd",
+                          color: "#D49F2E",
+                          "&:hover": {
+                            borderColor: "#D49F2E",
+                            bgcolor: "rgba(212, 159, 46, 0.04)",
+                          },
+                        }}
+                      >
+                        Add attachment
+                      </Button>
+                    )}
                     <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileUpload} />
                   </Box>
                 </Box>
@@ -679,7 +689,7 @@ export default function ApplyJobPage() {
                   variant="contained"
                   fullWidth
                   onClick={handleSubmitEnquiry}
-                  disabled={!enquiryTitle.trim() || enquiryText.trim().length < 20 || attachments.length === 0}
+                  disabled={!enquiryTitle.trim() || enquiryText.trim().length < 20 || !attachment}
                   sx={{
                     py: 1.5,
                     bgcolor: "#D49F2E",

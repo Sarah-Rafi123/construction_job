@@ -19,7 +19,7 @@ export default function LocationPermissionRequest({
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-amber-100 p-2 rounded-full">
-              <MapPin className="h-5 w-5 text-amber-600" />
+              <MapPin className="h-5 w-5 text-[#D49F2E]" />
             </div>
             <div>
               <h3 className="font-medium text-gray-900">Location access</h3>
@@ -44,7 +44,7 @@ export default function LocationPermissionRequest({
               </button>
               <button
                 onClick={onRequestLocation}
-                className="px-3 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors"
+                className="px-3 py-1.5 text-sm bg-[#D49F2E] text-white rounded-md hover:bg-amber-600 transition-colors"
               >
                 Allow access
               </button>
@@ -52,7 +52,7 @@ export default function LocationPermissionRequest({
           )}
 
           {status === "loading" && (
-            <div className="flex items-center gap-2 text-amber-600">
+            <div className="flex items-center gap-2 text-[#D49F2E]">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm">Getting your location...</span>
             </div>

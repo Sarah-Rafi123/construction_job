@@ -69,7 +69,7 @@ export default function JobMarker({ job, position }: JobMarkerProps) {
               </p>
             )}
             <button
-              className="mt-2 text-xs bg-amber-500 text-white px-3 py-1 rounded-md font-medium hover:bg-amber-600 transition-colors"
+              className="mt-2 text-xs bg-[#D49F2E] text-white px-3 py-1 rounded-md font-medium hover:bg-amber-600 transition-colors"
               onClick={() => router.push(`/jobs/${job._id}`)}
             >
               View Details
