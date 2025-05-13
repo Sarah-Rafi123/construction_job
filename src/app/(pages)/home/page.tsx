@@ -132,8 +132,8 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-        <Navbar messageCount={3} />
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white">
+        <Navbar />
       </div>
       <div className="min-h-screen bg-gray-50 pt-16">
         {" "}

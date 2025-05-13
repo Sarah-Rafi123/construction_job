@@ -42,8 +42,6 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
       socket.off("receiveMessage")
     }
   }, [activeConversation, socket])
-
-  // Helper function to get file name from URL
   const getFileNameFromUrl = (url: string) => {
     try {
       const urlParts = url.split("/")

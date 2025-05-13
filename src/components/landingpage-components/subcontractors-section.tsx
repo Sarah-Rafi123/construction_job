@@ -29,7 +29,7 @@ export default function SubcontractorsSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/2">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">For Sub-Contractors</h2>
+            <h2 className="text-3xl font-bold text-gray-900 ">For Sub-Contractors</h2>
             <div className="w-64 h-1 bg-[#D49F2E] mb-10"></div>
 
             <div className="space-y-10">

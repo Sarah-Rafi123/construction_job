@@ -341,8 +341,8 @@ export default function ApplyJobPage() {
   return (
     <ProtectedRoute>
       <ThemeProvider theme={theme}>
-        <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-          <Navbar messageCount={3} />
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white">
+          <Navbar />
         </div>
         <Box sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 64px)", mt: 6 }}>
           <Container maxWidth="md" sx={{ py: 4 }}>

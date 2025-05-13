@@ -168,11 +168,7 @@ export default function PostJob() {
     message: "",
     severity: "info",
   })
-
-  // Add this state
   const [showDocumentDialog, setShowDocumentDialog] = useState(false)
-
-  // Validation state for coordinates
   const [coordErrors, setCoordErrors] = useState({
     latitude: "",
     longitude: "",
@@ -336,7 +332,9 @@ export default function PostJob() {
 
   return (
     <ProtectedRoute>
-      <Navbar/>
+     <div className="fixed top-0 left-0 right-0 z-50 bg-white">
+             <Navbar messageCount={3} />
+           </div>
       <ThemeProvider theme={theme}>
         <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", bgcolor: "background.default" }}>
           <Snackbar
@@ -352,15 +350,9 @@ export default function PostJob() {
           <Box sx={{ flexGrow: 1, overflow: "auto", py: 4 }}>
             <Container maxWidth="md">
               <Box component="form" onSubmit={handleSubmit}>
-                <Typography
-                  variant="h4"
-                  component="h1"
-                  gutterBottom
-                  sx={{ mb: 4, color: "text.primary", textAlign: "center" }}
-                >
-                  Create a New Job Posting
-                </Typography>
-
+              <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4, mt:10, color: "#D49F2E", textAlign: "center" }}>
+  Create a New Job Posting
+</Typography>
                 {/* Job Title */}
                 <Card>
                   <CardHeader title="Job Title" />

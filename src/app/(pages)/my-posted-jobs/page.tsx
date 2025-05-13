@@ -12,7 +12,7 @@ export default function MyPostedJobsPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-    <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-white">
                    <Navbar  />
                  </div>
       <main className="flex-grow mt-16">

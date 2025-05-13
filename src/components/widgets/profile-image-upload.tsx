@@ -6,44 +6,30 @@ import { useState, useRef } from "react"
 import Image from "next/image"
 import { User, Upload } from "lucide-react"
 import { useUpdateUserProfileMutation } from "@/store/api/userProfileApi"
-
 interface ProfileImageUploadProps {
   profilePicture: string | null | undefined
   userId: string
 }
-
 export default function ProfileImageUpload({ profilePicture, userId }: ProfileImageUploadProps) {
   const [updateUserProfile, { isLoading }] = useUpdateUserProfileMutation()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
-
-  // Trigger file input click
   const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click()
     }
   }
-
-  // Handle profile picture upload
   const handleProfilePictureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       try {
         const file = e.target.files[0]
-
-        // Create preview URL for immediate feedback
         const objectUrl = URL.createObjectURL(file)
         setPreviewUrl(objectUrl)
-
-        // Create FormData
         const formData = new FormData()
         formData.append("profile_picture", file)
-
-        // Upload the image
         await updateUserProfile(formData).unwrap()
         setUploadError(null)
-
-        // Clean up preview URL
         return () => URL.revokeObjectURL(objectUrl)
       } catch (error) {
         console.error("Failed to upload profile picture:", error)
@@ -52,10 +38,7 @@ export default function ProfileImageUpload({ profilePicture, userId }: ProfileIm
       }
     }
   }
-
-  // Determine which image to show
   const displayImage = previewUrl || profilePicture
-
   return (
     <div className="relative w-32 h-32 mb-4 group">
       {displayImage ? (
