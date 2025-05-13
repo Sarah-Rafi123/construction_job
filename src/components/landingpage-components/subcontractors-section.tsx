@@ -71,7 +71,7 @@ export default function SubcontractorsSection() {
             <div className="mt-10">
               <button
                 onClick={handleFindProjectsClick}
-                className="px-28 py-2 bg-[#D49F2E] text-white font-medium rounded-md inline-block hover:bg-[#C48E1D] transition-colors"
+                className="px-28 py-2 bg-[#D49F2E] cursor-pointer text-white font-medium rounded-md inline-block hover:bg-[#C48E1D] transition-colors"
               >
                 Find Projects
               </button>

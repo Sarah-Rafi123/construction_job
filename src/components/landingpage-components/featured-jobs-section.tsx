@@ -1,7 +1,9 @@
 import type React from "react"
 import { MapPin, ArrowRight } from "react-feather";
 import Link from "next/link"
-
+import type { RootState } from "@/store"
+import { useSelector } from "react-redux"
+import { useRouter } from "next/navigation"
 interface Job {
   id: string
   title: string
@@ -69,6 +71,16 @@ const FeaturedJobsSection: React.FC = () => {
       category: "Finance",
     },
   ]
+ const router = useRouter()
+  const currentUser = useSelector((state: RootState) => state.user?.currentUser)
+  const isAuthenticated = !!currentUser
+  const handleExploreClick = () => {
+    if (isAuthenticated) {
+      router.push("/home")
+    } else {
+      router.push("/login")
+    }
+  }
 
   return (
     <div className="py-12">
@@ -79,6 +91,7 @@ const FeaturedJobsSection: React.FC = () => {
             <div
               key={index}
               className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all cursor-pointer"
+              onClick={handleExploreClick}
             >
               <div className="flex flex-col">
                 <div className="flex justify-between items-start mb-1">
@@ -101,7 +114,7 @@ const FeaturedJobsSection: React.FC = () => {
                     <MapPin className="h-4 w-4 text-gray-400 mr-1" />
                     <span className="text-sm text-gray-500">Newyork, NY</span>
                   </div>
-                  <Link href="#" className="text-sm text-[#F5A623] hover:underline flex items-center">
+                  <Link role="button" href="#" className="text-sm text-[#F5A623] hover:underline cursor-pointer flex items-center">
                     View Details <ArrowRight className="ml-1 h-3 w-3" />
                   </Link>
                 </div>

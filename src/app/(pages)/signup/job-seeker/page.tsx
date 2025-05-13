@@ -327,6 +327,9 @@ export default function JobSeekerSignup() {
     else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB"
     else return (bytes / 1048576).toFixed(1) + " MB"
   }
+  const navigateToHome = () => {
+    router.push("/")
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -350,7 +353,7 @@ export default function JobSeekerSignup() {
           }}
         >
           {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }}  onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -628,6 +631,7 @@ export default function JobSeekerSignup() {
                     fullWidth
                     sx={{
                       textTransform: "none",
+                     color: "white",
                       mt: 2,
                       py: 1.5,
                       bgcolor: "#D49F2E",

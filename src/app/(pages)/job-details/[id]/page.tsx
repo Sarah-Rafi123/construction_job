@@ -118,7 +118,7 @@ export default function JobDetailsPage() {
     })
   }, [])
 
-  const handleLatitudeChange = (e) => {
+  const handleLatitudeChange = (e: { target: { value: any } }) => {
     const value = e.target.value
     setFormData((prev) => ({ ...prev, latitude: value }))
     const lat = Number.parseFloat(value)
@@ -131,7 +131,7 @@ export default function JobDetailsPage() {
     }
   }
 
-  const handleLongitudeChange = (e) => {
+  const handleLongitudeChange = (e: { target: { value: any } }) => {
     const value = e.target.value
     setFormData((prev) => ({ ...prev, longitude: value }))
     const lng = Number.parseFloat(value)
@@ -144,7 +144,7 @@ export default function JobDetailsPage() {
     }
   }
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
@@ -152,7 +152,7 @@ export default function JobDetailsPage() {
     }))
   }
 
-  const handleCheckboxChange = (e) => {
+  const handleCheckboxChange = (e: { target: { name: any; checked: any } }) => {
     const { name, checked } = e.target
     setFormData((prev) => ({
       ...prev,
@@ -160,7 +160,7 @@ export default function JobDetailsPage() {
     }))
   }
 
-  const handleServiceChange = (index, field, value) => {
+  const handleServiceChange = (index: number, field: string, value: string) => {
     const updatedServices = [...formData.services]
     updatedServices[index] = {
       ...updatedServices[index],
@@ -180,7 +180,7 @@ export default function JobDetailsPage() {
     }))
   }
 
-  const removeService = (index) => {
+  const removeService = (index: number) => {
     if (formData.services.length > 1) {
       const updatedServices = [...formData.services]
       updatedServices.splice(index, 1)
@@ -191,7 +191,7 @@ export default function JobDetailsPage() {
     }
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
 
     // Validate coordinates
@@ -417,7 +417,7 @@ export default function JobDetailsPage() {
               <div className="bg-white rounded-lg shadow-md border border-gray-200 mb-6">
                 <div className="p-6">
                   <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 rounded-full bg-[#D49F2E] text-black flex items-center justify-center font-bold text-lg mr-4">
+                    <div className="w-12 h-12 rounded-full bg-[#D49F2E] text-white flex items-center justify-center font-bold text-lg mr-4">
                       {avatarText}
                     </div>
                     <div>
@@ -513,7 +513,7 @@ export default function JobDetailsPage() {
               <div className="flex justify-between items-center">
                 <button
                   onClick={handleGoBack}
-                  className="flex items-center bg-[#D49F2E] hover:bg-[#C48E1D] text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  className="flex items-center bg-[#D49F2E] hover:bg-[#C48E1D] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
@@ -733,7 +733,7 @@ export default function JobDetailsPage() {
 
                         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm text-black font-medium text-gray-700 mb-1">Latitude</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
                             <input
                               type="number"
                               value={formData.latitude}
@@ -917,7 +917,7 @@ export default function JobDetailsPage() {
                   <AlertTriangle className="h-6 w-6 mr-2" />
                   <h3 className="text-lg font-bold">Confirm Deletion</h3>
                 </div>
-                <p className="mb-6">Are you sure you want to delete this job? This action cannot be undone.</p>
+                <p className="mb-6 text-black">Are you sure you want to delete this job? This action cannot be undone.</p>
                 <div className="flex justify-end space-x-3">
                   <button
                     onClick={() => setShowDeleteConfirm(false)}

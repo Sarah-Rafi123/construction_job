@@ -95,7 +95,9 @@ export default function ForgotPasswordPage() {
       setError(err.data?.message || "Failed to process your request. Please try again later.")
     }
   }
-
+  const navigateToHome = () => {
+    router.push("/")
+  }
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -114,9 +116,10 @@ export default function ForgotPasswordPage() {
             flexDirection: "column",
             p: { xs: 2, sm: 4 },
           }}
+
         >
           {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}    onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -187,8 +190,8 @@ export default function ForgotPasswordPage() {
                         variant="contained"
                         disabled={isLoading}
                         fullWidth
-                        sx={{ textTransform: "none" }}
-                        className="bg-[#D49F2E] hover:bg-[#C48E1D] py-2"
+                        sx={{ textTransform: "none", color: "white"  }}
+                        className="bg-[#D49F2E] text-white hover:bg-[#C48E1D] py-2"
                       >
                         {isLoading ? "Sending..." : "Send Reset Link"}
                       </Button>
@@ -207,13 +210,13 @@ export default function ForgotPasswordPage() {
                   </form>
                 </>
               ) : (
-                <CardContent sx={{ py: 6, px: 4 }}>
+                <CardContent sx={{ px: 4 }}>
                   <Box sx={{ textAlign: "center", mb: 3 }}>
                     <CheckCircle size={60} className="text-green-500 mx-auto mb-4" />
-                    <Typography variant="h5" fontWeight="bold" className="text-gray-800 mb-2">
+                    <Typography sx={{ py: 2 }} variant="h5" fontWeight="bold" className="text-gray-800 my-4">
                       Check Your Email
                     </Typography>
-                    <Typography variant="body1" className="text-gray-600 mb-10">
+                    <Typography sx={{ pb: 2 }}  variant="body1" className="text-gray-600 mb-10">
                       We've sent a password reset link to <strong>{email}</strong>. Please check your inbox and follow
                       the instructions to reset your password.
                     </Typography>

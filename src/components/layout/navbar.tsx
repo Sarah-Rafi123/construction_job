@@ -60,9 +60,9 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
       <div className="max-w-7xl mx-auto px-4 ">
         <div className="flex justify-between h-16">
           <div className="flex">
-            <Link href="/" className="flex-shrink-0 flex items-center">
+            <Link href="/" className="flex-shrink-0 cursor-pointer flex items-center">
               <Briefcase className="h-10 w-10 mr-2 text-[#D49F2E]" />
-              <span className="text-xl ml-2 font-bold text-black">Jay Constructions</span>
+              <span className="text-xl ml-2 sm:block hidden font-bold text-black">Jay Constructions</span>
             </Link>
           </div>
 
@@ -73,33 +73,33 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
               <>
                 <Link
                   href="/chat"
-                  className="flex items-center px-3 py-1.5 text-[#D49F2E] hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="flex items-center px-3 py-1.5 text-[#D49F2E] hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <MessageSquare size={20} className="mr-1" />
                   <span className="text-sm font-medium">Chat</span>
                 </Link>
                 <div className="relative" ref={userMenuRef}>
                   <button
-                    className="flex items-center text-gray-600 hover:text-gray-800 focus:outline-none"
+                    className="flex items-center cursor-pointer text-[#D49F2E] focus:outline-none"
                     onClick={() => {
                       setIsUserMenuOpen(!isUserMenuOpen)
                     }}
                     aria-label="User menu"
                   >
                     <User size={20} className="mr-1" />
-                    <span className="text-sm font-medium">{displayName}</span>
+                    <span className="text-sm text-[#D49F2E] font-medium">{displayName}</span>
                     <ChevronDown size={16} className="ml-1" />
                   </button>
                   {isUserMenuOpen && (
                     <div className="absolute right-0 mt-6 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-50">
-                      <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <Link href="/profile" className="block px-4 py-2 text-sm text-[#D49F2E] hover:bg-gray-100">
                         Your Profile
                       </Link>
                       <div className="border-t border-gray-100"></div>
                       <button
                         onClick={handleLogout}
                         disabled={isLoggingOut}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 relative"
+                        className="block w-full text-left px-4 py-2 text-sm text-[#D49F2E] cursor-pointer hover:bg-gray-100 disabled:opacity-50 relative"
                       >
                         {isLoggingOut ? (
                           <div className="flex items-center">

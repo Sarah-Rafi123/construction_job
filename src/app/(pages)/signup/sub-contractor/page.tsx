@@ -255,6 +255,10 @@ export default function SubContractorSignup() {
     }
   }
 
+  const navigateToHome = () => {
+    router.push("/")
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -275,7 +279,7 @@ export default function SubContractorSignup() {
             height: "100vh", // Use fixed height instead of maxHeight
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }}  onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -481,6 +485,7 @@ export default function SubContractorSignup() {
                     fullWidth
                     sx={{
                       textTransform: "none",
+                      color: "white",
                       mt: 2,
                       py: 1.5,
                       bgcolor: "#D49F2E",

@@ -303,8 +303,8 @@ export default function LoginPage() {
                     variant="contained"
                     disabled={isLoading}
                     fullWidth
-                    sx={{ textTransform: "none" }}
-                    className="bg-[#D49F2E] hover:bg-[#C48E1D] py-2"
+                    sx={{ textTransform: "none", color: "white"  }}
+                    className="bg-[#D49F2E] hover:bg-[#C48E1D] text-white py-2"
                   >
                     {isLoading ? "Logging in..." : "Log In"}
                   </Button>

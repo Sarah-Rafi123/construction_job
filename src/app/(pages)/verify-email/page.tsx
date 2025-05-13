@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { CheckCircle, XCircle, Loader2, Home } from "lucide-react"
+import { CheckCircle, XCircle, Loader2, Home, Briefcase } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import Box from "@mui/material/Box"
@@ -11,34 +11,32 @@ import Typography from "@mui/material/Typography"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
 import { useVerifyEmailMutation } from "@/store/api/authApi"
-
-// Create a theme instance with mustard and white colors
 const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#D49F2E", // Mustard color
+      main: "#D49F2E",
     },
     success: {
       main: "#22c55e",
     },
     background: {
-      default: "#ffffff", // White background
+      default: "#ffffff", 
       paper: "#ffffff",
     },
     text: {
-      primary: "#000000", // Black text
-      secondary: "#4B5563", // Dark gray for secondary text
+      primary: "#000000", 
+      secondary: "#4B5563",
     },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         contained: {
-          backgroundColor: "#D49F2E", // Mustard background for buttons
-          color: "#ffffff", // White text for buttons
+          backgroundColor: "#D49F2E", 
+          color: "#ffffff", 
           "&:hover": {
-            backgroundColor: "#C48E1D", // Slightly darker mustard on hover
+            backgroundColor: "#C48E1D", 
           },
         },
       },
@@ -46,9 +44,9 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#ffffff", // White app bar
-          color: "#000000", // Black text in app bar
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)", // Subtle shadow
+          backgroundColor: "#ffffff",
+          color: "#000000",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)", 
         },
       },
     },
@@ -79,8 +77,6 @@ export default function VerifyEmail() {
           email: decodeURIComponent(email),
           token: decodeURIComponent(token),
         }).unwrap()
-
-        // If successful, set state to success
         setVerificationState("success")
       } catch (error: any) {
         console.error("Verification error:", error)
@@ -95,6 +91,10 @@ export default function VerifyEmail() {
   const handleGoToHome = () => {
     router.push("/login")
   }
+  const navigateToHome = () => {
+    router.push("/")
+  }
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -116,7 +116,7 @@ export default function VerifyEmail() {
               p: { xs: 3, sm: 6 },
             }}
           >
-            <Box sx={{ position: "absolute", top: 20, left: 20, display: "flex", alignItems: "center" }}>
+            <Box sx={{ position: "absolute", top: 20, left: 20, display: "flex", alignItems: "center" }}   onClick={navigateToHome}>
               <Box
                 component="span"
                 sx={{
@@ -126,22 +126,7 @@ export default function VerifyEmail() {
                   alignItems: "center",
                 }}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Briefcase size={24} />
               </Box>
               <Typography variant="h6" component="div" sx={{ fontWeight: 600, color: "black" }}>
                 Jay Constructions
@@ -191,10 +176,10 @@ export default function VerifyEmail() {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
                           <Link
-                            href="/signup"
+                            href="/login"
                             className="flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-md transition duration-300"
                           >
-                            Back to Sign Up
+                            Back to Login
                           </Link>
                           <button
                             onClick={() => window.location.reload()}

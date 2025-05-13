@@ -135,9 +135,16 @@ export default function PrivacyPolicy() {
               <li>3. Request that we stop processing your personal data under certain circumstances.</li>
             </ul>
             <Typography variant="body1">
-              To exercise these rights, please contact us at jay@constructions.co.uk.
-            </Typography>
-
+        To exercise these rights, please contact us at{" "}
+        <a
+                href="mailto:jay@constructions.co.uk?subject=Inquiry%20for%20Jay%20Constructions&body=Hello%20Jay%20Constructions%2C%0A%0AI%20am%20interested%20in%20your%20services%20and%20would%20like%20to%20request%20more%20information%20about%3A%0A%0A%0AThank%20you%2C%0A%0A"
+                style={{ color: "#D49F2E", textDecoration: "none" }}
+                className="hover:underline"
+              >
+          jay@constructions.co.uk
+        </a>
+        .
+      </Typography>
             <Typography variant="h2" component="h2">
               7. Cookies
             </Typography>

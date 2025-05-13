@@ -172,6 +172,9 @@ export default function ResetPasswordPage() {
   const handleClickShowConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword)
   }
+  const navigateToHome = () => {
+    router.push("/")
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -193,7 +196,7 @@ export default function ResetPasswordPage() {
           }}
         >
           {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}  onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -234,7 +237,7 @@ export default function ResetPasswordPage() {
                         variant="contained"
                         fullWidth
                         sx={{ textTransform: "none" }}
-                        className="bg-[#D49F2E] hover:bg-[#C48E1D] py-2"
+                        className="bg-[#D49F2E] text-white hover:bg-[#C48E1D] py-2"
                       >
                         Request New Link
                       </Button>
@@ -361,7 +364,7 @@ export default function ResetPasswordPage() {
                         disabled={isLoading}
                         fullWidth
                         sx={{ textTransform: "none" }}
-                        className="bg-[#D49F2E] hover:bg-[#C48E1D] py-2"
+                        className="bg-[#D49F2E] text-white hover:bg-[#C48E1D] py-2"
                       >
                         {isLoading ? "Resetting Password..." : "Reset Password"}
                       </Button>

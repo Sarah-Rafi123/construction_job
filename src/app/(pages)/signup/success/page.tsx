@@ -14,6 +14,8 @@ import Alert from "@mui/material/Alert"
 import CircularProgress from "@mui/material/CircularProgress"
 import { useAppSelector } from "@/store/hooks"
 import { useResendVerificationEmailMutation } from "@/store/api/authApi"
+import { Briefcase } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const theme = createTheme({
   palette: {
@@ -69,7 +71,10 @@ export default function SignupSuccess() {
       setIsLoading(false)
     }
   }
-
+  const navigateToHome = () => {
+    router.push("/")
+  }
+  const router = useRouter()
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -84,69 +89,90 @@ export default function SignupSuccess() {
           sx={{
             width: { xs: "100%", md: "50%" },
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            flexDirection: "column",
             p: { xs: 2, sm: 4 },
           }}
         >
-          <Card
+          <Box
             sx={{
-              width: "100%",
-              maxWidth: "400px",
-              textAlign: "center",
-              boxShadow: "none",
-              border: "none",
+              display: "flex",
+              alignItems: "center",
+              mt: 4,
+              ml: 4,
+              cursor: "pointer",
             }}
-            className="rounded-lg"
+            onClick={navigateToHome}
           >
-            <CardHeader
-              title={
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <CheckCircleIcon color="success" sx={{ fontSize: 64, mb: 2 }} className="text-green-500" />
-                  <Typography variant="h5" fontWeight="bold" className="text-gray-800">
-                    Sign Up Successful!
-                  </Typography>
-                </Box>
-              }
-              subheader={
-                <Typography variant="body2" color="text.secondary" className="text-gray-500">
-                  Your account has been created successfully.
+            <Box
+              sx={{
+                color: "#D49F2E",
+                mr: 1.5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Briefcase size={24} />
+            </Box>
+            <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
+              Jay Constructions
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>
+            <Card
+              sx={{
+                width: "100%",
+                maxWidth: "500px",
+                boxShadow: "none", // Remove shadow
+                border: "none", // Remove border
+              }}
+              className=""
+            >
+              <CardHeader
+                title={
+                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyItems: "center" }}>
+                    <CheckCircleIcon color="success" sx={{ fontSize: 64, mb: 2 }} className="text-green-500" />
+                    <Typography variant="h5" fontWeight="bold" className="text-gray-800">
+                      Sign Up Successful!
+                    </Typography>
+                  </Box>
+                }
+              />
+              <CardContent>
+                <Typography sx={{ textAlign: "center" }} color="text.secondary" className="text-gray-600 mb-4">
+                  A verification email has been sent to your registered email address <strong>{userEmail}</strong>
+                  .Please check your inbox and follow the instructions to activate your account.
                 </Typography>
-              }
-            />
-            <CardContent>
-              <Typography color="text.secondary" className="text-gray-600 mb-4">
-                A verification email has been sent to your registered email address <strong>{userEmail}</strong>. Please
-                check your inbox and follow the instructions to activate your account.
-              </Typography>
-              <Typography color="text.secondary" className="text-gray-600 mb-4">
-                Didn't receive the verification email? Click the button below to resend it.
-              </Typography>
+                <Typography color="text.secondary" sx={{ textAlign: "center" }} className="text-gray-600 mb-4">
+                  Didn't receive the verification email? Click the button below to resend it.
+                </Typography>
 
-              {resendStatus.type && (
-                <Alert severity={resendStatus.type} sx={{ mb: 2, textAlign: "left" }}>
-                  {resendStatus.message}
-                </Alert>
-              )}
+                {resendStatus.type && (
+                  <Alert severity={resendStatus.type} sx={{ mb: 2, textAlign: "left" }}>
+                    {resendStatus.message}
+                  </Alert>
+                )}
 
-              <Button
-                variant="outlined"
-                color="primary"
-                disabled={isLoading}
-                onClick={handleResendVerificationEmail}
-                sx={{
-                  textTransform: "none",
-                  mt: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  mx: "auto",
-                }}
-              >
-                {isLoading ? <CircularProgress size={20} color="inherit" /> : "Resend Verification Email"}
-              </Button>
-            </CardContent>
-          </Card>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  disabled={isLoading}
+                  onClick={handleResendVerificationEmail}
+                  sx={{
+                    textTransform: "none",
+                    mt: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    mx: "auto",
+                  }}
+                >
+                  {isLoading ? <CircularProgress size={20} color="inherit" /> : "Resend Verification Email"}
+                </Button>
+              </CardContent>
+            </Card>
+          </Box>
         </Box>
         <Box
           sx={{

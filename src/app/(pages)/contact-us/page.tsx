@@ -82,8 +82,14 @@ export default function ContactPage() {
                     For general inquiries and support:
                   </Typography>
                   <Typography variant="body1" align="center" sx={{ fontWeight: "bold" }}>
-                    jay@constructions.co.uk
-                  </Typography>
+              <a
+                href="mailto:jay@constructions.co.uk?subject=Inquiry%20for%20Jay%20Constructions&body=Hello%20Jay%20Constructions%2C%0A%0AI%20am%20interested%20in%20your%20services%20and%20would%20like%20to%20request%20more%20information%20about%3A%0A%0A%0AThank%20you%2C%0A%0A"
+                style={{ color: "#D49F2E", textDecoration: "none" }}
+                className="hover:underline"
+              >
+                jay@constructions.co.uk
+              </a>
+            </Typography>
                 </Paper>
               </Grid>
 
@@ -107,8 +113,14 @@ export default function ContactPage() {
                     For immediate assistance:
                   </Typography>
                   <Typography variant="body1" align="center" sx={{ fontWeight: "bold" }}>
-                    +12 98786543218
-                  </Typography>
+              <a
+                href="tel:+1298786543218"
+                style={{ color: "#D49F2E", textDecoration: "none" }}
+                className="hover:underline"
+              >
+                +12 98786543218
+              </a>
+            </Typography>
                 </Paper>
               </Grid>
             </Grid>

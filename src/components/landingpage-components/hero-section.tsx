@@ -12,19 +12,12 @@ interface HeroSectionProps {
 
 export default function HeroSection({ companies = [] }: HeroSectionProps) {
   const router = useRouter()
-
-  // Get current user from Redux store (set by ProtectedRoute)
   const currentUser = useSelector((state: RootState) => state.user?.currentUser)
   const isAuthenticated = !!currentUser
-
-  // Function to handle navigation when "Explore More" is clicked
   const handleExploreClick = () => {
-    // Check if user is authenticated based on currentUser presence
     if (isAuthenticated) {
-      // If logged in, navigate to home page
       router.push("/home")
     } else {
-      // If not logged in, navigate to login page
       router.push("/login")
     }
   }
@@ -42,7 +35,7 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
               fast.
             </p>
             <button
-              className="bg-[#D49F2E] hover:bg-[#C48E1D] text-white text-lg font-bold py-3 px-8 rounded-md transition duration-300 ease-in-out"
+              className="bg-[#D49F2E] hover:bg-[#C48E1D] cursor-pointer text-white text-lg font-bold py-3 px-8 rounded-md transition duration-300 ease-in-out"
               onClick={handleExploreClick}
             >
               Explore More

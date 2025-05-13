@@ -42,6 +42,9 @@ export default function SignupPage() {
       router.push(`/signup/${userType}`)
     }
   }
+  const navigateToHome = () => {
+    router.push("/")
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -63,7 +66,7 @@ export default function SignupPage() {
           }}
         >
           {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}  onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -134,7 +137,7 @@ export default function SignupPage() {
                   disabled={!userType}
                   variant="contained"
                   fullWidth
-                  sx={{ textTransform: "none" }}
+                  sx={{ textTransform: "none", color: "white"  }}
                   className="bg-[#90caf9] text-white hover:bg-[#90caf9]/90 py-2"
                 >
                   Continue

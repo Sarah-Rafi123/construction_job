@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Construction Job Posting",
+  title: "Jay Constructions",
   description: "One platform to find the right workers for your construction projects",
 };
 

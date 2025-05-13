@@ -73,7 +73,7 @@ export default function JobSeekersSection() {
             <div className="mt-8">
               <button
                 onClick={handleFindJobsClick}
-                className="px-32 py-2 bg-[#D49F2E] text-white font-medium rounded-md inline-block hover:bg-[#C48E1D] transition-colors"
+                className="px-32 py-2 bg-[#D49F2E] text-white cursor-pointer font-medium rounded-md inline-block hover:bg-[#C48E1D] transition-colors"
               >
                 Find Jobs
               </button>
