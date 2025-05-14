@@ -313,7 +313,7 @@ export default function PostJob() {
 
     try {
       const result = await postJob(requestBody).unwrap()
-      console.log(result)
+      // console.log(result)
       setNotification({
         open: true,
         message: result.message || "Job posted successfully!",
@@ -321,7 +321,7 @@ export default function PostJob() {
       })
       router.push("/home")
     } catch (error: any) {
-      console.error("Error posting job:", error)
+      // console.error("Error posting job:", error)
       if (error.status === 403 && error.data?.message?.includes("admin approval")) {
         setShowDocumentDialog(true)
       } else {

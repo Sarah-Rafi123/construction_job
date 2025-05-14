@@ -157,7 +157,6 @@ export default function AdminHome() {
         severity: "success",
       })
     } catch (error) {
-      console.error("Error verifying contractor:", error)
       setNotification({
         open: true,
         message: "Failed to verify contractor",
@@ -180,7 +179,7 @@ export default function AdminHome() {
         severity: "success",
       })
     } catch (error) {
-      console.error("Error declining contractor:", error)
+      // console.error("Error declining contractor:", error)
       setNotification({
         open: true,
         message: "Failed to decline contractor",

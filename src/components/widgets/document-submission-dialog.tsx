@@ -102,7 +102,7 @@ export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubm
         onClose()
       }, 2000)
     } catch (err: any) {
-      console.error("Error submitting documents:", err)
+      // console.error("Error submitting documents:", err)
       setError(err.data?.message || "Failed to submit documents. Please try again.")
     }
   }

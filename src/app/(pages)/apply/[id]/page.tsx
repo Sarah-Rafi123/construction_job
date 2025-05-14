@@ -205,10 +205,10 @@ export default function ApplyJobPage() {
         },
         withCredentials: true,
       })
-      console.log("response is", response)
+      // console.log("response is", response)
       return response.data.files // array of S3 URLs
     } catch (error) {
-      console.error("File upload failed", error)
+      // console.error("File upload failed", error)
       throw error
     }
   }
@@ -250,15 +250,15 @@ export default function ApplyJobPage() {
     if (isValid) {
       // Upload the single attachment
       const uploadedAttachments = await uploadAttachments(attachment)
-      console.log("uploaded urls", uploadedAttachments)
+      // console.log("uploaded urls", uploadedAttachments)
 
       // Here you would normally send the data to your API
-      console.log("Submitting enquiry:", {
-        title: enquiryTitle,
-        enquiry: enquiryText,
-        attachments: uploadedAttachments?.map((file: { url: any }) => file.url),
-        jobId: id,
-      })
+      // console.log("Submitting enquiry:", {
+      //   title: enquiryTitle,
+      //   enquiry: enquiryText,
+      //   attachments: uploadedAttachments?.map((file: { url: any }) => file.url),
+      //   jobId: id,
+      // })
 
       socket.emit(
         "sendMessage",
@@ -274,7 +274,7 @@ export default function ApplyJobPage() {
         },
         ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
           if (!error && data) {
-            console.log("message sent", data)
+            // console.log("message sent", data)
             router.push(`/chat/${data.conversation._id}`)
           } else {
             console.error("Message send failed:", error)
@@ -450,12 +450,12 @@ export default function ApplyJobPage() {
             {/* Action Buttons - Repositioned as requested */}
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
               {/* Back to Jobs button in the position of Apply Now */}
-              <Button variant="contained" startIcon={<ArrowBackIcon />} onClick={handleGoBack}>
+              <Button variant="contained"   sx={{ color: "white"  }} startIcon={<ArrowBackIcon />} onClick={handleGoBack}>
                 Back
               </Button>
 
               {/* Apply Now button moved to the extreme right */}
-              <Button variant="contained" onClick={handleApplyNowClick}>
+              <Button variant="contained"   sx={{  color: "white"  }} onClick={handleApplyNowClick}>
                 Apply Now
               </Button>
             </Box>
@@ -507,14 +507,13 @@ export default function ApplyJobPage() {
                   onClick={() => setOpenDisclaimerDialog(false)}
                   sx={{
                     py: 1.5,
+                    color: "white",
                   }}
                 >
                   I Understand
                 </Button>
               </DialogActions>
             </Dialog>
-
-            {/* Enquiry Dialog */}
             <Dialog
               open={openDialog}
               onClose={() => setOpenDialog(false)}

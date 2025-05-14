@@ -46,7 +46,7 @@ export default function ProfileImageUpload({ profilePicture, userId }: ProfileIm
         // Clean up preview URL
         return () => URL.revokeObjectURL(objectUrl)
       } catch (error) {
-        console.error("Failed to upload profile picture:", error)
+        // console.error("Failed to upload profile picture:", error)
         setUploadError("Failed to upload image. Please try again.")
         setPreviewUrl(null)
       }

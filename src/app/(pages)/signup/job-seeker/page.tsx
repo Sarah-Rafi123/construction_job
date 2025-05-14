@@ -227,6 +227,9 @@ export default function JobSeekerSignup() {
     } else if (!validateName(formData.name)) {
       newErrors.name = "Name should only contain letters and spaces"
       isValid = false
+    } else if (formData.name.length > 50) {
+      newErrors.name = "Name cannot exceed 50 characters"
+      isValid = false
     }
 
     // Validate email
@@ -235,6 +238,9 @@ export default function JobSeekerSignup() {
       isValid = false
     } else if (!validateEmail(formData.email)) {
       newErrors.email = "Please enter a valid email address"
+      isValid = false
+    } else if (formData.email.length > 50) {
+      newErrors.email = "Email cannot exceed 50 characters"
       isValid = false
     }
 
@@ -245,6 +251,9 @@ export default function JobSeekerSignup() {
     } else if (!validatePhoneNumber(formData.contactNumber)) {
       newErrors.contactNumber = "Contact number should only contain digits"
       isValid = false
+    } else if (formData.contactNumber.length > 50) {
+      newErrors.contactNumber = "Contact number cannot exceed 50 characters"
+      isValid = false
     }
 
     if (!formData.trade.trim()) {
@@ -252,6 +261,9 @@ export default function JobSeekerSignup() {
       isValid = false
     } else if (!validateTrade(formData.trade)) {
       newErrors.trade = "Trade should only contain letters and spaces"
+      isValid = false
+    } else if (formData.trade.length > 50) {
+      newErrors.trade = "Trade cannot exceed 50 characters"
       isValid = false
     }
 
@@ -353,7 +365,7 @@ export default function JobSeekerSignup() {
           }}
         >
           {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }}  onClick={navigateToHome}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -411,6 +423,9 @@ export default function JobSeekerSignup() {
                         className="rounded"
                         placeholder="Enter your full name"
                         error={!!errors.name}
+                        inputProps={{
+                          maxLength: 50,
+                        }}
                       />
                       <ErrorMessage message={errors.name} />
                     </Box>
@@ -431,6 +446,9 @@ export default function JobSeekerSignup() {
                         className="rounded"
                         placeholder="Enter your email address"
                         error={!!errors.email}
+                        inputProps={{
+                          maxLength: 50,
+                        }}
                       />
                       <ErrorMessage message={errors.email} />
                     </Box>
@@ -453,7 +471,11 @@ export default function JobSeekerSignup() {
                         className="rounded"
                         placeholder="Enter digits only"
                         error={!!errors.contactNumber}
-                        inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                        inputProps={{
+                          inputMode: "numeric",
+                          pattern: "[0-9]*",
+                          maxLength: 50,
+                        }}
                       />
                       <ErrorMessage message={errors.contactNumber} />
                     </Box>
@@ -473,6 +495,9 @@ export default function JobSeekerSignup() {
                         className="rounded"
                         placeholder="Enter your trade (e.g., Electrician, Plumber)"
                         error={!!errors.trade}
+                        inputProps={{
+                          maxLength: 50,
+                        }}
                       />
                       <ErrorMessage message={errors.trade} />
                     </Box>
@@ -631,7 +656,7 @@ export default function JobSeekerSignup() {
                     fullWidth
                     sx={{
                       textTransform: "none",
-                     color: "white",
+                      color: "white",
                       mt: 2,
                       py: 1.5,
                       bgcolor: "#D49F2E",

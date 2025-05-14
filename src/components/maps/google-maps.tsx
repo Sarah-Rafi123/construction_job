@@ -82,7 +82,7 @@ export default function GoogleMapComponent({
   // Handle load errors
   useEffect(() => {
     if (loadError) {
-      console.error("Google Maps loading error:", loadError)
+      // console.error("Google Maps loading error:", loadError)
       setMapError("Failed to load Google Maps. Please check your API key and network connection.")
     }
   }, [loadError])
@@ -90,7 +90,7 @@ export default function GoogleMapComponent({
   // Check if API key is missing
   useEffect(() => {
     if (!apiKey) {
-      console.error("Google Maps API key is missing")
+      // console.error("Google Maps API key is missing")
       setMapError(
         "Google Maps API key is missing. Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your environment variables.",
       )
@@ -122,7 +122,7 @@ export default function GoogleMapComponent({
           }
         },
         (error) => {
-          console.error("Error getting user location:", error)
+          // console.error("Error getting user location:", error)
           setPermissionStatus("denied")
           setTimeout(() => setShowPermissionRequest(false), 3000) // Hide after 3 seconds
         },
@@ -221,7 +221,7 @@ export default function GoogleMapComponent({
         src={`https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`}
         strategy="beforeInteractive"
         onError={() => {
-          console.error("Failed to load Google Maps script")
+          // console.error("Failed to load Google Maps script")
           setMapError("Failed to load Google Maps. Please check your API key and network connection.")
         }}
       />

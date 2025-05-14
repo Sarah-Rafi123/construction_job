@@ -98,7 +98,7 @@ export default function JobLocationMap({ initialLatitude, initialLongitude, onLo
           mapRef.current?.setView([latitude, longitude], 13)
         },
         (error) => {
-          console.error("Error getting location:", error)
+          // console.error("Error getting location:", error)
           setSearchError("Unable to get your current location. Please try again or select manually.")
           setTimeout(() => setSearchError(""), 5000)
         },
@@ -131,7 +131,7 @@ export default function JobLocationMap({ initialLatitude, initialLongitude, onLo
         setTimeout(() => setSearchError(""), 5000)
       }
     } catch (error) {
-      console.error("Error searching location:", error)
+      // console.error("Error searching location:", error)
       setSearchError("Error searching for location. Please try again.")
       setTimeout(() => setSearchError(""), 5000)
     }

@@ -171,11 +171,17 @@ export default function SubContractorSignup() {
     } else if (!validateName(formData.name)) {
       newErrors.name = "Name should only contain letters and spaces"
       isValid = false
+    } else if (formData.name.length > 50) {
+      newErrors.name = "Name cannot exceed 50 characters"
+      isValid = false
     }
 
     // Validate company name
     if (!formData.companyName.trim()) {
       newErrors.companyName = "Company name is required"
+      isValid = false
+    } else if (formData.companyName.length > 50) {
+      newErrors.companyName = "Company name cannot exceed 50 characters"
       isValid = false
     }
 
@@ -186,6 +192,9 @@ export default function SubContractorSignup() {
     } else if (!validateEmail(formData.email)) {
       newErrors.email = "Please enter a valid email address"
       isValid = false
+    } else if (formData.email.length > 50) {
+      newErrors.email = "Email cannot exceed 50 characters"
+      isValid = false
     }
 
     // Validate contact number
@@ -194,6 +203,9 @@ export default function SubContractorSignup() {
       isValid = false
     } else if (!validatePhoneNumber(formData.contactNumber)) {
       newErrors.contactNumber = "Contact number should only contain digits"
+      isValid = false
+    } else if (formData.contactNumber.length > 50) {
+      newErrors.contactNumber = "Contact number cannot exceed 50 characters"
       isValid = false
     }
 
@@ -245,7 +257,7 @@ export default function SubContractorSignup() {
         }))
       }
     } catch (error: any) {
-      console.error("Error during email check:", error)
+      // console.error("Error during email check:", error)
       setErrors((prev) => ({
         ...prev,
         email: error.data?.message || "This email is already registered or there was an error checking the email.",
@@ -279,7 +291,7 @@ export default function SubContractorSignup() {
             height: "100vh", // Use fixed height instead of maxHeight
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }}  onClick={navigateToHome}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -292,7 +304,7 @@ export default function SubContractorSignup() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions 
+              Jay Constructions
             </Typography>
           </Box>
           <Box
@@ -338,6 +350,9 @@ export default function SubContractorSignup() {
                         className="rounded"
                         placeholder="Enter your full name"
                         error={!!errors.name}
+                        inputProps={{
+                          maxLength: 50,
+                        }}
                       />
                       <ErrorMessage message={errors.name} />
                     </Box>
@@ -358,6 +373,9 @@ export default function SubContractorSignup() {
                         className="rounded"
                         placeholder="Enter your company name"
                         error={!!errors.companyName}
+                        inputProps={{
+                          maxLength: 50,
+                        }}
                       />
                       <ErrorMessage message={errors.companyName} />
                     </Box>
@@ -379,6 +397,9 @@ export default function SubContractorSignup() {
                       className="rounded"
                       placeholder="Enter your Email Address"
                       error={!!errors.email}
+                      inputProps={{
+                        maxLength: 50,
+                      }}
                     />
                     <ErrorMessage message={errors.email} />
                   </Box>
@@ -399,7 +420,11 @@ export default function SubContractorSignup() {
                       className="rounded"
                       placeholder="Enter Phone Number"
                       error={!!errors.contactNumber}
-                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                      inputProps={{
+                        inputMode: "numeric",
+                        pattern: "[0-9]*",
+                        maxLength: 50,
+                      }}
                     />
                     <ErrorMessage message={errors.contactNumber} />
                   </Box>

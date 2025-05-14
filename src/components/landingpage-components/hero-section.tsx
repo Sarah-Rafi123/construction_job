@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Briefcase, Building2, Users, PlusCircle } from "lucide-react"
 import HouseSvg from "../../../public/assets/svg/HouseSVG"
 import type { RootState } from "@/store"
+import { useGetStatisticsQuery } from "@/store/api/statisticsApi"
 
 interface HeroSectionProps {
   companies?: string[]
@@ -14,12 +15,24 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
   const router = useRouter()
   const currentUser = useSelector((state: RootState) => state.user?.currentUser)
   const isAuthenticated = !!currentUser
+
+  // Fetch statistics from API
+  const { data: statisticsData, isLoading, error } = useGetStatisticsQuery()
+
   const handleExploreClick = () => {
     if (isAuthenticated) {
       router.push("/home")
     } else {
       router.push("/login")
     }
+  }
+
+  // Get stats from API response or use fallback values
+  const stats = {
+    totalJobs: statisticsData?.stats.totalJobs ?? 0,
+    newlyPostedJobs: statisticsData?.stats.newlyPostedJobs ?? 0,
+    totalCompanies: statisticsData?.stats.totalCompanies ?? 0,
+    totalCandidates: statisticsData?.stats.totalCandidates ?? 0,
   }
 
   return (
@@ -55,7 +68,7 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
               <Briefcase className="w-6 h-6 text-[#F5A623]" />
             </div>
             <div>
-              <div className="text-2xl text-black font-bold">12900</div>
+              <div className="text-2xl text-black font-bold">{isLoading ? "Loading..." : stats.totalJobs}</div>
               <div className="text-gray-400 text-sm">Live Jobs</div>
             </div>
           </div>
@@ -65,7 +78,7 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
               <Building2 className="w-6 h-6 text-[#F5A623]" />
             </div>
             <div>
-              <div className="text-2xl text-black font-bold">840</div>
+              <div className="text-2xl text-black font-bold">{isLoading ? "Loading..." : stats.totalCompanies}</div>
               <div className="text-gray-400 text-sm">Companies</div>
             </div>
           </div>
@@ -75,7 +88,7 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
               <Users className="w-6 h-6 text-[#F5A623]" />
             </div>
             <div>
-              <div className="text-2xl text-black font-bold">13049</div>
+              <div className="text-2xl text-black font-bold">{isLoading ? "Loading..." : stats.totalCandidates}</div>
               <div className="text-gray-400 text-sm">Candidates</div>
             </div>
           </div>
@@ -85,7 +98,7 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
               <PlusCircle className="w-6 h-6 text-[#F5A623]" />
             </div>
             <div>
-              <div className="text-2xl text-black font-bold">10900</div>
+              <div className="text-2xl text-black font-bold">{isLoading ? "Loading..." : stats.newlyPostedJobs}</div>
               <div className="text-gray-400 text-sm">New Jobs</div>
             </div>
           </div>

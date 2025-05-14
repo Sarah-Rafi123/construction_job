@@ -47,7 +47,7 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
       localStorage.removeItem("userType")
       window.location.href = "/landing-page"
     } catch (error) {
-      console.error("Logout failed:", error)
+      // console.error("Logout failed:", error)
       dispatch(clearCurrentUser())
       localStorage.removeItem("userType")
       window.location.href = "/landing-page"

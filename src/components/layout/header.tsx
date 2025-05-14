@@ -17,7 +17,7 @@ export default function Header() {
       // Redirect to login page after successful logout
       router.push("/login")
     } catch (err) {
-      console.error("Failed to logout:", err)
+      // console.error("Failed to logout:", err)
       setError("Failed to logout. Please try again.")
     }
   }

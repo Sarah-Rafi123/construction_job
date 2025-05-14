@@ -79,7 +79,7 @@ export default function VerifyEmail() {
         }).unwrap()
         setVerificationState("success")
       } catch (error: any) {
-        console.error("Verification error:", error)
+        // console.error("Verification error:", error)
         setVerificationState("error")
         setErrorMessage(error.data?.message || "Email verification failed")
       }

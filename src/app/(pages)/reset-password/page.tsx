@@ -119,6 +119,9 @@ export default function ResetPasswordPage() {
     } else if (formData.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters long"
       isValid = false
+    } else if (formData.password.length > 50) {
+      newErrors.password = "Password cannot exceed 50 characters"
+      isValid = false
     }
 
     // Validate confirm password
@@ -127,6 +130,9 @@ export default function ResetPasswordPage() {
       isValid = false
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match"
+      isValid = false
+    } else if (formData.confirmPassword.length > 50) {
+      newErrors.confirmPassword = "Password cannot exceed 50 characters"
       isValid = false
     }
 
@@ -157,7 +163,7 @@ export default function ResetPasswordPage() {
         router.push("/login")
       }, 3000)
     } catch (err: any) {
-      console.error("Reset password error:", err)
+      // console.error("Reset password error:", err)
       setErrors((prev) => ({
         ...prev,
         general: err.data?.message || "Failed to reset password. Please try again later.",
@@ -196,7 +202,7 @@ export default function ResetPasswordPage() {
           }}
         >
           {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}  onClick={navigateToHome}>
+          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }} onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -305,6 +311,9 @@ export default function ResetPasswordPage() {
                           placeholder="Enter your new password"
                           className="rounded"
                           error={!!errors.password}
+                          inputProps={{
+                            maxLength: 50,
+                          }}
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">
@@ -338,6 +347,9 @@ export default function ResetPasswordPage() {
                           placeholder="Confirm your new password"
                           className="rounded"
                           error={!!errors.confirmPassword}
+                          inputProps={{
+                            maxLength: 50,
+                          }}
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">

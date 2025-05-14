@@ -30,7 +30,7 @@ const ChatInputForm = () => {
       },
       ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
         if (!error && data) {
-          console.log("message sent", data);
+          // console.log("message sent", data);
           dispatch(addMessage(data.message));
           dispatch(updateConversationInInbox(data.conversation));
         } else {

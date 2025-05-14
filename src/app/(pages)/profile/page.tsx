@@ -21,14 +21,14 @@ export default function ProfilePage() {
   const [imageError, setImageError] = useState(false)
 
   // Log profile data for debugging
-  useEffect(() => {
-    if (userData) {
-      console.log("Profile data loaded:", userData)
-    }
-    if (error) {
-      console.error("Profile error details:", error)
-    }
-  }, [userData, error])
+  // useEffect(() => {
+  //   if (userData) {
+  //     console.log("Profile data loaded:", userData)
+  //   }
+  //   if (error) {
+  //     console.error("Profile error details:", error)
+  //   }
+  // }, [userData, error])
 
   const formatRole = (role: string) => {
     return role
@@ -95,7 +95,7 @@ export default function ProfilePage() {
 
   // Handle image load error
   const handleImageError = () => {
-    console.log("Image failed to load:", currentUser?.profile_picture)
+    // console.log("Image failed to load:", currentUser?.profile_picture)
     setImageError(true)
   }
 

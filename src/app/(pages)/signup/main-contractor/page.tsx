@@ -80,7 +80,8 @@ export default function MainContractorSignup() {
   }
 
   const validatePhoneNumber = (phone: string) => {
-    const phoneRegex = /^\d+$/
+    // Validates formats like: +1 (123) 456-7890, 123-456-7890, 1234567890
+    const phoneRegex = /^(\+\d{1,3}\s?)?($$\d{1,4}$$\s?)?(\d{1,4}[-\s]?){1,3}\d{1,4}$/
     return phoneRegex.test(phone)
   }
 
@@ -88,8 +89,11 @@ export default function MainContractorSignup() {
     const { id, value } = e.target
 
     // Apply specific validation during input for contact number
-    if (id === "contactNumber" && value !== "" && !/^\d*$/.test(value)) {
-      return // Don't update if not a number
+    if (id === "contactNumber" && value !== "") {
+      // Allow digits, spaces, parentheses, plus sign, and hyphens for phone numbers
+      if (!/^[0-9()\-+\s]*$/.test(value)) {
+        return // Don't update if contains invalid characters
+      }
     }
 
     setFormData((prev) => ({
@@ -122,9 +126,19 @@ export default function MainContractorSignup() {
       isValid = false
     }
 
+    if (formData.contractorName.length > 50) {
+      newErrors.contractorName = "Contractor name cannot exceed 50 characters"
+      isValid = false
+    }
+
     // Validate company name
     if (!formData.companyName.trim()) {
       newErrors.companyName = "Company name is required"
+      isValid = false
+    }
+
+    if (formData.companyName.length > 50) {
+      newErrors.companyName = "Company name cannot exceed 50 characters"
       isValid = false
     }
 
@@ -137,12 +151,22 @@ export default function MainContractorSignup() {
       isValid = false
     }
 
+    if (formData.email.length > 50) {
+      newErrors.email = "Email address cannot exceed 50 characters"
+      isValid = false
+    }
+
     // Validate contact number
     if (!formData.contactNumber) {
       newErrors.contactNumber = "Contact number is required"
       isValid = false
     } else if (!validatePhoneNumber(formData.contactNumber)) {
-      newErrors.contactNumber = "Contact number should only contain digits"
+      newErrors.contactNumber = "Please enter a valid phone number format (e.g., +1 (123) 456-7890 or 123-456-7890)"
+      isValid = false
+    }
+
+    if (formData.contactNumber.length > 50) {
+      newErrors.contactNumber = "Contact number cannot exceed 50 characters"
       isValid = false
     }
 
@@ -222,7 +246,7 @@ export default function MainContractorSignup() {
           }}
         >
           {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }}  onClick={navigateToHome}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -235,7 +259,7 @@ export default function MainContractorSignup() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions 
+              Jay Constructions
             </Typography>
           </Box>
 
@@ -279,6 +303,9 @@ export default function MainContractorSignup() {
                       className="rounded"
                       placeholder="Enter your full name"
                       error={!!errors.contractorName}
+                      inputProps={{
+                        maxLength: 50,
+                      }}
                     />
                     <ErrorMessage message={errors.contractorName} />
                   </Box>
@@ -298,6 +325,9 @@ export default function MainContractorSignup() {
                       className="rounded"
                       placeholder="Enter your company name"
                       error={!!errors.companyName}
+                      inputProps={{
+                        maxLength: 50,
+                      }}
                     />
                     <ErrorMessage message={errors.companyName} />
                   </Box>
@@ -318,6 +348,9 @@ export default function MainContractorSignup() {
                       className="rounded"
                       placeholder="example@email.com"
                       error={!!errors.email}
+                      inputProps={{
+                        maxLength: 50,
+                      }}
                     />
                     <ErrorMessage message={errors.email} />
                   </Box>
@@ -336,9 +369,13 @@ export default function MainContractorSignup() {
                       value={formData.contactNumber}
                       onChange={handleChange}
                       className="rounded"
-                      placeholder="Enter digits only"
+                      placeholder="e.g., +1 (123) 456-7890"
                       error={!!errors.contactNumber}
-                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                      inputProps={{
+                        inputMode: "tel",
+                        placeholder: "e.g., +1 (123) 456-7890",
+                        maxLength: 50,
+                      }}
                     />
                     <ErrorMessage message={errors.contactNumber} />
                   </Box>
@@ -350,7 +387,7 @@ export default function MainContractorSignup() {
                     fullWidth
                     sx={{
                       textTransform: "none",
-                      color: "white" ,
+                      color: "white",
                       mt: 2,
                       py: 1.5,
                       bgcolor: "#D49F2E",

@@ -77,8 +77,6 @@ export default function UserDetails({ isOpen, togglePanel }: UserDetailsProps) {
             </div>
           </div>
         </div>
-
-        {/* Tasks */}
         <div className="flex-1">
           <div className="p-4"></div>
         </div>

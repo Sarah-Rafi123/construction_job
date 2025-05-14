@@ -130,19 +130,19 @@ export default function LoginPage() {
         email: formData.email,
         password: formData.password,
       }).unwrap()
-      console.log("Login response:", response)
+      // console.log("Login response:", response)
       const isAdmin = response.user?.role === "admin"
-      console.log("User role:", response.user?.role)
-      console.log("Is admin:", isAdmin)
+      // console.log("User role:", response.user?.role)
+      // console.log("Is admin:", isAdmin)
       if (isAdmin) {
-        console.log("Admin user detected, redirecting to admin-home")
+        // console.log("Admin user detected, redirecting to admin-home")
         router.push("/admin-home")
       } else {
-        console.log("Regular user detected, redirecting to home")
+        // console.log("Regular user detected, redirecting to home")
         router.push("/home")
       }
     } catch (err: any) {
-      console.error("Login error:", err)
+      // console.error("Login error:", err)
       setErrors((prev) => ({
         ...prev,
         general: err.data?.message || "Login failed. Please check your credentials.",

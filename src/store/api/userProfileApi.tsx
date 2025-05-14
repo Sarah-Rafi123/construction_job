@@ -62,12 +62,12 @@ export const userProfileApi = createApi({
       providesTags: ["UserProfile"],
       // Add this for better debugging
       transformResponse: (response: { data: User }) => {
-        console.log("Profile API response:", response)
+        // console.log("Profile API response:", response)
         return response
       },
       // Add this for error handling
       transformErrorResponse: (response) => {
-        console.error("Profile API error:", response)
+        // console.error("Profile API error:", response)
         return response
       },
     }),

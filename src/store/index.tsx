@@ -13,6 +13,7 @@ import { adminStatusApi } from "./api/adminStatusApi"
 import { contractorApi } from "./api/pendingContractorApi"
 import { passwordResetApi } from "./api/passwordResetApi"
 import { userPostedJobsApi } from "./api/userPostedJobsApi"
+import { statisticsApi } from "./api/statisticsApi"
 export const store = configureStore({
   reducer: {
     user: userReducer,
@@ -22,6 +23,7 @@ export const store = configureStore({
     [jobsApi.reducerPath]: jobsApi.reducer,
     [jobPostingApi.reducerPath]: jobPostingApi.reducer,
     [chatApi.reducerPath]: chatApi.reducer,
+    [statisticsApi.reducerPath]: statisticsApi.reducer,
     [documentSubmissionApi.reducerPath]: documentSubmissionApi.reducer,
     [userProfileApi.reducerPath]: userProfileApi.reducer,
     [contractorApi.reducerPath]: contractorApi.reducer,
@@ -41,6 +43,7 @@ export const store = configureStore({
       contractorApi.middleware,
       passwordResetApi.middleware,
       userPostedJobsApi.middleware,
+      statisticsApi.middleware,
     ),
 })
 setupListeners(store.dispatch)

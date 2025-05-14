@@ -74,7 +74,7 @@ export function FileUploader({ accept, maxSize, label, multiple = false }: FileU
       }
     } catch (err) {
       setError("Could not access camera")
-      console.error("Error accessing camera:", err)
+      // console.error("Error accessing camera:", err)
     }
   }
 

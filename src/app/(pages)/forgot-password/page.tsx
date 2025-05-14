@@ -84,6 +84,11 @@ export default function ForgotPasswordPage() {
       return
     }
 
+    if (email.length > 50) {
+      setError("Email cannot exceed 50 characters")
+      return
+    }
+
     try {
       // Call the API
       const response = await forgotPassword({ email }).unwrap()
@@ -91,7 +96,7 @@ export default function ForgotPasswordPage() {
       // Show success message
       setSuccess(true)
     } catch (err: any) {
-      console.error("Forgot password error:", err)
+      // console.error("Forgot password error:", err)
       setError(err.data?.message || "Failed to process your request. Please try again later.")
     }
   }
@@ -116,10 +121,9 @@ export default function ForgotPasswordPage() {
             flexDirection: "column",
             p: { xs: 2, sm: 4 },
           }}
-
         >
           {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }}    onClick={navigateToHome}>
+          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }} onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -179,6 +183,9 @@ export default function ForgotPasswordPage() {
                           placeholder="Enter your email address"
                           className="rounded"
                           error={!!error}
+                          inputProps={{
+                            maxLength: 50,
+                          }}
                         />
                         <ErrorMessage message={error} />
                       </Box>
@@ -190,7 +197,7 @@ export default function ForgotPasswordPage() {
                         variant="contained"
                         disabled={isLoading}
                         fullWidth
-                        sx={{ textTransform: "none", color: "white"  }}
+                        sx={{ textTransform: "none", color: "white" }}
                         className="bg-[#D49F2E] text-white hover:bg-[#C48E1D] py-2"
                       >
                         {isLoading ? "Sending..." : "Send Reset Link"}
@@ -216,7 +223,7 @@ export default function ForgotPasswordPage() {
                     <Typography sx={{ py: 2 }} variant="h5" fontWeight="bold" className="text-gray-800 my-4">
                       Check Your Email
                     </Typography>
-                    <Typography sx={{ pb: 2 }}  variant="body1" className="text-gray-600 mb-10">
+                    <Typography sx={{ pb: 2 }} variant="body1" className="text-gray-600 mb-10">
                       We've sent a password reset link to <strong>{email}</strong>. Please check your inbox and follow
                       the instructions to reset your password.
                     </Typography>

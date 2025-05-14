@@ -28,7 +28,7 @@ apiClient.interceptors.response.use(
     // Handle global errors here (e.g., 401 unauthorized, etc.)
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      console.log("Unauthorized access detected, redirecting to landing page")
+      // console.log("Unauthorized access detected, redirecting to landing page")
 
       // Clear user data from Redux store
       store.dispatch(clearCurrentUser())

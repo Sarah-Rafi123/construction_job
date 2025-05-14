@@ -28,8 +28,8 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
     router.push("/home")
   }
 
-  console.log("current user is", currentUser)
-  console.log("inbox is", inbox)
+  // console.log("current user is", currentUser)
+  // console.log("inbox is", inbox)
 
   const filteredInbox = inbox?.filter((conversation) => {
     const otherParticipant = conversation.participants.find((participant) => participant._id !== currentUser?.id)

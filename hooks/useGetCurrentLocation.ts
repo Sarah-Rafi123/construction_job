@@ -13,9 +13,6 @@ const useGetCurrentLocation = () => {
             const { latitude, longitude } = position.coords;
             dispatch(setCurrentUserLocation({ latitude, longitude }));
           },
-          (error) => {
-            console.error("Error getting location:", error);
-          }
         );
       } else {
         console.error("Geolocation is not supported by this browser.");

@@ -247,7 +247,7 @@ export default function JobDetailsPage() {
 
       setIsEditing(false)
     } catch (error) {
-      console.error("Failed to update job:", error)
+      // console.error("Failed to update job:", error)
       setNotification({
         show: true,
         message: "Failed to update job. Please try again.",
@@ -270,7 +270,7 @@ export default function JobDetailsPage() {
         router.push("/my-posted-jobs")
       }, 1500)
     } catch (error) {
-      console.error("Failed to delete job:", error)
+      // console.error("Failed to delete job:", error)
       setNotification({
         show: true,
         message: "Failed to delete job. Please try again.",

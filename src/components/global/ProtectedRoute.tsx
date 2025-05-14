@@ -67,7 +67,7 @@ const ProtectedRoute = ({ children, allowedRoles, redirectUnauthenticated = true
       // Check if component is still mounted before updating state
       if (!isMounted.current) return
 
-      console.error("Not authenticated:", error)
+      // console.error("Not authenticated:", error)
       dispatch(clearCurrentUser())
 
       // Mark that we've attempted authentication

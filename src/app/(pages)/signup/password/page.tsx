@@ -128,6 +128,9 @@ export default function PasswordSetup() {
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters long"
       isValid = false
+    } else if (formData.password.length > 50) {
+      newErrors.password = "Password cannot exceed 50 characters"
+      isValid = false
     }
 
     // Validate confirm password
@@ -136,6 +139,9 @@ export default function PasswordSetup() {
       isValid = false
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match"
+      isValid = false
+    } else if (formData.confirmPassword.length > 50) {
+      newErrors.confirmPassword = "Password cannot exceed 50 characters"
       isValid = false
     }
 
@@ -249,10 +255,9 @@ export default function PasswordSetup() {
             flexDirection: "column",
             p: { xs: 2, sm: 4 },
           }}
-        
         >
           {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }}   onClick={navigateToHome}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
             <Box
               sx={{
                 color: "#D49F2E",
@@ -265,7 +270,7 @@ export default function PasswordSetup() {
               <Briefcase size={24} />
             </Box>
             <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions 
+              Jay Constructions
             </Typography>
           </Box>
 
@@ -316,6 +321,9 @@ export default function PasswordSetup() {
                       className="rounded"
                       placeholder="Enter your password"
                       error={!!errors.password}
+                      inputProps={{
+                        maxLength: 50,
+                      }}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -350,6 +358,9 @@ export default function PasswordSetup() {
                       className="rounded"
                       placeholder="Confirm your password"
                       error={!!errors.confirmPassword}
+                      inputProps={{
+                        maxLength: 50,
+                      }}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -379,7 +390,7 @@ export default function PasswordSetup() {
                     fullWidth
                     sx={{
                       textTransform: "none",
-                      color: "white" ,
+                      color: "white",
                       mt: 2,
                       py: 1.5,
                       bgcolor: "#D49F2E",

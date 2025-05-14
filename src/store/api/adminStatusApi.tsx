@@ -32,12 +32,12 @@ export const adminStatusApi = createApi({
       providesTags: ["AdminStatus"],
       // Add this for better debugging
       transformResponse: (response: AdminStatusResponse) => {
-        console.log("Admin Status API response:", response)
+        // console.log("Admin Status API response:", response)
         return response
       },
       // Add this for error handling
       transformErrorResponse: (response) => {
-        console.error("Admin Status API error:", response)
+        // console.error("Admin Status API error:", response)
         return response
       },
     }),

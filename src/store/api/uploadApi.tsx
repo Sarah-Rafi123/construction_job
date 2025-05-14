@@ -21,10 +21,10 @@ export async function uploadMultipleFiles(files: File[]) {
       withCredentials: true, // Important for sending cookies with the request
     })
 
-    console.log("File upload response:", response.data)
+    // console.log("File upload response:", response.data)
     return response.data.files // array of S3 URLs
   } catch (error) {
-    console.error("File upload failed:", error)
+    // console.error("File upload failed:", error)
     throw error
   }
 }
@@ -46,10 +46,10 @@ export async function uploadSingleFile(file: File) {
       withCredentials: true,
     })
 
-    console.log("Single file upload response:", response.data)
+    // console.log("Single file upload response:", response.data)
     return response.data.file // S3 URL of the uploaded file
   } catch (error) {
-    console.error("Single file upload failed:", error)
+    // console.error("Single file upload failed:", error)
     throw error
   }
 }
