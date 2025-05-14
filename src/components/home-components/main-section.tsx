@@ -75,7 +75,7 @@ export default function MainSection({ userType }: MainSectionProps) {
 
       {!isContractor ? (
         <>
-          <div className="relative z-10 w-full pt-6 md:pt-10 px-4">
+          <div className="relative hidden lg:block  w-full pt-6 md:pt-10 px-4">
             <div className="flex flex-col gap-x-20 md:flex-row justify-center items-center gap-4">
               <div className="bg-white/30 backdrop-blur-sm px-4 py-2 rounded-md text-sm md:text-base">
                 <span className="flex items-center">
@@ -101,7 +101,7 @@ export default function MainSection({ userType }: MainSectionProps) {
           </div>
 
           {/* Main content centered - For job seekers */}
-          <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 md:px-8">
+          <div className="relative h-full flex flex-col items-center justify-center text-center px-4 md:px-8">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Find the Right Job, Built Around You</h1>
             <p className="text-white text-base md:text-xl max-w-3xl">
               We match you with real opportunities in construction — based on your skills, availability, and goals. No
@@ -112,7 +112,7 @@ export default function MainSection({ userType }: MainSectionProps) {
       ) : (
         /* Content for contractors */
         <>
-        <div className="relative z-10 w-full pt-6 md:pt-10 px-4">
+        <div className="relative hidden lg:block w-full pt-6 px-4">
             <div className="flex flex-col gap-x-20 md:flex-row justify-center items-center gap-4">
               <div className="bg-white/30 backdrop-blur-sm px-4 py-2 rounded-md text-sm md:text-base">
                 <span className="flex items-center">
@@ -136,7 +136,7 @@ export default function MainSection({ userType }: MainSectionProps) {
               </div>
             </div>
           </div>
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 md:px-8">
+        <div className="relative h-full flex flex-col items-center justify-center text-center px-4 md:px-8">
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Post Jobs. Build Crews. Win More Projects.</h1>
           <p className="text-white text-base md:text-xl max-w-3xl mb-8">
             Whether you're a contractor or subcontractor, we help you post jobs fast, connect with skilled labor, and

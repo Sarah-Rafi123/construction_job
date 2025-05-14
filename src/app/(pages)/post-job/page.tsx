@@ -336,9 +336,11 @@ export default function PostJob() {
 
   return (
     <ProtectedRoute>
-      <Navbar/>
+  <div className="fixed top-0 left-0 right-0 z-50">
+        <Navbar />
+      </div>
       <ThemeProvider theme={theme}>
-        <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", bgcolor: "background.default" }}>
+        <Box sx={{ display: "flex", mt:8, flexDirection: "column", minHeight: "100vh", bgcolor: "background.default" }}>
           <Snackbar
             open={notification.open}
             autoHideDuration={6000}

@@ -16,7 +16,7 @@ export default function LandingPage() {
     <div className="min-h-screen  bg-white relative">
       <BackgroundDesign />
       <div className="fixed top-0 left-0 right-0 z-50">
-        <Navbar messageCount={3} />
+        <Navbar />
       </div>
       <div className="max-w-7xl mx-auto px-4 ">
       <div className="pt-[80px] z-10">

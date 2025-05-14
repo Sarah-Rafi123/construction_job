@@ -97,7 +97,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
             className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 lg"
             onClick={toggleDetailsPanel}
           >
-            <text className="underline text-[#D49F2E] hover">View Profile </text>
+            <span className="underline text-[#D49F2E] hover">View Profile </span>
           </button>
         </div>
       </div>

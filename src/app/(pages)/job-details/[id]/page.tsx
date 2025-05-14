@@ -8,6 +8,7 @@ import Footer from "@/components/layout/footer"
 import { MapPin, Trash2, AlertTriangle, Calendar, Briefcase, DollarSign, ArrowLeft } from "lucide-react"
 import { format, isValid, parseISO } from "date-fns"
 import dynamic from "next/dynamic"
+import ProtectedRoute from "@/components/global/ProtectedRoute"
 
 // Import the map component with dynamic import to avoid SSR issues
 const JobLocationMap = dynamic(() => import("@/components/maps/job-location-map"), {
@@ -366,6 +367,7 @@ export default function JobDetailsPage() {
     : "JB"
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main className="flex-grow">
@@ -947,5 +949,6 @@ export default function JobDetailsPage() {
       </main>
       <Footer />
     </div>
+    </ProtectedRoute>
   )
 }

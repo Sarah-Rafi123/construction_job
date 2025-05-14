@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setCurrentUserLocation } from "@/store/slices/userSlice";
 
 const useGetCurrentLocation = () => {
   const dispatch = useDispatch();
@@ -11,7 +10,6 @@ const useGetCurrentLocation = () => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
-            dispatch(setCurrentUserLocation({ latitude, longitude }));
           },
         );
       } else {

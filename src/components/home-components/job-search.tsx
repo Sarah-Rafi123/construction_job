@@ -89,7 +89,7 @@ export default function JobSearch({
 }: JobSearchProps) {
   const [showFilters, setShowFilters] = useState(false)
 
-  const jobTypes = ["All Types", "Full-Time", "Part-Time", "Contract", "Temporary"]
+  const jobTypes = ["All Types", "Full-Time", "Part-Time"]
   const serviceTypes = ["All Services", "Electrician", "Plumber", "Carpenter", "Painter", "Construction Manager"]
   const sortOptions = [
     { value: "newest", label: "Newest First" },
