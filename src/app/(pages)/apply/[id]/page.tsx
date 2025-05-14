@@ -111,6 +111,7 @@ export default function ApplyJobPage() {
     attachments: "",
   })
   const [isMainContractor, setIsMainContractor] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (userData?.data?.role) {
@@ -248,47 +249,48 @@ export default function ApplyJobPage() {
     setErrors(newErrors)
 
     if (isValid) {
-      // Upload the single attachment
-      const uploadedAttachments = await uploadAttachments(attachment)
-      // console.log("uploaded urls", uploadedAttachments)
+      // Set submitting state to true to show loader
+      setIsSubmitting(true)
 
-      // Here you would normally send the data to your API
-      // console.log("Submitting enquiry:", {
-      //   title: enquiryTitle,
-      //   enquiry: enquiryText,
-      //   attachments: uploadedAttachments?.map((file: { url: any }) => file.url),
-      //   jobId: id,
-      // })
+      try {
+        // Upload the single attachment
+        const uploadedAttachments = await uploadAttachments(attachment)
 
-      socket.emit(
-        "sendMessage",
-        {
-          recipientId: job?.created_by?._id,
-          enquiry: {
-            title: enquiryTitle,
-            description: enquiryText,
-            attachments: uploadedAttachments?.map((file: { url: any }) => file.url),
-            jobId: job?._id,
+        socket.emit(
+          "sendMessage",
+          {
+            recipientId: job?.created_by?._id,
+            enquiry: {
+              title: enquiryTitle,
+              description: enquiryText,
+              attachments: uploadedAttachments?.map((file: { url: any }) => file.url),
+              jobId: job?._id,
+            },
+            type: "enquiry",
           },
-          type: "enquiry",
-        },
-        ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
-          if (!error && data) {
-            // console.log("message sent", data)
-            router.push(`/chat/${data.conversation._id}`)
-          } else {
-            console.error("Message send failed:", error)
-          }
-        },
-      )
+          ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
+            if (!error && data) {
+              // Navigate to chat page
+              router.push(`/chat/${data.conversation._id}`)
+            } else {
+              console.error("Message send failed:", error)
+              // Reset submitting state if there's an error
+              setIsSubmitting(false)
+              // Show error message
+              alert("Failed to send enquiry. Please try again.")
+            }
+          },
+        )
 
-      alert("Your enquiry has been submitted!")
-      setOpenDialog(false)
-
-      // Reset form
-      setEnquiryTitle("")
-      setEnquiryText("")
-      setAttachment(null)
+        // Reset form (these will only be applied if navigation fails)
+        setEnquiryTitle("")
+        setEnquiryText("")
+        setAttachment(null)
+      } catch (error) {
+        console.error("Error submitting enquiry:", error)
+        setIsSubmitting(false)
+        alert("Failed to upload attachments. Please try again.")
+      }
     }
   }
 
@@ -450,12 +452,12 @@ export default function ApplyJobPage() {
             {/* Action Buttons - Repositioned as requested */}
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
               {/* Back to Jobs button in the position of Apply Now */}
-              <Button variant="contained"   sx={{ color: "white"  }} startIcon={<ArrowBackIcon />} onClick={handleGoBack}>
+              <Button variant="contained" sx={{ color: "white" }} startIcon={<ArrowBackIcon />} onClick={handleGoBack}>
                 Back
               </Button>
 
               {/* Apply Now button moved to the extreme right */}
-              <Button variant="contained"   sx={{  color: "white"  }} onClick={handleApplyNowClick}>
+              <Button variant="contained" sx={{ color: "white" }} onClick={handleApplyNowClick}>
                 Apply Now
               </Button>
             </Box>
@@ -688,7 +690,7 @@ export default function ApplyJobPage() {
                   variant="contained"
                   fullWidth
                   onClick={handleSubmitEnquiry}
-                  disabled={!enquiryTitle.trim() || enquiryText.trim().length < 20 || !attachment}
+                  disabled={!enquiryTitle.trim() || enquiryText.trim().length < 20 || !attachment || isSubmitting}
                   sx={{
                     py: 1.5,
                     bgcolor: "#D49F2E",
@@ -697,7 +699,16 @@ export default function ApplyJobPage() {
                     },
                   }}
                 >
-                  Send enquiry
+                  {isSubmitting ? (
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Box sx={{ display: "inline-block", mr: 1 }}>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      </Box>
+                      Your enquiry is being submitted...
+                    </Box>
+                  ) : (
+                    "Send enquiry"
+                  )}
                 </Button>
               </DialogActions>
             </Dialog>
