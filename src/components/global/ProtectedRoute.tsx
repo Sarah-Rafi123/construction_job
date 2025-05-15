@@ -81,19 +81,13 @@ const ProtectedRoute = ({ children, allowedRoles, redirectUnauthenticated = true
       }
     }
   }
-
-  // Handle initial authentication and role check - only runs once on mount
   useEffect(() => {
-    // Set mounted flag
     isMounted.current = true
-
-    // Reset authentication state on mount
     hasAuthenticated.current = false
 
     if (!currentUser) {
       fetchUser()
     } else {
-      // We already have a user in Redux, so mark as authenticated
       hasAuthenticated.current = true
 
       if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
@@ -101,7 +95,6 @@ const ProtectedRoute = ({ children, allowedRoles, redirectUnauthenticated = true
       } else {
         setLoading(false)
 
-        // Connect socket if not already connected
         if (!socketConnected.current) {
           socket.connect()
           socketConnected.current = true

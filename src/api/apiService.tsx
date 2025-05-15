@@ -1,8 +1,8 @@
 import axios from "axios"
-import { clearCurrentUser } from "@/store/slices/userSlice" // Import the action to clear user state
-import { store } from "@/store" // Import your Redux store
+import { clearCurrentUser } from "@/store/slices/userSlice"
+import { store } from "@/store" 
 
-// Create an axios instance with default config
+
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   headers: {
@@ -38,7 +38,7 @@ apiClient.interceptors.response.use(
 
       // Redirect to landing page
       if (typeof window !== "undefined") {
-        // Check if we're in the browser environment
+
         window.location.href = "/login"
       }
     }
@@ -46,16 +46,12 @@ apiClient.interceptors.response.use(
   },
 )
 
-// Add the login function
 export const loginUser = async (email: string, password: string) => {
   try {
     const response = await apiClient.post("/login", {
       email,
       password,
     })
-
-    // The cookie will be automatically stored by the browser
-    // We just need to return the user data
     return response.data
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Login failed")

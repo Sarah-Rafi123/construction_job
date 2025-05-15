@@ -62,7 +62,7 @@ export default function JobCard({ job, router }: JobCardProps) {
       </p>
 
       <div className="flex gap-2 mb-4 flex-wrap">
-        <span className="inline-block px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded">
+        <span className="inline-block px-2 py-0.5 text-xs font-medium bg-pink-100 text-pink-600 rounded">
           {job.job_type}
         </span>
         {job.services &&
@@ -84,8 +84,9 @@ export default function JobCard({ job, router }: JobCardProps) {
 
       <div className="flex bottom-0 items-center justify-between">
         <div className="flex items-center text-gray-500 text-sm">
-          <MapPin className="h-4 w-4 mr-1 text-gray-400" />
-          {job.job_location ? "Map location" : "Location not specified"}
+          <span className=" text-sm text-green-800 px-2 py-0.5 rounded-sm bg-green-100">${job.budget ? job.budget : " not defined " }</span>
+          {/* <MapPin className="h-4 w-4 mr-1 text-gray-400" />
+          {job.job_location ? "Map location" : "Location not specified"} */}
         </div>
 
         <button

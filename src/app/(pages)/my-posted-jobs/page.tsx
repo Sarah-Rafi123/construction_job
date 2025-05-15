@@ -102,11 +102,11 @@ export default function MyPostedJobsPage() {
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-500 text-sm">
+                      <div className="flex items-center w-full justify-between">
+                        {/* <div className="flex items-center text-gray-500 text-sm">
                           <MapPin className="h-4 w-4 mr-1 text-gray-400" />
                           {job.job_location ? "Map location" : "Location not specified"}
-                        </div>
+                        </div> */}
 
                         <div className="flex items-center">
                           {job.budget !== null && (
