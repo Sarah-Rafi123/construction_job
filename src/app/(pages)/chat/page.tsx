@@ -23,8 +23,10 @@ export default function ChatPage() {
   return (
     <ProtectedRoute>
       <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <div className="flex bg-white">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+                <Navbar />
+              </div>
+        <div className="flex mt-16 bg-white">
           <ChatSidebar isMobileDrawerOpen={isMobileDrawerOpen} toggleMobileDrawer={toggleMobileDrawer} />
           <div className="flex-1 flex flex-col overflow-hidden">
             <ChatWindow toggleMobileDrawer={toggleMobileDrawer} toggleDetailsPanel={toggleDetailsPanel} />

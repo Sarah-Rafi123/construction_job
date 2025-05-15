@@ -1,7 +1,7 @@
 "use client"
 
 import type { useRouter } from "next/navigation"
-import { MapPin, Clock } from "lucide-react"
+import { Clock } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 
 // Define a more accurate Job type that matches your actual data structure
@@ -32,14 +32,21 @@ interface Job {
   __v: number
 }
 
+// Update the JobCardProps interface to include an optional onViewDetails function
 interface JobCardProps {
   job: Job
   router: ReturnType<typeof useRouter>
+  onViewDetails?: (jobId: string) => void
 }
 
-export default function JobCard({ job, router }: JobCardProps) {
+// Update the JobCard component to use the provided onViewDetails function if available
+export default function JobCard({ job, router, onViewDetails }: JobCardProps) {
   const handleViewDetails = () => {
-    router.push(`/apply/${job._id}`)
+    if (onViewDetails) {
+      onViewDetails(job._id)
+    } else {
+      router.push(`/apply/${job._id}`)
+    }
   }
 
   // Format the creation date
@@ -47,7 +54,7 @@ export default function JobCard({ job, router }: JobCardProps) {
 
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
-     <div className="flex justify-between items-start mb-1">
+      <div className="flex justify-between items-start mb-1">
         <h3 className="text-base font-semibold text-gray-800 truncate max-w-[70%]" title={job.job_title}>
           {job.job_title.length > 20 ? `${job.job_title.substring(0, 20)}...` : job.job_title}
         </h3>
@@ -84,7 +91,9 @@ export default function JobCard({ job, router }: JobCardProps) {
 
       <div className="flex bottom-0 items-center justify-between">
         <div className="flex items-center text-gray-500 text-sm">
-          <span className=" text-sm text-green-800 px-2 py-0.5 rounded-sm bg-green-100">${job.budget ? job.budget : " not defined " }</span>
+          <span className=" text-sm text-green-800 px-2 py-0.5 rounded-sm bg-green-100">
+            ${job.budget ? job.budget : " not defined "}
+          </span>
           {/* <MapPin className="h-4 w-4 mr-1 text-gray-400" />
           {job.job_location ? "Map location" : "Location not specified"} */}
         </div>

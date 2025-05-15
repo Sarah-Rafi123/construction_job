@@ -1,59 +1,58 @@
-"use client";
-import socket from "@/lib/socket/connectSocket";
-import { useRef, useEffect } from "react";
-import { Avatar } from "@mui/material";
-import { Menu, FileText, Download } from "lucide-react";
-import { formatTime } from "../../../utils/formatTime";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/store";
-import { useGetMessagesByConversationIdQuery } from "@/store/api/chatApi";
-import ChatInputForm from "./chat-input-form";
-import { useDispatch } from "react-redux";
-import { addMessage, updateConversationInInbox } from "@/store/slices/chatSlice";
+"use client"
+import socket from "@/lib/socket/connectSocket"
+import { useRef, useEffect } from "react"
+import { Avatar } from "@mui/material"
+import { Menu, FileText, Download } from "lucide-react"
+import { formatTime } from "../../../utils/formatTime"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store"
+import { useGetMessagesByConversationIdQuery } from "@/store/api/chatApi"
+import ChatInputForm from "./chat-input-form"
+import { useDispatch } from "react-redux"
+import { addMessage, updateConversationInInbox } from "@/store/slices/chatSlice"
+import Navbar from "../layout/navbar"
 interface ChatWindowProps {
-  toggleMobileDrawer: () => void;
-  toggleDetailsPanel: () => void;
+  toggleMobileDrawer: () => void
+  toggleDetailsPanel: () => void
 }
 
 export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: ChatWindowProps) {
-  const dispatch = useDispatch();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { currentUser } = useSelector((state: RootState) => state.user);
-  const { messages, activeConversation } = useSelector((state: RootState) => state.chat);
-  const user = activeConversation?.participants.find((u) => u._id !== currentUser?.id);
+  const dispatch = useDispatch()
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { currentUser } = useSelector((state: RootState) => state.user)
+  const { messages, activeConversation } = useSelector((state: RootState) => state.chat)
+  const user = activeConversation?.participants.find((u) => u._id !== currentUser?.id)
   const { isLoading, isError } = useGetMessagesByConversationIdQuery(activeConversation?._id || "", {
     skip: !activeConversation,
-    refetchOnMountOrArgChange: true,
-  });
+  })
 
-  console.log("messages are are", activeConversation);
   // console.log("messages", messages)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   useEffect(() => {
     socket.on("receiveMessage", (data) => {
-      dispatch(updateConversationInInbox(data.conversation));
+      dispatch(updateConversationInInbox(data.conversation))
       if (activeConversation?._id == data.conversation._id) {
-        dispatch(addMessage(data.message));
+        dispatch(addMessage(data.message))
       }
-    });
+    })
 
     return () => {
-      socket.off("receiveMessage");
-    };
-  }, [activeConversation, socket]);
+      socket.off("receiveMessage")
+    }
+  }, [activeConversation, socket])
 
   // Helper function to get file name from URL
   const getFileNameFromUrl = (url: string) => {
     try {
-      const urlParts = url.split("/");
-      return urlParts[urlParts.length - 1];
+      const urlParts = url.split("/")
+      return urlParts[urlParts.length - 1]
     } catch (error) {
-      return "attachment";
+      return "attachment"
     }
-  };
+  }
 
   if (!messages || !activeConversation) {
     return (
@@ -71,7 +70,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
           <p className="text-gray-500 text-xl">Select a conversation to start chatting</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -94,9 +93,12 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
             </div>
           </div>
         </div>
-        <div className="hidden items-center gap-2 lg:flex">
-          <button className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 lg" onClick={toggleDetailsPanel}>
-            <span className="underline text-[#D49F2E] hover">View Profile </span>
+        <div className="items-center gap-2 lg:flex">
+          <button
+            className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 lg"
+            onClick={toggleDetailsPanel}
+          >
+            <text className="underline text-[#D49F2E] hover">View Profile </text>
           </button>
         </div>
       </div>
@@ -107,7 +109,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
           </div>
         )} */}
         {messages?.map((message, index) => {
-          const isUser = message.sender === currentUser?.id;
+          const isUser = message.sender === currentUser?.id
           return (
             <div key={index} className="mb-4">
               <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -123,7 +125,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
                       <div className="bg-[#F2E2A0] text-gray-600 rounded-lg p-3 text-sm space-y-2">
                         {/* Enquiry Box with Title and Description */}
                         <div className="border-b border-[#D49F2E] pb-2 mb-2">
-                          <p className="text-xs font-medium text-black mb-2">Title</p>
+                        <p className="text-xs font-medium text-black mb-2">Title</p>
                           <h3 className="font-medium text-gray-800">{message.enquiry?.title}</h3>
                         </div>
                         <p className="text-xs font-medium text-black mb-2">Description</p>
@@ -142,7 +144,9 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
                                 className="flex items-center gap-2 p-2 bg-white rounded-md mb-1 hover:bg-gray-50 transition-colors"
                               >
                                 <FileText size={16} className="text-[#D49F2E]" />
-                                <span className="text-xs text-gray-700 flex-1 truncate">{getFileNameFromUrl(attachment)}</span>
+                                <span className="text-xs text-gray-700 flex-1 truncate">
+                                  {getFileNameFromUrl(attachment)}
+                                </span>
                                 <Download size={14} className="text-gray-500" />
                               </a>
                             ))}
@@ -156,11 +160,11 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
                 </div>
               </div>
             </div>
-          );
+          )
         })}
         <div ref={messagesEndRef} />
       </div>
       <ChatInputForm />
     </div>
-  );
+  )
 }

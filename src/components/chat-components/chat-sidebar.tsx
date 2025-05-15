@@ -45,7 +45,7 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
     <>
       {/* Mobile overlay */}
       {isMobileDrawerOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden" onClick={toggleMobileDrawer} />
+        <div className="fixed inset-0 bg-transparent backdrop-blur-sm  bg-opacity-50 z-20 lg:hidden" onClick={toggleMobileDrawer} />
       )}
 
       {/* Sidebar */}
@@ -57,10 +57,8 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
       `}
       >
         <div className="flex flex-col border-b border-gray-300 h-full">
-          {/* Header */}
           <div className="p-4 border-b border-gray-300">
             <div className="flex items-center justify-between mb-4">
-              {/* Back button with Conversations text */}
               <button
                 onClick={navigateToHome}
                 className="flex items-center text-gray-800 hover:text-[#D49F2E] transition-colors"
@@ -72,8 +70,6 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
                 <X size={24} />
               </button>
             </div>
-
-            {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
@@ -85,8 +81,6 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
               />
             </div>
           </div>
-
-          {/* Conversation list */}
           <div className="flex-1 overflow-y-auto">
             {filteredInbox?.map((conversation) => {
               const user = conversation.participants.find((u) => u._id !== currentUser?.id)
