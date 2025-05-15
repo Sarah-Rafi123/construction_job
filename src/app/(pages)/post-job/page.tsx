@@ -20,7 +20,6 @@ import Radio from "@mui/material/Radio"
 import IconButton from "@mui/material/IconButton"
 import AddIcon from "@mui/icons-material/Add"
 import RemoveIcon from "@mui/icons-material/Remove"
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import InputAdornment from "@mui/material/InputAdornment"
 import Card from "@mui/material/Card"
@@ -29,7 +28,6 @@ import CardHeader from "@mui/material/CardHeader"
 import Checkbox from "@mui/material/Checkbox"
 import Select from "@mui/material/Select"
 import InputLabel from "@mui/material/InputLabel"
-import LocationOnIcon from "@mui/icons-material/LocationOn"
 import CircularProgress from "@mui/material/CircularProgress"
 import Snackbar from "@mui/material/Snackbar"
 import Alert from "@mui/material/Alert"
@@ -37,6 +35,9 @@ import DocumentSubmissionDialog from "@/components/widgets/document-submission-d
 import ProtectedRoute from "@/components/global/ProtectedRoute"
 import Navbar from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
+
+// Import the geocoding service at the top of the file
+import { reverseGeocode } from "@/store/service/geocodingService"
 
 // Import the map component with dynamic import to avoid SSR issues
 const JobLocationMap = dynamic(() => import("@/components/maps/job-location-map"), {
@@ -178,8 +179,11 @@ export default function PostJob() {
     longitude: "",
   })
 
+  // Add a new state for the address
+  const [address, setAddress] = useState("")
+
   // Handle location selection from the map
-  const handleLocationSelect = useCallback((lat: string, lng: string) => {
+  const handleLocationSelect = useCallback(async (lat: string, lng: string) => {
     setLatitude(lat)
     setLongitude(lng)
     // Clear any previous errors
@@ -187,6 +191,14 @@ export default function PostJob() {
       latitude: "",
       longitude: "",
     })
+
+    // Get address from coordinates
+    try {
+      const result = await reverseGeocode(Number.parseFloat(lat), Number.parseFloat(lng))
+      setAddress(result.formatted)
+    } catch (error) {
+      console.error("Error getting address:", error)
+    }
   }, [])
   const handleLatitudeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -270,7 +282,7 @@ export default function PostJob() {
     }
     const formattedServices = services.map((service) => {
       const serviceName = service.type
-      let numberOfDays = 7 
+      let numberOfDays = 7
       if (durationType === "days") {
         numberOfDays = Number.parseInt(duration) || 1
       } else if (durationType === "weeks") {
@@ -300,8 +312,8 @@ export default function PostJob() {
     const requestBody = {
       job_title: title,
       job_location: {
-        coordinates: [lng, lat] as [number, number], 
-        type: "Point", 
+        coordinates: [lng, lat] as [number, number],
+        type: "Point",
       },
       job_type: formattedJobType,
       target_user: formattedTargetUser,
@@ -336,11 +348,13 @@ export default function PostJob() {
 
   return (
     <ProtectedRoute>
-  <div className="fixed top-0 left-0 right-0 z-50">
+      <div className="fixed top-0 left-0 right-0 z-50">
         <Navbar />
       </div>
       <ThemeProvider theme={theme}>
-        <Box sx={{ display: "flex", mt:8, flexDirection: "column", minHeight: "100vh", bgcolor: "background.default" }}>
+        <Box
+          sx={{ display: "flex", mt: 8, flexDirection: "column", minHeight: "100vh", bgcolor: "background.default" }}
+        >
           <Snackbar
             open={notification.open}
             autoHideDuration={6000}
@@ -510,7 +524,6 @@ export default function PostJob() {
                   <CardHeader title="Project Location" />
                   <CardContent>
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                      <LocationOnIcon sx={{ mr: 1, color: "primary.main" }} />
                       <Typography variant="body2" sx={{ fontWeight: "medium" }}>
                         Select the job location on the map
                       </Typography>
@@ -686,7 +699,7 @@ export default function PostJob() {
           <DocumentSubmissionDialog open={showDocumentDialog} onClose={() => setShowDocumentDialog(false)} />
         </Box>
       </ThemeProvider>
-      <Footer/>
+      <Footer />
     </ProtectedRoute>
   )
 }

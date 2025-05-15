@@ -39,6 +39,7 @@ import { useGetJobByIdQuery } from "@/store/api/jobsApi"
 import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
 import ProtectedRoute from "@/components/global/ProtectedRoute"
 import Footer from "@/components/layout/footer"
+import LocationDisplay from "@/components/maps/location-display"
 
 const theme = createTheme({
   palette: {
@@ -362,13 +363,15 @@ export default function ApplyJobPage() {
                   </Box>
                 </Box>
 
-                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                  <LocationOnIcon sx={{ mr: 1, color: "#D49F2E" }} />
-                  <Typography color="text.secondary">
-                    {job.job_location
-                      ? `${job.job_location.coordinates[0]}, ${job.job_location.coordinates[1]}`
-                      : "Location not specified"}
-                  </Typography>
+                <Box sx={{ mb: 1 }}>
+                  {job.job_location ? (
+                    <LocationDisplay coordinates={job.job_location.coordinates as [number, number]} />
+                  ) : (
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <LocationOnIcon sx={{ mr: 1, color: "#D49F2E" }} />
+                      <Typography color="text.secondary">Location not specified</Typography>
+                    </Box>
+                  )}
                 </Box>
 
                 <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -569,13 +572,18 @@ export default function ApplyJobPage() {
                     <Typography variant="subtitle1" fontWeight="medium">
                       {job.job_title}
                     </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
-                      <LocationOnIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                      <Typography variant="body2">
-                        {job.job_location
-                          ? `${job.job_location.coordinates[0]}, ${job.job_location.coordinates[1]}`
-                          : "Location not specified"}
-                      </Typography>
+                    <Box sx={{ display: "flex", alignItems: "flex-start", color: "text.secondary" }}>
+                      {job.job_location ? (
+                        <LocationDisplay
+                          coordinates={job.job_location.coordinates as [number, number]}
+                          iconColor="text.secondary"
+                        />
+                      ) : (
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <LocationOnIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                          <Typography variant="body2">Location not specified</Typography>
+                        </Box>
+                      )}
                     </Box>
                   </Box>
                 </Paper>

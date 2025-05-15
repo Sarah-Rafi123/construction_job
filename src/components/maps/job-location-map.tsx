@@ -8,15 +8,15 @@ import "leaflet/dist/leaflet.css"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
-import MyLocationIcon from "@mui/icons-material/MyLocation"
 import SearchIcon from "@mui/icons-material/Search"
 import TextField from "@mui/material/TextField"
 import InputAdornment from "@mui/material/InputAdornment"
 import IconButton from "@mui/material/IconButton"
 import Alert from "@mui/material/Alert"
+import CircularProgress from "@mui/material/CircularProgress"
+import { reverseGeocode } from "@/store/service/geocodingService"
 
 const fixLeafletIcon = () => {
-
   delete (L.Icon.Default.prototype as any)._getIconUrl
 
   L.Icon.Default.mergeOptions({
@@ -72,6 +72,10 @@ export default function JobLocationMap({ initialLatitude, initialLongitude, onLo
   const [mapLoaded, setMapLoaded] = useState(false)
   const mapRef = useRef<L.Map>(null)
 
+  // Add states for address and loading
+  const [address, setAddress] = useState("")
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false)
+
   // Fix Leaflet icon issue on component mount
   useEffect(() => {
     fixLeafletIcon()
@@ -83,9 +87,41 @@ export default function JobLocationMap({ initialLatitude, initialLongitude, onLo
     onLocationSelect(position[0].toFixed(6), position[1].toFixed(6))
   }, [position, onLocationSelect])
 
+  // Get address on initial load
+  useEffect(() => {
+    const getInitialAddress = async () => {
+      setIsLoadingAddress(true)
+      try {
+        const result = await reverseGeocode(position[0], position[1])
+        setAddress(result.formatted)
+        setSearchQuery(result.formatted)
+      } catch (error) {
+        console.error("Error getting initial address:", error)
+      } finally {
+        setIsLoadingAddress(false)
+      }
+    }
+
+    if (mapLoaded) {
+      getInitialAddress()
+    }
+  }, [mapLoaded, position[0], position[1]])
+
   // Handle marker position changes
-  const handlePositionChange = (lat: number, lng: number) => {
+  const handlePositionChange = async (lat: number, lng: number) => {
     setPosition([lat, lng])
+
+    // Get address from coordinates
+    setIsLoadingAddress(true)
+    try {
+      const result = await reverseGeocode(lat, lng)
+      setAddress(result.formatted)
+      setSearchQuery(result.formatted)
+    } catch (error) {
+      console.error("Error getting address:", error)
+    } finally {
+      setIsLoadingAddress(false)
+    }
   }
 
   // Get user's current location
@@ -94,7 +130,7 @@ export default function JobLocationMap({ initialLatitude, initialLongitude, onLo
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords
-          setPosition([latitude, longitude])
+          handlePositionChange(latitude, longitude)
           mapRef.current?.setView([latitude, longitude], 13)
         },
         (error) => {
@@ -126,6 +162,18 @@ export default function JobLocationMap({ initialLatitude, initialLongitude, onLo
         const longitude = Number.parseFloat(lon)
         setPosition([latitude, longitude])
         mapRef.current?.setView([latitude, longitude], 13)
+
+        // Get address for the searched location
+        setIsLoadingAddress(true)
+        try {
+          const result = await reverseGeocode(latitude, longitude)
+          setAddress(result.formatted)
+          setSearchQuery(result.formatted)
+        } catch (error) {
+          console.error("Error getting address:", error)
+        } finally {
+          setIsLoadingAddress(false)
+        }
       } else {
         setSearchError("Location not found. Please try a different search term.")
         setTimeout(() => setSearchError(""), 5000)
@@ -158,19 +206,19 @@ export default function JobLocationMap({ initialLatitude, initialLongitude, onLo
       <Box sx={{ mb: 2 }}>
         <TextField
           fullWidth
-          placeholder="Search for a location..."
+          placeholder={isLoadingAddress ? "Loading address..." : "Search for a location..."}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyPress={handleKeyPress}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon />
+                {isLoadingAddress ? <CircularProgress size={20} /> : <SearchIcon />}
               </InputAdornment>
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={handleSearch} edge="end">
+                <IconButton onClick={handleSearch} edge="end" disabled={isLoadingAddress}>
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
@@ -213,7 +261,6 @@ export default function JobLocationMap({ initialLatitude, initialLongitude, onLo
 
         <Button
           variant="contained"
-          startIcon={<MyLocationIcon />}
           onClick={handleGetCurrentLocation}
           sx={{
             position: "absolute",
