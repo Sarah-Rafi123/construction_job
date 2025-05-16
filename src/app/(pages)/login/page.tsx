@@ -22,7 +22,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
 import { Briefcase, Facebook, Twitter, Linkedin, Github } from "lucide-react"
 import { useLoginMutation } from "@/store/api/authApi"
-
+import SitepalLogo from "../../../../public/assets/images/SitepalLogo.jpg";
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -185,20 +185,14 @@ export default function LoginPage() {
             }}
             onClick={navigateToHome}
           >
-            <Box
-              sx={{
-                color: "#D49F2E",
-                mr: 1.5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Briefcase size={24} />
-            </Box>
-            <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions
-            </Typography>
+             <Image
+                src={SitepalLogo || "/placeholder.svg"}
+                alt="Company Logo"
+                className="ml-2 sm:block hidden h-16"
+                width={180}
+                height={200}
+                priority
+              />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>

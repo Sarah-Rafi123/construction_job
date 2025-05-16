@@ -1,21 +1,19 @@
 "use client"
-
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { MessageSquare, User, ChevronDown } from "react-feather"
 import { useLogoutMutation } from "@/store/api/authApi"
 import { useSelector, useDispatch } from "react-redux"
 import type { RootState } from "@/store"
-import { Briefcase } from "lucide-react"
 import ProtectedRoute from "../global/ProtectedRoute"
 import { clearCurrentUser } from "@/store/slices/userSlice"
-
+import SitepalLogo from "../../../public/assets/images/SitepalLogo.jpg";
 interface NavbarProps {
   messageCount?: number
   requireAuth?: boolean
 }
-
 export default function Navbar({ messageCount = 0, requireAuth = false }: NavbarProps) {
   const router = useRouter()
   const dispatch = useDispatch()
@@ -58,11 +56,17 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
   const renderNavbarContent = () => (
     <nav className="bg-white">
       <div className="max-w-7xl mx-auto px-4 ">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-20">
           <div className="flex">
             <Link href="/" className="flex-shrink-0 cursor-pointer flex items-center">
-              <Briefcase className="h-10 w-10 mr-2 text-[#D49F2E]" />
-              <span className="text-xl ml-2 sm:block hidden font-bold text-black">Jay Constructions</span>
+              <Image
+                src={SitepalLogo || "/placeholder.svg"}
+                alt="Company Logo"
+                className="ml-2 sm:block hidden h-16"
+                width={180}
+                height={200}
+                priority
+              />
             </Link>
           </div>
 

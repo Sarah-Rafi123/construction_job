@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import type React from "react"
-
+import SitepalLogo from "../../../public/assets/images/SitepalLogo.jpg";
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -124,20 +124,14 @@ export default function ForgotPasswordPage() {
         >
           {/* Logo and brand name */}
           <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }} onClick={navigateToHome}>
-            <Box
-              sx={{
-                color: "#D49F2E",
-                mr: 1.5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Briefcase size={24} />
-            </Box>
-            <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions
-            </Typography>
+              <Image
+                            src={SitepalLogo || "/placeholder.svg"}
+                            alt="Company Logo"
+                            className="ml-2 sm:block hidden h-16"
+                            width={180}
+                            height={200}
+                            priority
+                          />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>

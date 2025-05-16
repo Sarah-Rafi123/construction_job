@@ -3,6 +3,7 @@
 import { useSelector } from "react-redux"
 import { useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
+import Image from "next/image"
 import type { RootState } from "@/store"
 
 export default function SubcontractorsSection() {
@@ -78,8 +79,18 @@ export default function SubcontractorsSection() {
             </div>
           </div>
 
-          <div className="md:w-1/2">
-            <div className="bg-white rounded-lg shadow-lg border border-gray-100 h-full"></div>
+          <div className="hidden md:block md:w-1/2 bg-white rounded-lg border border-gray-200  overflow-hidden">
+            <div className="relative w-full h-full min-h-[400px]">
+              {/* Use a static path directly */}
+              <Image
+                src="/assets/images/sub-contractor.jpg"
+                alt="Subcontractors working on projects"
+                fill
+                style={{ objectFit: "cover" }}
+                className="rounded-md"
+                priority
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -18,7 +18,7 @@ import ConstructionImage from "../../../../../public/assets/images/ConstructionI
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { useRegisterUserMutation } from "@/store/api/authApi"
 import { useRegisterJobSeekerMutation } from "@/store/api/jobSeekerApi"
-
+import SitepalLogo from "../../../../../public/assets/images/SitepalLogo.jpg";
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -258,23 +258,15 @@ export default function PasswordSetup() {
         >
           {/* Logo and brand name */}
           <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
-            <Box
-              sx={{
-                color: "#D49F2E",
-                mr: 1.5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Briefcase size={24} />
-            </Box>
-            <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions
-            </Typography>
+           <Image
+                           src={SitepalLogo || "/placeholder.svg"}
+                           alt="Company Logo"
+                           className="ml-2 sm:block hidden h-16"
+                           width={180}
+                           height={200}
+                           priority
+                         />
           </Box>
-
-          {/* Form content - centered with max width */}
           <Box
             sx={{
               display: "flex",

@@ -3,7 +3,9 @@
 import { useSelector } from "react-redux"
 import { useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
+import Image from "next/image"
 import type { RootState } from "@/store"
+import jobSeekersImage from "../../../public/assets/images/job-seeker.jpg" // Import the image
 
 export default function JobSeekersSection() {
   const router = useRouter()
@@ -80,7 +82,18 @@ export default function JobSeekersSection() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 p-8 hidden md:block"></div>
+          <div className="hidden md:block bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="relative w-full h-full">
+              <Image
+                src={jobSeekersImage || "/placeholder.svg"}
+                alt="Job seekers finding opportunities"
+                fill
+                style={{ objectFit: "cover" }}
+                className="rounded-md"
+                priority
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>

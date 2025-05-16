@@ -56,7 +56,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
 
   if (!messages || !activeConversation) {
     return (
-      <div className=" flex flex-col items-center justify-center bg-white">
+      <div className=" flex flex-col h-screen bg-white">
         <div className="p-4 border-b border-gray-200 bg-white flex items-center justify-between lg:hidden">
           <div className="flex items-center gap-3">
             <button className="text-gray-500 hover:text-gray-700" onClick={toggleMobileDrawer}>
@@ -66,7 +66,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
           </div>
         </div>
 
-        <div className=" flex items-center justify-center">
+        <div className="flex items-center h-screen justify-center">
           <p className="text-gray-500 text-xl">Select a conversation to start chatting</p>
         </div>
       </div>
@@ -75,7 +75,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+      <div className="flex items-center justify-between p-4 border border-gray-200 bg-white">
         <div className="flex items-center gap-3">
           <button className="lg:hidden text-gray-500 hover:text-gray-700 mr-1" onClick={toggleMobileDrawer}>
             <Menu size={24} />
@@ -98,7 +98,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
             className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 lg"
             onClick={toggleDetailsPanel}
           >
-            <text className="underline text-[#D49F2E] hover">View Profile </text>
+            <span className="underline text-[#D49F2E] hover">View Profile </span>
           </button>
         </div>
       </div>

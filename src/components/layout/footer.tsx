@@ -4,8 +4,8 @@ export default function Footer() {
   const socialLoginUrls = {
     facebook: "https://www.facebook.com/login",
     twitter: "https://twitter.com/i/flow/login",
-    linkedin: "https://www.linkedin.com/login",
-    instagram: "https://www.instagram.com/accounts/login",
+    linkedin: "https://www.linkedin.com/company/sitepal/e",
+    instagram: "https://www.instagram.com/sitepal.ltd/#",
   }
   const handleSocialLogin = (provider: string) => {
     window.location.href = socialLoginUrls[provider as keyof typeof socialLoginUrls]
@@ -17,7 +17,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center mb-4">
               <Briefcase className="h-6 w-6 mr-2 text-[#F5A623]" />
-              <span className="text-xl font-bold text-white">Jay Constructions</span>
+              <span className="text-xl font-bold text-white">Site-Pal</span>
             </div>
             <p className="text-gray-400 mb-4">
               The ultimate platform connecting contractors, sub-contractors, and skilled workers for successful
@@ -26,9 +26,6 @@ export default function Footer() {
             <div className="flex space-x-4">
               <a   onClick={() => handleSocialLogin("facebook")} href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Facebook className="h-5 w-5" />
-              </a>
-              <a  onClick={() => handleSocialLogin("twitter")} href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="h-5 w-5" />
               </a>
               <a  onClick={() => handleSocialLogin("linkedin")} href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Linkedin className="h-5 w-5" />
@@ -79,7 +76,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center">
-          <p className="text-gray-400">© {new Date().getFullYear()} Jay Constructions. All rights reserved.</p>
+          <p className="text-gray-400">© {new Date().getFullYear()} Site-Pal. All rights reserved.</p>
         </div>
       </div>
     </footer>

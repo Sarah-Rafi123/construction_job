@@ -59,7 +59,7 @@ export default function PrivacyPolicy() {
               1. Introduction
             </Typography>
             <Typography variant="body1">
-              This Privacy Policy explains how Jay Constructions LLC ("we," "us," or "our") collects, uses, and protects
+              This Privacy Policy explains how Site-Pal ("we," "us," or "our") collects, uses, and protects
               your personal information when you use our construction job platform ("Platform"). By accessing or using
               the Platform, you consent to the collection and use of your information as described in this Privacy
               Policy.

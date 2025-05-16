@@ -9,8 +9,6 @@ import Navbar from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
 import { format, isValid, parseISO } from "date-fns"
 import ProtectedRoute from "@/components/global/ProtectedRoute"
-
-// Import components
 import LoadingState from "@/components/job-details/LoadingState"
 import ErrorState from "@/components/job-details/ErrorState"
 import ViewJobDetails from "@/components/job-details/ViewJobDetails"
@@ -227,11 +225,11 @@ export default function JobDetailsPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex flex-col bg-white">
-        <Navbar />
-        <main className="flex-grow">
-          {/* Notification */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+             <Navbar />
+           </div>
+        <main className="mt-10 flex-grow">
           <Notification notification={notification} />
-
           <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
             {!isEditing ? (
               // View mode
@@ -244,7 +242,6 @@ export default function JobDetailsPage() {
                 setShowDeleteConfirm={setShowDeleteConfirm}
               />
             ) : (
-              // Edit mode
               <JobEditForm
                 formData={formData}
                 setFormData={setFormData}
@@ -254,8 +251,6 @@ export default function JobDetailsPage() {
                 coordErrors={coordErrors}
               />
             )}
-
-            {/* Delete Confirmation Dialog */}
             <DeleteConfirmationDialog
               showDeleteConfirm={showDeleteConfirm}
               setShowDeleteConfirm={setShowDeleteConfirm}

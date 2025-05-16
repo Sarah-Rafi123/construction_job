@@ -14,6 +14,7 @@ import { contractorApi } from "./api/pendingContractorApi"
 import { passwordResetApi } from "./api/passwordResetApi"
 import { userPostedJobsApi } from "./api/userPostedJobsApi"
 import { statisticsApi } from "./api/statisticsApi"
+import { sampleJobsApi } from "./api/sampleJobsApi"
 export const store = configureStore({
   reducer: {
     user: userReducer,
@@ -30,6 +31,7 @@ export const store = configureStore({
     [adminStatusApi.reducerPath]: adminStatusApi.reducer,
     [passwordResetApi.reducerPath]: passwordResetApi.reducer,
     [userPostedJobsApi.reducerPath]: userPostedJobsApi.reducer,
+    [sampleJobsApi.reducerPath]: sampleJobsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -44,9 +46,10 @@ export const store = configureStore({
       passwordResetApi.middleware,
       userPostedJobsApi.middleware,
       statisticsApi.middleware,
+      sampleJobsApi.middleware,
     ),
 })
 setupListeners(store.dispatch)
-
+ 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch

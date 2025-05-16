@@ -639,7 +639,7 @@ export default function PostJob() {
                               </TextField>
                             </Box>
 
-                            {targetUsers !== "Sub Contractors" && (
+                            {targetUsers.trim() === "Sub Contractors" ? null : (
                               <Box>
                                 <FormLabel required sx={{ display: "block", mb: 1 }}>
                                   Number of {service.type}s Required

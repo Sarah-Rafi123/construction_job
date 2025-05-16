@@ -43,15 +43,12 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
 
   return (
     <>
-      {/* Mobile overlay */}
       {isMobileDrawerOpen && (
         <div className="fixed inset-0 bg-transparent backdrop-blur-sm  bg-opacity-50 z-20 lg:hidden" onClick={toggleMobileDrawer} />
       )}
-
-      {/* Sidebar */}
       <div
         className={`
-        fixed lg:static w-80 h-screen border-b border-gray-300 bg-white z-30 
+        fixed lg:static w-80 h-screen border border-gray-300 bg-white z-30 
         transform transition-transform duration-300 ease-in-out
         ${isMobileDrawerOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}

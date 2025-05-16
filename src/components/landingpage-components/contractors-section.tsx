@@ -4,7 +4,8 @@ import { useSelector } from "react-redux"
 import { useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 import type { RootState } from "@/store"
-
+import Image from "next/image"
+import mainContractorsImage from "../../../public/assets/images/main-contractor.jpg"
 export default function ContractorsSection() {
   const router = useRouter()
 
@@ -28,7 +29,18 @@ export default function ContractorsSection() {
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white rounded-lg border border-gray-200 p-8 hidden md:block"></div>
+  <div className="hidden md:block bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="relative w-full h-full">
+              <Image
+                src={mainContractorsImage || "/placeholder.svg"}
+                alt="Job seekers finding opportunities"
+                fill
+                style={{ objectFit: "cover" }}
+                className="rounded-md"
+                priority
+              />
+            </div>
+          </div>
           <div>
             <h3 className="text-2xl font-bold text-gray-900 mb-4 relative inline-block">
               For Contractors

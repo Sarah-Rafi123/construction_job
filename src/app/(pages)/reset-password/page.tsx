@@ -19,11 +19,11 @@ import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
 import Alert from "@mui/material/Alert"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
-import { Briefcase, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react"
+import { ArrowLeft, CheckCircle, AlertCircle } from "lucide-react"
 import { useResetPasswordMutation } from "@/store/api/passwordResetApi"
 import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
+import SitepalLogo from "../../../../public/assets/images/SitepalLogo.jpg";
 
-// Use the same theme as the login page
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -203,20 +203,14 @@ export default function ResetPasswordPage() {
         >
           {/* Logo and brand name */}
           <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }} onClick={navigateToHome}>
-            <Box
-              sx={{
-                color: "#D49F2E",
-                mr: 1.5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Briefcase size={24} />
-            </Box>
-            <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions
-            </Typography>
+           <Image
+                src={SitepalLogo || "/placeholder.svg"}
+                alt="Company Logo"
+                className="ml-2 sm:block hidden h-16"
+                width={180}
+                height={200}
+                priority
+              />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>

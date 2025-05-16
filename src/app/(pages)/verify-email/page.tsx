@@ -10,6 +10,7 @@ import CardContent from "@mui/material/CardContent"
 import Typography from "@mui/material/Typography"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
+import SitepalLogo from "../../../../public/assets/images/SitepalLogo.jpg";
 import { useVerifyEmailMutation } from "@/store/api/authApi"
 const theme = createTheme({
   palette: {
@@ -117,20 +118,14 @@ export default function VerifyEmail() {
             }}
           >
             <Box sx={{ position: "absolute", top: 20, left: 20, display: "flex", alignItems: "center" }}   onClick={navigateToHome}>
-              <Box
-                component="span"
-                sx={{
-                  color: "primary.main",
-                  mr: 1,
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Briefcase size={24} />
-              </Box>
-              <Typography variant="h6" component="div" sx={{ fontWeight: 600, color: "black" }}>
-                Jay Constructions
-              </Typography>
+               <Image
+                src={SitepalLogo || "/placeholder.svg"}
+                alt="Company Logo"
+                className="ml-2 sm:block hidden h-16"
+                width={180}
+                height={200}
+                priority
+              />
             </Box>
 
             <Box sx={{ maxWidth: "450px", width: "100%", mt: 4 }}>

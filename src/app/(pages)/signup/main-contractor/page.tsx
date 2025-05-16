@@ -15,7 +15,7 @@ import ConstructionImage from "../../../../../public/assets/images/ConstructionI
 import { useCheckEmailMutation } from "@/store/api/authApi"
 import { useAppDispatch } from "@/store/hooks"
 import { setEmail, setUserType } from "@/store/slices/userSlice"
-
+import SitepalLogo from "../../../../../public/assets/images/SitepalLogo.jpg";
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -31,7 +31,6 @@ const theme = createTheme({
     },
   },
 })
-
 const ErrorMessage = ({ message }: { message: string }) => (
   <Box
     sx={{
@@ -48,12 +47,10 @@ const ErrorMessage = ({ message }: { message: string }) => (
     )}
   </Box>
 )
-
 export default function MainContractorSignup() {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const [checkEmail] = useCheckEmailMutation()
-
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     contractorName: "",
@@ -61,53 +58,40 @@ export default function MainContractorSignup() {
     contactNumber: "",
     email: "",
   })
-
   const [errors, setErrors] = useState({
     contractorName: "",
     companyName: "",
     contactNumber: "",
     email: "",
   })
-
   const validateName = (name: string) => {
     const nameRegex = /^[a-zA-Z\s]+$/
     return nameRegex.test(name)
   }
-
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
   }
-
   const validatePhoneNumber = (phone: string) => {
-    // Validates formats like: +1 (123) 456-7890, 123-456-7890, 1234567890
     const phoneRegex = /^(\+\d{1,3}\s?)?($$\d{1,4}$$\s?)?(\d{1,4}[-\s]?){1,3}\d{1,4}$/
     return phoneRegex.test(phone)
   }
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
-
-    // Apply specific validation during input for contact number
     if (id === "contactNumber" && value !== "") {
-      // Allow digits, spaces, parentheses, plus sign, and hyphens for phone numbers
       if (!/^[0-9()\-+\s]*$/.test(value)) {
-        return // Don't update if contains invalid characters
+        return 
       }
     }
-
     setFormData((prev) => ({
       ...prev,
       [id]: value,
     }))
-
-    // Clear the specific error when user starts typing
     setErrors((prev) => ({
       ...prev,
       [id]: "",
     }))
   }
-
   const validateForm = () => {
     const newErrors = {
       contractorName: "",
@@ -116,8 +100,6 @@ export default function MainContractorSignup() {
       email: "",
     }
     let isValid = true
-
-    // Validate contractor name
     if (!formData.contractorName.trim()) {
       newErrors.contractorName = "Contractor name is required"
       isValid = false
@@ -130,19 +112,14 @@ export default function MainContractorSignup() {
       newErrors.contractorName = "Contractor name cannot exceed 50 characters"
       isValid = false
     }
-
-    // Validate company name
     if (!formData.companyName.trim()) {
       newErrors.companyName = "Company name is required"
       isValid = false
     }
-
     if (formData.companyName.length > 50) {
       newErrors.companyName = "Company name cannot exceed 50 characters"
       isValid = false
     }
-
-    // Validate email
     if (!formData.email) {
       newErrors.email = "Email is required"
       isValid = false
@@ -155,8 +132,6 @@ export default function MainContractorSignup() {
       newErrors.email = "Email address cannot exceed 50 characters"
       isValid = false
     }
-
-    // Validate contact number
     if (!formData.contactNumber) {
       newErrors.contactNumber = "Contact number is required"
       isValid = false
@@ -164,31 +139,22 @@ export default function MainContractorSignup() {
       newErrors.contactNumber = "Please enter a valid phone number format (e.g., +1 (123) 456-7890 or 123-456-7890)"
       isValid = false
     }
-
     if (formData.contactNumber.length > 50) {
       newErrors.contactNumber = "Contact number cannot exceed 50 characters"
       isValid = false
     }
-
     setErrors(newErrors)
     return isValid
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!validateForm()) {
       return
     }
-
     setIsSubmitting(true)
-
     try {
-      // Check email uniqueness using Redux Toolkit mutation
       const result = await checkEmail({ email: formData.email }).unwrap()
-
       if (result.success) {
-        // Email is unique, proceed with signup
         localStorage.setItem(
           "signupData",
           JSON.stringify({
@@ -196,15 +162,10 @@ export default function MainContractorSignup() {
             userType: "main-contractor",
           }),
         )
-
-        // Update Redux state
         dispatch(setEmail(formData.email))
         dispatch(setUserType("main-contractor"))
-
-        // Navigate to password page
         router.push("/signup/password")
       } else {
-        // Email already exists
         setErrors((prev) => ({
           ...prev,
           email: result.message || "This email is already registered. Please use a different email.",
@@ -223,7 +184,6 @@ export default function MainContractorSignup() {
   const navigateToHome = () => {
     router.push("/")
   }
-
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -234,7 +194,6 @@ export default function MainContractorSignup() {
         }}
         className="bg-white"
       >
-        {/* Left side - Signup Form */}
         <Box
           sx={{
             width: { xs: "100%", md: "50%" },
@@ -245,25 +204,16 @@ export default function MainContractorSignup() {
             maxHeight: "100vh",
           }}
         >
-          {/* Logo and brand name */}
           <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
-            <Box
-              sx={{
-                color: "#D49F2E",
-                mr: 1.5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Briefcase size={24} />
-            </Box>
-            <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions
-            </Typography>
+              <Image
+                src={SitepalLogo || "/placeholder.svg"}
+                alt="Company Logo"
+                className="ml-2 sm:block hidden h-16"
+                width={180}
+                height={200}
+                priority
+              />
           </Box>
-
-          {/* Form content - centered with max width */}
           <Box
             sx={{
               display: "flex",
@@ -276,7 +226,7 @@ export default function MainContractorSignup() {
             <Box
               sx={{
                 width: "100%",
-                maxWidth: "480px", // Narrower content area like in the image
+                maxWidth: "480px", 
               }}
             >
               <Typography variant="h4" fontWeight="bold" sx={{ mb: 1, color: "#333" }}>
@@ -309,7 +259,6 @@ export default function MainContractorSignup() {
                     />
                     <ErrorMessage message={errors.contractorName} />
                   </Box>
-
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="companyName" className="text-gray-700">
                       Company Name *
@@ -331,7 +280,6 @@ export default function MainContractorSignup() {
                     />
                     <ErrorMessage message={errors.companyName} />
                   </Box>
-
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="email" className="text-gray-700">
                       Email Address *
@@ -411,8 +359,6 @@ export default function MainContractorSignup() {
             </Box>
           </Box>
         </Box>
-
-        {/* Right side - Image */}
         <Box
           sx={{
             width: "50%",

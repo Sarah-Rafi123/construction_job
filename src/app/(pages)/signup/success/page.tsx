@@ -16,7 +16,7 @@ import { useAppSelector } from "@/store/hooks"
 import { useResendVerificationEmailMutation } from "@/store/api/authApi"
 import { Briefcase } from "lucide-react"
 import { useRouter } from "next/navigation"
-
+import SitepalLogo from "../../../../../public/assets/images/SitepalLogo.jpg";
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -112,11 +112,14 @@ export default function SignupSuccess() {
                 justifyContent: "center",
               }}
             >
-              <Briefcase size={24} />
-            </Box>
-            <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions
-            </Typography>
+            <Image
+                src={SitepalLogo || "/placeholder.svg"}
+                alt="Company Logo"
+                className="ml-2 sm:block hidden h-16"
+                width={180}
+                height={200}
+                priority
+              />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>

@@ -16,7 +16,7 @@ import { Autocomplete, Chip, Slider } from "@mui/material"
 import { useCheckEmailMutation } from "@/store/api/authApi"
 import { useAppDispatch } from "@/store/hooks"
 import { setEmail, setUserType } from "@/store/slices/userSlice"
-
+import SitepalLogo from "../../../../../public/assets/images/SitepalLogo.jpg";
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -292,20 +292,14 @@ export default function SubContractorSignup() {
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
-            <Box
-              sx={{
-                color: "#D49F2E",
-                mr: 1.5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Briefcase size={24} />
-            </Box>
-            <Typography variant="h6" fontWeight="bold" sx={{ color: "#333" }}>
-              Jay Constructions
-            </Typography>
+             <Image
+                            src={SitepalLogo || "/placeholder.svg"}
+                            alt="Company Logo"
+                            className="ml-2 sm:block hidden h-16"
+                            width={180}
+                            height={200}
+                            priority
+                          />
           </Box>
           <Box
             sx={{

@@ -61,7 +61,7 @@ export default function TermsAndConditions() {
             </Typography>
             <Typography variant="body1">
               These Terms and Conditions ("Terms") govern your use of the construction job platform ("Platform")
-              provided by Jay Constructions LLC ("we," "us," or "our"). By accessing or using the Platform, you agree to comply
+              provided by Site-Pal ("we," "us," or "our"). By accessing or using the Platform, you agree to comply
               with these Terms. If you do not agree, please do not use the Platform.
             </Typography>
 
@@ -146,7 +146,7 @@ export default function TermsAndConditions() {
               10. Governing Law
             </Typography>
             <Typography variant="body1">
-              These Terms are governed by the laws of the jurisdiction in which Jay Constructions LLC operates, and any disputes
+              These Terms are governed by the laws of the jurisdiction in which Site-Pal operates, and any disputes
               will be resolved in the competent courts in that jurisdiction.
             </Typography>
           </Paper>
