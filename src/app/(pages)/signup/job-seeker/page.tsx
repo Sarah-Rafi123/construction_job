@@ -12,12 +12,12 @@ import TextField from "@mui/material/TextField"
 import FormLabel from "@mui/material/FormLabel"
 import Slider from "@mui/material/Slider"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
-import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
+import ConstructionImage from "@/assets/images/ConstructionImage.png"
 import { useCheckEmailMutation } from "@/store/api/authApi"
 import { useAppDispatch } from "@/store/hooks"
 import { setEmail, setUserType } from "@/store/slices/userSlice"
 import IconButton from "@mui/material/IconButton"
-import SitepalLogo from "../../../../../public/assets/images/SitepalLogo.jpg";
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
 const theme = createTheme({
   palette: {
     mode: "light",

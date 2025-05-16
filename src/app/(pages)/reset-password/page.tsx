@@ -21,8 +21,8 @@ import Alert from "@mui/material/Alert"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import { ArrowLeft, CheckCircle, AlertCircle } from "lucide-react"
 import { useResetPasswordMutation } from "@/store/api/passwordResetApi"
-import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
-import SitepalLogo from "../../../../public/assets/images/SitepalLogo.jpg";
+import ConstructionImage from "@/assets/images/ConstructionImage.png"
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
 
 const theme = createTheme({
   palette: {

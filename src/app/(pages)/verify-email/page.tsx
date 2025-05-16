@@ -9,8 +9,8 @@ import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Typography from "@mui/material/Typography"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
-import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
-import SitepalLogo from "../../../../public/assets/images/SitepalLogo.jpg";
+import ConstructionImage from "@/assets/images/ConstructionImage.png"
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
 import { useVerifyEmailMutation } from "@/store/api/authApi"
 const theme = createTheme({
   palette: {

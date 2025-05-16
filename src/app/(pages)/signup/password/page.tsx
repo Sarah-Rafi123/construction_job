@@ -14,11 +14,11 @@ import InputAdornment from "@mui/material/InputAdornment"
 import IconButton from "@mui/material/IconButton"
 import Alert from "@mui/material/Alert"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
-import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
+import ConstructionImage from "@/assets/images/ConstructionImage.png"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { useRegisterUserMutation } from "@/store/api/authApi"
 import { useRegisterJobSeekerMutation } from "@/store/api/jobSeekerApi"
-import SitepalLogo from "../../../../../public/assets/images/SitepalLogo.jpg";
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
 const theme = createTheme({
   palette: {
     mode: "light",

@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import type React from "react"
-import SitepalLogo from "../../../public/assets/images/SitepalLogo.jpg";
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -17,7 +17,7 @@ import FormLabel from "@mui/material/FormLabel"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import { Briefcase, ArrowLeft, CheckCircle } from "lucide-react"
 import { useForgotPasswordMutation } from "@/store/api/passwordResetApi"
-import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
+import ConstructionImage from "@/assets/images/ConstructionImage.png"
 
 // Use the same theme as the login page
 const theme = createTheme({

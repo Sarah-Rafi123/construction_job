@@ -19,10 +19,10 @@ import Visibility from "@mui/icons-material/Visibility"
 import VisibilityOff from "@mui/icons-material/VisibilityOff"
 import Divider from "@mui/material/Divider"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
-import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
+import ConstructionImage from "@/assets/images/ConstructionImage.png"
 import { Briefcase, Facebook, Twitter, Linkedin, Github } from "lucide-react"
 import { useLoginMutation } from "@/store/api/authApi"
-import SitepalLogo from "../../../../public/assets/images/SitepalLogo.jpg";
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
 const theme = createTheme({
   palette: {
     mode: "light",

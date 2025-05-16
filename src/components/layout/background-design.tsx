@@ -1,6 +1,6 @@
 import Image from "next/image"
-import BlueprintLeft from "../../../public/assets/images/BlueprintLeft.png";
-import BlueprintRight from "../../../public/assets/images/BlueprintRight.png";
+import BlueprintLeft from "@/assets/images/BlueprintLeft.png";
+import BlueprintRight from "@/assets/images/BlueprintRight.png";
 
 export default function BackgroundDesign() {
   return (

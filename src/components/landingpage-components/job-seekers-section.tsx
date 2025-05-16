@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 import Image from "next/image"
 import type { RootState } from "@/store"
-import jobSeekersImage from "../../../public/assets/images/job-seeker.jpg" // Import the image
+import jobSeekersImage from "@/assets/images/job-seeker.jpg" // Import the image
 
 export default function JobSeekersSection() {
   const router = useRouter()

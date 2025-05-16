@@ -3,7 +3,7 @@
 import { useSelector } from "react-redux"
 import { useRouter } from "next/navigation"
 import { Briefcase, Building2, Users, PlusCircle } from "lucide-react"
-import HouseSvg from "../../../public/assets/svg/HouseSVG"
+import HouseSvg from "../../assets/svg/HouseSVG"
 import type { RootState } from "@/store"
 import { useGetStatisticsQuery } from "@/store/api/statisticsApi"
 
@@ -16,7 +16,6 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
   const currentUser = useSelector((state: RootState) => state.user?.currentUser)
   const isAuthenticated = !!currentUser
 
-  // Fetch statistics from API
   const { data: statisticsData, isLoading, error } = useGetStatisticsQuery()
 
   const handleExploreClick = () => {
@@ -27,12 +26,11 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
     }
   }
 
-  // Get stats from API response or use fallback values
   const stats = {
-    totalJobs: statisticsData?.stats.totalJobs ?? 0,
-    newlyPostedJobs: statisticsData?.stats.newlyPostedJobs ?? 0,
-    totalCompanies: statisticsData?.stats.totalCompanies ?? 0,
-    totalCandidates: statisticsData?.stats.totalCandidates ?? 0,
+    totalJobs: statisticsData?.stats?.totalJobs ?? 0,
+    newlyPostedJobs: statisticsData?.stats?.newlyPostedJobs ?? 0,
+    totalCompanies: statisticsData?.stats?.totalCompanies ?? 0,
+    totalCandidates: statisticsData?.stats?.totalCandidates ?? 0,
   }
 
   return (

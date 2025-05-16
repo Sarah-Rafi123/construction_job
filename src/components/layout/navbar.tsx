@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from "react-redux"
 import type { RootState } from "@/store"
 import ProtectedRoute from "../global/ProtectedRoute"
 import { clearCurrentUser } from "@/store/slices/userSlice"
-import SitepalLogo from "../../../public/assets/images/SitepalLogo.jpg";
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
 interface NavbarProps {
   messageCount?: number
   requireAuth?: boolean

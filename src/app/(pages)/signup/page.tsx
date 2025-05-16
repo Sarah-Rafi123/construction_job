@@ -17,8 +17,8 @@ import MenuItem from "@mui/material/MenuItem"
 import FormLabel from "@mui/material/FormLabel"
 import Divider from "@mui/material/Divider"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
-import ConstructionImage from "../../../../public/assets/images/ConstructionImage.png"
-import SitepalLogo from "../../../../public/assets/images/SitepalLogo.jpg";
+import ConstructionImage from "@/assets/images/ConstructionImage.png"
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
 
 const theme = createTheme({
   palette: {

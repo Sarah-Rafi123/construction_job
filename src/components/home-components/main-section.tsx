@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import Home from "../../../public/assets/images/Home.png"
+import Home from "@/assets/images/Home.png"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useGetUserProfileQuery } from "@/store/api/userProfileApi"

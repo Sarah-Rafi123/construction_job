@@ -9,14 +9,13 @@ import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
-import ConstructionImage from "../../../../../public/assets/images/ConstructionImage.png"
 import Alert from "@mui/material/Alert"
 import CircularProgress from "@mui/material/CircularProgress"
 import { useAppSelector } from "@/store/hooks"
 import { useResendVerificationEmailMutation } from "@/store/api/authApi"
-import { Briefcase } from "lucide-react"
 import { useRouter } from "next/navigation"
-import SitepalLogo from "../../../../../public/assets/images/SitepalLogo.jpg";
+
+// Create theme outside of the component
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -42,6 +41,7 @@ export default function SignupSuccess() {
 
   const userEmail = useAppSelector((state) => state.user?.email || "")
   const [resendVerificationEmail] = useResendVerificationEmailMutation()
+  const router = useRouter()
 
   const handleResendVerificationEmail = async () => {
     if (!userEmail) {
@@ -71,10 +71,11 @@ export default function SignupSuccess() {
       setIsLoading(false)
     }
   }
+  
   const navigateToHome = () => {
     router.push("/")
   }
-  const router = useRouter()
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -112,14 +113,15 @@ export default function SignupSuccess() {
                 justifyContent: "center",
               }}
             >
-            <Image
-                src={SitepalLogo || "/placeholder.svg"}
+              <Image
+                src="/assets/images/SitepalLogo.jpg"
                 alt="Company Logo"
                 className="ml-2 sm:block hidden h-16"
                 width={180}
                 height={200}
                 priority
               />
+            </Box>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>
@@ -145,7 +147,7 @@ export default function SignupSuccess() {
               <CardContent>
                 <Typography sx={{ textAlign: "center" }} color="text.secondary" className="text-gray-600 mb-4">
                   A verification email has been sent to your registered email address <strong>{userEmail}</strong>
-                  .Please check your inbox and follow the instructions to activate your account.
+                  . Please check your inbox and follow the instructions to activate your account.
                 </Typography>
                 <Typography color="text.secondary" sx={{ textAlign: "center" }} className="text-gray-600 mb-4">
                   Didn't receive the verification email? Click the button below to resend it.
@@ -189,7 +191,7 @@ export default function SignupSuccess() {
         >
           <div style={{ position: "relative", width: "100%", height: "100%" }}>
             <Image
-              src={ConstructionImage || "/placeholder.svg?height=1080&width=1920"}
+              src="/assets/images/ConstructionImage.png"
               alt="Construction success"
               fill
               style={{
