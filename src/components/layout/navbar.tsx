@@ -95,7 +95,7 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
                     <ChevronDown size={16} className="ml-1" />
                   </button>
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-6 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                    <div className="absolute right-0 mt-8 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                       <Link href="/profile" className="block px-4 py-2 text-sm text-[#D49F2E] hover:bg-gray-100">
                         Your Profile
                       </Link>

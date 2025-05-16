@@ -152,7 +152,7 @@ export default function MainSection({ userType }: MainSectionProps) {
 
       <DocumentSubmissionDialog open={showDocumentDialog} onClose={() => setShowDocumentDialog(false)} />
       {showVerificationMessage && (
-        <div className="absolute bottom-10 left-0 right-0 mx-auto w-full max-w-md bg-white/90 backdrop-blur-sm border-l-4 border-yellow-500 text-gray-800 px-4 py-3 rounded shadow-md mt-4 text-center">
+        <div className="absolute bottom-20 left-0 z-50 right-0 mx-auto w-full max-w-md bg-white/90 backdrop-blur-sm border-l-4 border-yellow-500 text-gray-800 px-4 py-3 rounded shadow-md mt-4 text-center">
           <p className="font-medium">Your documents are under verification by admin.</p>
           <p className="text-sm">You'll be able to post jobs once verified.</p>
         </div>
