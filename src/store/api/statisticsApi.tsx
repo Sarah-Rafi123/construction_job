@@ -13,7 +13,7 @@ export interface StatisticsResponse {
 export const statisticsApi = createApi({
   reducerPath: "statisticsApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+    baseUrl: "http://localhost:9000",
     credentials: "include",
   }),
   endpoints: (builder) => ({
