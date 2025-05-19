@@ -14,8 +14,8 @@ import CircularProgress from "@mui/material/CircularProgress"
 import { useAppSelector } from "@/store/hooks"
 import { useResendVerificationEmailMutation } from "@/store/api/authApi"
 import { useRouter } from "next/navigation"
-
-// Create theme outside of the component
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
+import ConstructionImage from "@/assets/images/ConstructionImage.png"
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -104,24 +104,14 @@ export default function SignupSuccess() {
             }}
             onClick={navigateToHome}
           >
-            <Box
-              sx={{
-                color: "#D49F2E",
-                mr: 1.5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Image
-                src="/assets/images/SitepalLogo.jpg"
+             <Image
+                src={SitepalLogo || "/placeholder.svg"}
                 alt="Company Logo"
                 className="ml-2 sm:block hidden h-16"
                 width={180}
                 height={200}
                 priority
               />
-            </Box>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>
@@ -189,10 +179,10 @@ export default function SignupSuccess() {
             overflow: "hidden",
           }}
         >
-          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+         <div style={{ position: "relative", width: "100%", height: "100%" }}>
             <Image
-              src="/assets/images/ConstructionImage.png"
-              alt="Construction success"
+              src={ConstructionImage || "/placeholder.svg"}
+              alt="Construction contractor"
               fill
               style={{
                 objectFit: "cover",
