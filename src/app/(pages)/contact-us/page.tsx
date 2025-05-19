@@ -90,11 +90,11 @@ export default function ContactPage() {
                   </Typography>
                   <Typography variant="body1" align="center" sx={{ fontWeight: "bold" }}>
               <a
-                href="mailto:hello@sie-pal.com?subject=Inquiry%20for%20Jay%20Constructions&body=Hello%20Jay%20Constructions%2C%0A%0AI%20am%20interested%20in%20your%20services%20and%20would%20like%20to%20request%20more%20information%20about%3A%0A%0A%0AThank%20you%2C%0A%0A"
+                href="mailto:hello@site-pal.com?subject=Inquiry%20for%20Jay%20Constructions&body=Hello%20Jay%20Constructions%2C%0A%0AI%20am%20interested%20in%20your%20services%20and%20would%20like%20to%20request%20more%20information%20about%3A%0A%0A%0AThank%20you%2C%0A%0A"
                 style={{ color: "#D49F2E", textDecoration: "none" }}
                 className="hover:underline"
               >
-                hello@sie-pal.com
+                hello@site-pal.com
               </a>
             </Typography>
                 </Paper>
