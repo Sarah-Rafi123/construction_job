@@ -1,5 +1,10 @@
 "use client"
+// In your API files (e.g., jobsApi.ts, userPostedJobsApi.ts)
+import { 
+  Job
+} from '@/types/jobTypes';
 
+// Then use these imported types instead of redefining them
 import type { useRouter } from "next/navigation"
 import { Clock } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
@@ -14,22 +19,6 @@ interface JobService {
 interface JobLocation {
   type: string
   coordinates: number[]
-}
-
-interface Job {
-  _id: string
-  job_title: string
-  job_type: string
-  target_user: string
-  services: JobService[]
-  job_priority: boolean
-  budget: number | null
-  project_image: string | null
-  job_location: JobLocation | null
-  created_by: any | null
-  createdAt: string
-  updatedAt: string
-  __v: number
 }
 
 // Update the JobCardProps interface to include an optional onViewDetails function

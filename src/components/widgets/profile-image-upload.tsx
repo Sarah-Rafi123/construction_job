@@ -35,12 +35,14 @@ export default function ProfileImageUpload({ profilePicture, userId }: ProfileIm
         const objectUrl = URL.createObjectURL(file)
         setPreviewUrl(objectUrl)
 
-        // Create FormData
-        const formData = new FormData()
-        formData.append("profile_picture", file)
+        // Prepare payload according to UpdateUserProfileRequest type
+        const payload = {
+          userId,
+          profile_picture: file,
+        }
 
         // Upload the image
-        await updateUserProfile(formData).unwrap()
+        await updateUserProfile(payload).unwrap()
         setUploadError(null)
 
         // Clean up preview URL

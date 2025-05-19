@@ -61,8 +61,15 @@ export default function ContactPage() {
               us using the contact information below.
             </Typography>
 
-            <Grid container spacing={4} sx={{ mt: 2 }}>
-              <Grid item xs={12} md={6}>
+           <Box
+  sx={{
+    display: "flex",
+    flexDirection: { xs: "column", md: "row" },
+    gap: 4,
+    mt: 2,
+  }}
+>
+  <Box sx={{ flex: 1 }}>
                 <Paper
                   elevation={2}
                   sx={{
@@ -91,9 +98,9 @@ export default function ContactPage() {
               </a>
             </Typography>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+           <Box sx={{ flex: 1 }}>
                 <Paper
                   elevation={2}
                   sx={{
@@ -122,8 +129,8 @@ export default function ContactPage() {
               </a>
             </Typography>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
             <Box sx={{ mt: 6 }}>
               <Typography variant="h2" component="h2">

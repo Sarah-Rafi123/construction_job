@@ -54,10 +54,8 @@ export default function HeroSection({ companies = [] }: HeroSectionProps) {
               Explore More
             </button>
           </div>
-
-          {/* Right Column: House Blueprint SVG */}
           <div className="flex justify-center">
-            <HouseSvg className="w-52 h-52" />
+            <HouseSvg />
           </div>
         </div>
 

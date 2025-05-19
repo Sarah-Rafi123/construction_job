@@ -22,6 +22,7 @@ import {
   createTheme,
   IconButton,
   Paper,
+  CircularProgress,
 } from "@mui/material"
 import type { Message, Chat } from "@/types/chatTypes"
 import LocationOnIcon from "@mui/icons-material/LocationOn"
@@ -39,7 +40,6 @@ import { useGetJobByIdQuery } from "@/store/api/jobsApi"
 import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
 import ProtectedRoute from "@/components/global/ProtectedRoute"
 import Footer from "@/components/layout/footer"
-import LocationDisplay from "@/components/maps/location-display"
 
 const theme = createTheme({
   palette: {
@@ -112,6 +112,7 @@ export default function ApplyJobPage() {
     attachments: "",
   })
   const [isMainContractor, setIsMainContractor] = useState(false)
+  // Add loading state for enquiry submission
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -207,10 +208,8 @@ export default function ApplyJobPage() {
         },
         withCredentials: true,
       })
-      // console.log("response is", response)
       return response.data.files // array of S3 URLs
     } catch (error) {
-      // console.error("File upload failed", error)
       throw error
     }
   }
@@ -250,9 +249,9 @@ export default function ApplyJobPage() {
     setErrors(newErrors)
 
     if (isValid) {
-      // Set submitting state to true to show loader
+      // Set loading state to true
       setIsSubmitting(true)
-
+      
       try {
         // Upload the single attachment
         const uploadedAttachments = await uploadAttachments(attachment)
@@ -260,7 +259,9 @@ export default function ApplyJobPage() {
         socket.emit(
           "sendMessage",
           {
-            recipientId: job?.created_by?._id,
+            recipientId: typeof job?.created_by === "object" && job?.created_by !== null && "_id" in job.created_by
+              ? (job.created_by as { _id: string })._id
+              : job?.created_by,
             enquiry: {
               title: enquiryTitle,
               description: enquiryText,
@@ -271,26 +272,22 @@ export default function ApplyJobPage() {
           },
           ({ data, error }: { data?: { message: Message; conversation: Chat }; error?: string }) => {
             if (!error && data) {
-              // Navigate to chat page
+              // Redirect to chat page
               router.push(`/chat/${data.conversation._id}`)
             } else {
               console.error("Message send failed:", error)
-              // Reset submitting state if there's an error
+              // Set loading state to false if there's an error
               setIsSubmitting(false)
-              // Show error message
-              alert("Failed to send enquiry. Please try again.")
             }
-          },
+          }
         )
-
-        // Reset form (these will only be applied if navigation fails)
-        setEnquiryTitle("")
-        setEnquiryText("")
-        setAttachment(null)
+        
+        // Note: We don't reset the form or close the dialog here
+        // because we're redirecting the user to the chat page
       } catch (error) {
         console.error("Error submitting enquiry:", error)
+        // Set loading state to false if there's an error
         setIsSubmitting(false)
-        alert("Failed to upload attachments. Please try again.")
       }
     }
   }
@@ -336,7 +333,7 @@ export default function ApplyJobPage() {
   // Get the first letter of each word in the job title for the avatar
   const avatarText = job.job_title
     .split(" ")
-    .map((word: any[]) => word[0])
+    .map((word: string) => word[0])
     .join("")
     .substring(0, 2)
     .toUpperCase()
@@ -363,15 +360,13 @@ export default function ApplyJobPage() {
                   </Box>
                 </Box>
 
-                <Box sx={{ mb: 1 }}>
-                  {job.job_location ? (
-                    <LocationDisplay coordinates={job.job_location.coordinates as [number, number]} />
-                  ) : (
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <LocationOnIcon sx={{ mr: 1, color: "#D49F2E" }} />
-                      <Typography color="text.secondary">Location not specified</Typography>
-                    </Box>
-                  )}
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <LocationOnIcon sx={{ mr: 1, color: "#D49F2E" }} />
+                  <Typography color="text.secondary">
+                    {job.job_location
+                      ? `${job.job_location.coordinates[0]}, ${job.job_location.coordinates[1]}`
+                      : "Location not specified"}
+                  </Typography>
                 </Box>
 
                 <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -397,7 +392,7 @@ export default function ApplyJobPage() {
                   <strong>Services Required:</strong>
                 </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
-                  {job.services.map(
+                  {job.services?.map(
                     (service: { _id: React.Key | null | undefined; service_name: any; resource_count: number }) => (
                       <Chip
                         key={service._id}
@@ -434,23 +429,11 @@ export default function ApplyJobPage() {
                   {job.job_type === "Full-Time"
                     ? " This is a full-time position requiring commitment to the entire project duration."
                     : " This is a part-time position with flexible hours."}
-                  {job.services.length > 0 &&
-                    ` We are looking for professionals with expertise in ${job.services.map((s: { service_name: any }) => s.service_name).join(", ")}.`}
+                  {(job.services ?? []).length > 0 &&
+                    ` We are looking for professionals with expertise in ${job.services?.map((s: { service_name: any }) => s.service_name).join(", ")}.`}
                 </Typography>
               </CardContent>
             </Card>
-
-            {/* Contact Info */}
-            {/* <Card sx={{ mb: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Contact Information
-                </Typography>
-                <Typography variant="body1">Name: Project Manager</Typography>
-                <Typography variant="body1">Email: contact@buildconnect.com</Typography>
-                <Typography variant="body1">Phone: +1 (123) 456-7890</Typography>
-              </CardContent>
-            </Card> */}
 
             {/* Action Buttons - Repositioned as requested */}
             <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
@@ -521,7 +504,7 @@ export default function ApplyJobPage() {
             </Dialog>
             <Dialog
               open={openDialog}
-              onClose={() => setOpenDialog(false)}
+              onClose={() => !isSubmitting && setOpenDialog(false)}
               fullWidth
               maxWidth="sm"
               PaperProps={{
@@ -539,7 +522,10 @@ export default function ApplyJobPage() {
                   borderBottom: "1px solid #eee",
                 }}
               >
-                <ArrowBackIcon sx={{ mr: 1, cursor: "pointer" }} onClick={() => setOpenDialog(false)} />
+                <ArrowBackIcon 
+                  sx={{ mr: 1, cursor: isSubmitting ? "default" : "pointer" }} 
+                  onClick={() => !isSubmitting && setOpenDialog(false)} 
+                />
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                   Send an enquiry
                 </Typography>
@@ -572,18 +558,13 @@ export default function ApplyJobPage() {
                     <Typography variant="subtitle1" fontWeight="medium">
                       {job.job_title}
                     </Typography>
-                    <Box sx={{ display: "flex", alignItems: "flex-start", color: "text.secondary" }}>
-                      {job.job_location ? (
-                        <LocationDisplay
-                          coordinates={job.job_location.coordinates as [number, number]}
-                          iconColor="text.secondary"
-                        />
-                      ) : (
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <LocationOnIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                          <Typography variant="body2">Location not specified</Typography>
-                        </Box>
-                      )}
+                    <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary" }}>
+                      <LocationOnIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                      <Typography variant="body2">
+                        {job.job_location
+                          ? `${job.job_location.coordinates[0]}, ${job.job_location.coordinates[1]}`
+                          : "Location not specified"}
+                      </Typography>
                     </Box>
                   </Box>
                 </Paper>
@@ -604,6 +585,7 @@ export default function ApplyJobPage() {
                       error={!!errors.title}
                       helperText={errors.title}
                       size="small"
+                      disabled={isSubmitting}
                       sx={{
                         "& .MuiOutlinedInput-root": {
                           borderRadius: "8px",
@@ -627,6 +609,7 @@ export default function ApplyJobPage() {
                       onChange={handleEnquiryChange}
                       error={!!errors.enquiry}
                       helperText={errors.enquiry}
+                      disabled={isSubmitting}
                       sx={{
                         "& .MuiOutlinedInput-root": {
                           borderRadius: "8px",
@@ -657,7 +640,7 @@ export default function ApplyJobPage() {
                         <Typography variant="body2" noWrap sx={{ maxWidth: "80%" }}>
                           {attachment.name}
                         </Typography>
-                        <IconButton size="small" onClick={removeAttachment}>
+                        <IconButton size="small" onClick={removeAttachment} disabled={isSubmitting}>
                           <CloseIcon fontSize="small" />
                         </IconButton>
                       </Box>
@@ -675,6 +658,7 @@ export default function ApplyJobPage() {
                         variant="outlined"
                         startIcon={<AddIcon />}
                         onClick={() => fileInputRef.current?.click()}
+                        disabled={isSubmitting}
                         sx={{
                           textTransform: "none",
                           borderColor: "#ddd",
@@ -688,7 +672,7 @@ export default function ApplyJobPage() {
                         Add attachment
                       </Button>
                     )}
-                    <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileUpload} />
+                    <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileUpload} disabled={isSubmitting} />
                   </Box>
                 </Box>
               </DialogContent>
@@ -698,22 +682,28 @@ export default function ApplyJobPage() {
                   variant="contained"
                   fullWidth
                   onClick={handleSubmitEnquiry}
-                  disabled={!enquiryTitle.trim() || enquiryText.trim().length < 20 || !attachment || isSubmitting}
+                  disabled={isSubmitting || !enquiryTitle.trim() || enquiryText.trim().length < 20 || !attachment}
                   sx={{
                     py: 1.5,
                     bgcolor: "#D49F2E",
                     "&:hover": {
                       bgcolor: "#D49F2E",
                     },
+                    position: "relative",
                   }}
                 >
                   {isSubmitting ? (
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Box sx={{ display: "inline-block", mr: 1 }}>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      </Box>
-                      Your enquiry is being submitted...
-                    </Box>
+                    <>
+                      <CircularProgress 
+                        size={24} 
+                        sx={{ 
+                          color: "white",
+                          position: "absolute",
+                          left: "calc(50% - 12px)",
+                        }} 
+                      />
+                      <span >ENQUIRY BEING SUBMITTED</span>
+                    </>
                   ) : (
                     "Send enquiry"
                   )}

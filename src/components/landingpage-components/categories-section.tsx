@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { ArrowRight, Wrench } from "lucide-react"
-import type { Category } from "@/lib/data/placeholderData"
+import type { Category } from "@/types/jobTypes"
 
 interface CategoriesSectionProps {
   categories: Category[]

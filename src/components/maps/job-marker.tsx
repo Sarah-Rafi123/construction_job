@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Marker, InfoWindow } from "@react-google-maps/api";
-import type { Job } from "@/store/api/jobsApi";
+import type { Job } from "@/types/jobTypes";
 import { useRouter } from "next/navigation";
 
 interface JobMarkerProps {

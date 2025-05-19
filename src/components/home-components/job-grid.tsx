@@ -3,7 +3,12 @@
 import type { useRouter } from "next/navigation"
 import JobCard from "./job-card"
 import GoogleMapComponent from "../maps/google-maps"
-import type { Job } from "@/store/api/jobsApi"
+// In your API files (e.g., jobsApi.ts, userPostedJobsApi.ts)
+import { 
+  Job
+} from '@/types/jobTypes';
+
+// Then use these imported types instead of redefining them
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 type Router = ReturnType<typeof useRouter>
@@ -56,7 +61,7 @@ export default function JobGrid({
         <div className="lg:col-span-2">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {jobs.map((job) => (
-              <JobCard key={job._id} job={job} router={router} />
+      <JobCard key={job._id} job={job as Job} router={router} />
             ))}
           </div>
         </div>

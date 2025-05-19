@@ -243,15 +243,16 @@ export default function JobLocationMap({ initialLatitude, initialLongitude, onLo
           border: "1px solid rgba(0, 0, 0, 0.12)",
         }}
       >
-        <MapContainer
-          center={position}
-          zoom={13}
-          style={{ height: "100%", width: "100%" }}
-          whenCreated={(map: L.Map | null) => {
-            // @ts-ignore - This is a valid prop but TypeScript doesn't recognize it
-            mapRef.current = map
-          }}
-        >
+<MapContainer
+  center={position}
+  zoom={13}
+  style={{ height: "100%", width: "100%" }}
+  ref={(map) => {
+    if (map) {
+      mapRef.current = map
+    }
+  }}
+>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

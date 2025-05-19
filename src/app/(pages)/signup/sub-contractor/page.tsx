@@ -437,7 +437,6 @@ export default function SubContractorSignup() {
                       renderTags={(value, getTagProps) =>
                         value.map((option, index) => (
                           <Chip
-                            key={option}
                             variant="outlined"
                             label={option}
                             size="small"

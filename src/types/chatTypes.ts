@@ -35,6 +35,7 @@ export interface Participant {
       title: string
       description: string
       jobId: string
+      attachments?: string[]
     }
     createdAt: string
     updatedAt: string

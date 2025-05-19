@@ -137,7 +137,7 @@ export default function Home() {
       </div>
       <div className="min-h-screen bg-gray-50 pt-16">
         {" "}
-        <MainSection userType={currentUser?.role} />
+    <MainSection userType={currentUser?.role ?? null} />
         <main className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="mt-12 mb-8 bg-white p-6 rounded-xl shadow-sm">
             <JobSearch

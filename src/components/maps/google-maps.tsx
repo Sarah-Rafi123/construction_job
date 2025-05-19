@@ -2,36 +2,22 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { GoogleMap, Marker, Circle, useJsApiLoader, InfoWindow } from "@react-google-maps/api"
-import type { Job } from "@/store/api/jobsApi"
 import LocationPermissionRequest from "./location-permission-request"
 import Script from "next/script"
 import { Crosshair, X } from "lucide-react"
+// In your API files (e.g., jobsApi.ts, userPostedJobsApi.ts)
+import { 
+  Job
+} from '@/types/jobTypes';
 
+// Then use these imported types instead of redefining them
 declare global {
   interface Window {
     google: any
   }
 }
 
-declare module "@/store/api/jobsApi" {
-  interface Job {
-    job_location?: {
-      coordinates: [number, number] // [longitude, latitude]
-      type: string
-    }
-    target_user?: string
-    _id: string
-    job_title: string
-    job_type: string
-    services?: Array<{
-      service_name: string
-      resource_count: number
-      no_of_days: number
-      _id: string
-    }>
-    // ... other fields
-  }
-}
+
 
 interface GoogleMapComponentProps {
   jobs: Job[]
@@ -52,7 +38,7 @@ const mapContainerStyle = {
   borderRadius: "0.5rem",
 }
 
-const libraries: ("places" | "drawing" | "geometry" | "localContext" | "visualization")[] = ["places"]
+const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = ["places"]
 
 export default function GoogleMapComponent({
   jobs,

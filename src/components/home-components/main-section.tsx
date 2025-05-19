@@ -1,5 +1,4 @@
 "use client"
-
 import Image from "next/image"
 import Home from "@/assets/images/Home.png"
 import { useRouter } from "next/navigation"
@@ -19,13 +18,10 @@ export default function MainSection({ userType }: MainSectionProps) {
   const [userRole, setUserRole] = useState<string | null>(null)
   const [showDocumentDialog, setShowDocumentDialog] = useState<boolean>(false)
   useEffect(() => {
-    // First priority: Use the role directly from API if available
     if (userData?.data?.role) {
-      // Convert from underscore to hyphen format if needed
       const apiRole = userData.data.role.replace("_", "-")
       setUserRole(apiRole)
     }
-    // Fallback to the userType prop from Redux
     else if (userType) {
       setUserRole(userType)
     }
@@ -40,10 +36,9 @@ export default function MainSection({ userType }: MainSectionProps) {
   }, [userData])
 
   const handlePostJob = () => {
-    // Check if admin_status is pending or not-verified
+ 
     if (userData?.data?.admin_status === "pending") {
       setShowVerificationMessage(true)
-      // Hide the message after 5 seconds
       setTimeout(() => {
         setShowVerificationMessage(false)
       }, 5000)
@@ -53,7 +48,6 @@ export default function MainSection({ userType }: MainSectionProps) {
       router.push("/post-job")
     }
   }
-  // Check if user is a contractor (either main or sub)
   const isContractor =
     userRole === "main-contractor" ||
     userRole === "subcontractor" ||
@@ -62,7 +56,6 @@ export default function MainSection({ userType }: MainSectionProps) {
 
   return (
     <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
-      {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
           src={Home || "/placeholder.svg"}
@@ -99,8 +92,6 @@ export default function MainSection({ userType }: MainSectionProps) {
               </div>
             </div>
           </div>
-
-          {/* Main content centered - For job seekers */}
           <div className="relative h-full flex flex-col items-center justify-center text-center px-4 md:px-8">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Find the Right Job, Built Around You</h1>
             <p className="text-white text-base md:text-xl max-w-3xl">
@@ -110,7 +101,6 @@ export default function MainSection({ userType }: MainSectionProps) {
           </div>
         </>
       ) : (
-        /* Content for contractors */
         <>
         <div className="relative hidden lg:block w-full pt-6 px-4">
             <div className="flex flex-col gap-x-20 md:flex-row justify-center items-center gap-4">
