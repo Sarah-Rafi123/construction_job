@@ -36,12 +36,12 @@ export default function MyPostedJobsPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">No jobs found</h3>
               <p className="text-gray-600">You haven't posted any jobs yet.</p>
-              <Link
+              {/* <Link
                 href="/post-job"
                 className="mt-4 inline-block bg-[#D49F2E] hover:bg-[#C48E1D] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               >
                 Post Your First Job
-              </Link>
+              </Link> */}
             </div>
           ) : (
             <>
