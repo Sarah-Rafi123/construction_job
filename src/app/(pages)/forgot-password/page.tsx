@@ -20,7 +20,7 @@ import { useForgotPasswordMutation } from "@/store/api/passwordResetApi"
 import ConstructionImage from "@/assets/images/ConstructionImage.png"
 
 // Use the same theme as the login page
-const theme = createTheme({
+const theme =  createTheme({
   palette: {
     mode: "light",
     primary: {
@@ -58,6 +58,9 @@ export default function ForgotPasswordPage() {
   const router = useRouter()
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation()
 
+
+
+  
   const [email, setEmail] = useState("")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
