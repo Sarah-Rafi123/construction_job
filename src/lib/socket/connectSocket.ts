@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:9000", {
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "https://jay-construction-job-posting-be.softaims.com", {
   withCredentials: true,
 });
 

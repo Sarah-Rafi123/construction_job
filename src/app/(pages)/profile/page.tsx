@@ -6,7 +6,7 @@ import { useState, useRef, useEffect } from "react"
 import Navbar from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
 import ProtectedRoute from "@/components/global/ProtectedRoute"
-import { Briefcase, Mail, User, Building, Hash, Shield, Edit, Upload, Check, X } from "lucide-react"
+import { Briefcase, Mail, User, Building, Hash, Shield, Edit, Upload } from "lucide-react"
 import { useUpdateUserProfileMutation, useGetUserProfileQuery } from "@/store/api/userProfileApi"
 
 export default function ProfilePage() {
@@ -19,6 +19,13 @@ export default function ProfilePage() {
 
   // Add state for image loading error
   const [imageError, setImageError] = useState(false)
+
+  // Initialize description when user data loads
+  useEffect(() => {
+    if (currentUser) {
+      setDescription(currentUser.description || "")
+    }
+  }, [currentUser])
 
   // Log profile data for debugging
   // useEffect(() => {
@@ -60,6 +67,7 @@ export default function ProfilePage() {
   // Save description
   const handleSaveDescription = async () => {
     try {
+      console.log("Saving description:", description)
       await updateUserProfile({ description }).unwrap()
       setIsEditingDescription(false)
     } catch (error) {
@@ -269,13 +277,7 @@ export default function ProfilePage() {
                             className="px-3 py-1.5 bg-[#D49F2E] text-white rounded-md hover:bg-[#D49F2E] flex items-center gap-1"
                             disabled={isUpdating}
                           >
-                            {isUpdating ? (
-                              "Saving..."
-                            ) : (
-                              <>
-                                Save
-                              </>
-                            )}
+                            {isUpdating ? "Saving..." : <>Save</>}
                           </button>
                         </div>
                       </div>

@@ -56,7 +56,7 @@ export interface UpdateJobRequest {
 export const userPostedJobsApi = createApi({
   reducerPath: "userPostedJobsApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9000/api/v0",
+    baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "https://jay-construction-job-posting-be.softaims.com/api/v0",
     credentials: "include",
   }),
   tagTypes: ["UserJobs"],

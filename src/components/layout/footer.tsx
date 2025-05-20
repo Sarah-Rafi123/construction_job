@@ -1,5 +1,6 @@
-import { Briefcase, Facebook, Twitter, Linkedin, Instagram } from "lucide-react"
+import { Briefcase, Facebook, Linkedin, Instagram } from "lucide-react"
 import Link from "next/link"
+
 export default function Footer() {
   const socialLoginUrls = {
     facebook: "https://www.facebook.com/login",
@@ -7,9 +8,7 @@ export default function Footer() {
     linkedin: "https://www.linkedin.com/company/sitepal/e",
     instagram: "https://www.instagram.com/sitepal.ltd/#",
   }
-  const handleSocialLogin = (provider: string) => {
-    window.location.href = socialLoginUrls[provider as keyof typeof socialLoginUrls]
-  }
+
   return (
     <footer className="py-12 bg-gray-900 text-white">
       <div className="mx-auto max-w-7xl px-4">
@@ -24,13 +23,28 @@ export default function Footer() {
               construction projects.
             </p>
             <div className="flex space-x-4">
-              <a   onClick={() => handleSocialLogin("facebook")} href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href={socialLoginUrls.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 <Facebook className="h-5 w-5" />
               </a>
-              <a  onClick={() => handleSocialLogin("linkedin")} href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href={socialLoginUrls.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 <Linkedin className="h-5 w-5" />
               </a>
-              <a onClick={() => handleSocialLogin("instagram")} href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a
+                href={socialLoginUrls.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
                 <Instagram className="h-5 w-5" />
               </a>
             </div>
