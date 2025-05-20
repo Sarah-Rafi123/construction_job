@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import { MapPin, Trash2 } from "lucide-react"
 import dynamic from "next/dynamic"
 
@@ -56,12 +56,43 @@ export default function JobEditForm({
   isUpdating,
   coordErrors,
 }: JobEditFormProps) {
+  // Log initial form data for debugging
+  useEffect(() => {
+    console.log("Initial form data:", formData)
+  }, [])
+
+  useEffect(() => {
+    // When the component mounts, ensure we have the description field properly set
+    if (formData.description && !formData.job_description) {
+      setFormData((prev: any) => ({
+        ...prev,
+        job_description: formData.description,
+      }))
+    }
+  }, [])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData((prev: any) => ({
-      ...prev,
-      [name]: value,
-    }))
+    console.log(`Input changed: ${name} = ${value}`)
+
+    if (name === "budget") {
+      const budgetValue = value === "" ? null : Number(value)
+      setFormData((prev: any) => ({
+        ...prev,
+        [name]: budgetValue,
+      }))
+    } else if (name === "job_description") {
+      // Only update job_description, not description
+      setFormData((prev: any) => ({
+        ...prev,
+        job_description: value,
+      }))
+    } else {
+      setFormData((prev: any) => ({
+        ...prev,
+        [name]: value,
+      }))
+    }
   }
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,11 +156,29 @@ export default function JobEditForm({
     [setFormData],
   )
 
+  // Custom form submit handler to log what's being submitted
+  function handleFormSubmit(e: React.FormEvent) {
+    e.preventDefault()
+
+    // Create a new object with the correct field mapping for the API
+    const apiData = {
+      ...formData,
+      job_description: undefined, // Remove job_description from the payload
+      description: formData.job_description, // Map job_description to description for the API
+    }
+
+    console.log("Submitting form with data:", apiData)
+
+    // Call the original submit handler with the modified data
+    const originalEvent = e
+    handleSubmit(originalEvent)
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 mb-6">
       <div className="p-6">
         <h2 className="text-xl text-black font-semibold mb-4">Edit Job</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleFormSubmit}>
           <div className="space-y-6">
             {/* Job Title */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
@@ -219,8 +268,6 @@ export default function JobEditForm({
                 )}
               </div>
             </div>
-
-            {/* Job Description */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
               <div className="p-4 border-b border-gray-200 bg-gray-50">
                 <h3 className="font-medium text-gray-700">Job Description</h3>
@@ -228,7 +275,7 @@ export default function JobEditForm({
               <div className="p-4">
                 <textarea
                   name="job_description"
-                  value={formData.job_description}
+                  value={formData.job_description || ""}
                   onChange={handleInputChange}
                   rows={4}
                   className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E]"

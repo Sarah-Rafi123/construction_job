@@ -321,7 +321,7 @@ export default function PostJob() {
       services: formattedServices,
       job_priority: isUrgent,
       budget: Number(budget) || null,
-      description: description || undefined,
+      job_description: description || undefined,
     }
 
     try {

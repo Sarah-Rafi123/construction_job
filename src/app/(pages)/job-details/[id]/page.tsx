@@ -107,7 +107,7 @@ export default function JobDetailsPage() {
       // Format the data according to the API requirements
       const jobData = {
         job_title: formData.job_title,
-        description: formData.job_description, // API expects 'description' not 'job_description'
+        job_description: formData.job_description, // API expects 'description' not 'job_description'
         job_type: formData.job_type,
         target_user: formData.target_user,
         job_priority: formData.job_priority,
@@ -137,6 +137,7 @@ export default function JobDetailsPage() {
       setIsEditing(false)
     } catch (error) {
       console.error("Failed to update job:", error)
+      console.log(error);
       setNotification({
         show: true,
         message: "Failed to update job. Please try again.",

@@ -417,12 +417,16 @@ export default function ApplyJobPage() {
                 )}
               </CardContent>
             </Card>
-
-            {/* Job Description */}
             <Card sx={{ mb: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Job Description
+                </Typography>
+                <Typography>
+                   {job.job_description ? `${job.job_description}` : "description not specified"}
+                </Typography>
+                 <Typography variant="h6" gutterBottom>
+                  Job Details
                 </Typography>
                 <Typography variant="body1">
                   This is a detailed job description for the {job.job_title} role.

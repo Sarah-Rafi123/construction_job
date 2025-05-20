@@ -37,7 +37,7 @@ export interface UserPostedJobsResponse {
 
 export interface UpdateJobRequest {
   job_title?: string
-  description?: string
+  job_description?: string
   job_type?: string
   target_user?: string
   job_location?: {
