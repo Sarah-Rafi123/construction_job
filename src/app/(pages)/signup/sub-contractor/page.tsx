@@ -4,7 +4,6 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Briefcase } from "lucide-react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
@@ -16,7 +15,7 @@ import { Autocomplete, Chip, Slider } from "@mui/material"
 import { useCheckEmailMutation } from "@/store/api/authApi"
 import { useAppDispatch } from "@/store/hooks"
 import { setEmail, setUserType } from "@/store/slices/userSlice"
-import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg"
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -278,6 +277,7 @@ export default function SubContractorSignup() {
           height: "100vh",
           display: "flex",
           bgcolor: "background.default",
+          flexDirection: { xs: "column", md: "row" },
         }}
         className="bg-white"
       >
@@ -287,19 +287,30 @@ export default function SubContractorSignup() {
             display: "flex",
             flexDirection: "column",
             p: { xs: 2, sm: 4 },
-            overflow: "hidden", // Change from overflowY: "auto" to prevent scrolling
-            height: "100vh", // Use fixed height instead of maxHeight
+            overflowY: "auto", // Make content scrollable
+            height: { xs: "100vh", md: "100vh" },
+            position: "relative",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
-             <Image
-                            src={SitepalLogo || "/placeholder.svg"}
-                            alt="Company Logo"
-                            className="ml-2 sm:block hidden h-16"
-                            width={180}
-                            height={200}
-                            priority
-                          />
+          {/* Logo centered on mobile, left-aligned on desktop */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: { xs: "center", md: "flex-start" },
+              alignItems: "center",
+              mb: 6,
+              mt: 2,
+            }}
+            onClick={navigateToHome}
+          >
+            <Image
+              src={SitepalLogo || "/placeholder.svg"}
+              alt="Company Logo"
+              width={180}
+              height={200}
+              priority
+              style={{ cursor: "pointer" }}
+            />
           </Box>
           <Box
             sx={{
@@ -308,7 +319,6 @@ export default function SubContractorSignup() {
               alignItems: "center",
               justifyContent: "center",
               flex: 1,
-              overflow: "hidden", // Prevent scrolling
             }}
           >
             <Box
@@ -327,7 +337,14 @@ export default function SubContractorSignup() {
               <form onSubmit={handleSubmit}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   {/* Name and Company Name in same row */}
-                  <Box sx={{ display: "flex", gap: 2, width: "100%" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      width: "100%",
+                      flexDirection: { xs: "column", sm: "row" }, // Stack vertically on mobile
+                    }}
+                  >
                     {/* Name Field */}
                     <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
                       <FormLabel htmlFor="name" className="text-gray-700">
@@ -515,7 +532,7 @@ export default function SubContractorSignup() {
                     {isSubmitting ? "Submitting..." : "Continue to Set Password"}
                   </Button>
 
-                  <Box sx={{ textAlign: "center", mt: 2 }}>
+                  <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
                     <Link href="/signup" style={{ textDecoration: "none" }}>
                       <Typography variant="body2" color="text.secondary" sx={{ "&:hover": { color: "text.primary" } }}>
                         Back to selection
@@ -531,7 +548,7 @@ export default function SubContractorSignup() {
         {/* Right side - Image */}
         <Box
           sx={{
-            width: "50%",
+            width: { xs: "100%", md: "50%" },
             display: { xs: "none", md: "block" },
             position: "relative",
             height: "100vh",

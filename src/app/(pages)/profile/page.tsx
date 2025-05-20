@@ -6,14 +6,72 @@ import { useState, useRef, useEffect } from "react"
 import Navbar from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
 import ProtectedRoute from "@/components/global/ProtectedRoute"
-import { Briefcase, Mail, User, Building, Hash, Shield, Edit, Upload } from "lucide-react"
+import {
+  Briefcase,
+  Mail,
+  User,
+  Building,
+  Hash,
+  Shield,
+  Edit,
+  Upload,
+  ChevronDown,
+  ChevronUp,
+  AlertCircle,
+} from "lucide-react"
 import { useUpdateUserProfileMutation, useGetUserProfileQuery } from "@/store/api/userProfileApi"
+
+// Component to truncate text with "See more" functionality
+const TruncatedText = ({
+  text,
+  limit,
+  isEditing = false,
+}: {
+  text: string
+  limit: number
+  isEditing?: boolean
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  if (!text) return <span className="text-gray-500 italic">Not provided</span>
+
+  // If editing or text is shorter than limit, show full text
+  if (isEditing || text.length <= limit || isExpanded) {
+    return (
+      <div>
+        <p className="font-medium">{text}</p>
+        {text.length > limit && !isEditing && (
+          <button
+            onClick={() => setIsExpanded(false)}
+            className="text-[#D49F2E] text-sm flex items-center mt-1 hover:underline"
+          >
+            See less <ChevronUp className="h-4 w-4 ml-1" />
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  // Show truncated text with "See more" button
+  return (
+    <div>
+      <p className="font-medium">{text.substring(0, limit)}...</p>
+      <button
+        onClick={() => setIsExpanded(true)}
+        className="text-[#D49F2E] text-sm flex items-center mt-1 hover:underline"
+      >
+        See more <ChevronDown className="h-4 w-4 ml-1" />
+      </button>
+    </div>
+  )
+}
 
 export default function ProfilePage() {
   const { data: userData, isLoading, error } = useGetUserProfileQuery()
   const currentUser = userData?.data
   const [isEditingDescription, setIsEditingDescription] = useState(false)
   const [description, setDescription] = useState("")
+  const [descriptionError, setDescriptionError] = useState<string | null>(null)
   const [updateUserProfile, { isLoading: isUpdating }] = useUpdateUserProfileMutation()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -26,16 +84,6 @@ export default function ProfilePage() {
       setDescription(currentUser.description || "")
     }
   }, [currentUser])
-
-  // Log profile data for debugging
-  // useEffect(() => {
-  //   if (userData) {
-  //     console.log("Profile data loaded:", userData)
-  //   }
-  //   if (error) {
-  //     console.error("Profile error details:", error)
-  //   }
-  // }, [userData, error])
 
   const formatRole = (role: string) => {
     return role
@@ -60,16 +108,24 @@ export default function ProfilePage() {
   const handleEditDescription = () => {
     if (currentUser) {
       setDescription(currentUser.description || "")
+      setDescriptionError(null)
       setIsEditingDescription(true)
     }
   }
 
-  // Save description
+  // Save description with validation
   const handleSaveDescription = async () => {
+    // Validate description length
+    if (description.trim().length < 20) {
+      setDescriptionError("Description must be at least 20 characters long")
+      return
+    }
+
     try {
       console.log("Saving description:", description)
       await updateUserProfile({ description }).unwrap()
       setIsEditingDescription(false)
+      setDescriptionError(null)
     } catch (error) {
       console.error("Failed to update description:", error)
     }
@@ -78,6 +134,7 @@ export default function ProfilePage() {
   // Cancel editing description
   const handleCancelEdit = () => {
     setIsEditingDescription(false)
+    setDescriptionError(null)
   }
 
   // Handle profile picture upload
@@ -103,7 +160,6 @@ export default function ProfilePage() {
 
   // Handle image load error
   const handleImageError = () => {
-    // console.log("Image failed to load:", currentUser?.profile_picture)
     setImageError(true)
   }
 
@@ -173,7 +229,6 @@ export default function ProfilePage() {
                       onChange={handleProfilePictureUpload}
                     />
                   </div>
-                  {/* <h2 className="text-xl text-black font-semibold">{currentUser.email.split("@")[0]}</h2> */}
                   <div className="text-sm text-gray-500">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mt-2">
                       {formatRole(currentUser.role)}
@@ -211,20 +266,20 @@ export default function ProfilePage() {
                 <div className="p-6 space-y-6">
                   <div className="space-y-4">
                     {currentUser.role === "job_seeker" ? (
-                      <div className="flex text-black items-center gap-3">
-                        <Briefcase size={18} className="text-gray-500" />
+                      <div className="flex text-black items-start gap-3">
+                        <Briefcase size={18} className="text-gray-500 mt-0.5" />
                         <div>
                           <p className="text-sm text-gray-500">Trade</p>
-                          <p className="font-medium">{currentUser.trade || "Not provided"}</p>
+                          <TruncatedText text={currentUser.trade || ""} limit={30} />
                         </div>
                       </div>
                     ) : (
                       <>
-                        <div className="flex text-black items-center gap-3">
-                          <Building size={18} className="text-gray-500" />
+                        <div className="flex text-black items-start gap-3">
+                          <Building size={18} className="text-gray-500 mt-0.5" />
                           <div>
                             <p className="text-sm text-gray-500">Company Name</p>
-                            <p className="font-medium">{currentUser.company_name || "Not provided"}</p>
+                            <TruncatedText text={currentUser.company_name || ""} limit={30} />
                           </div>
                         </div>
                         <div className="flex text-black items-center gap-3">
@@ -257,13 +312,36 @@ export default function ProfilePage() {
 
                     {isEditingDescription ? (
                       <div className="space-y-3">
-                        <textarea
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          className="w-full text-black p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D49F2E]"
-                          rows={4}
-                          placeholder="Write something about yourself or your company..."
-                        />
+                        <div className="relative">
+                          <textarea
+                            value={description}
+                            onChange={(e) => {
+                              setDescription(e.target.value)
+                              // Clear error when user starts typing again
+                              if (descriptionError) setDescriptionError(null)
+                            }}
+                            className={`w-full text-black p-3 border ${
+                              descriptionError ? "border-red-500" : "border-gray-300"
+                            } rounded-md focus:outline-none focus:ring-2 focus:ring-[#D49F2E]`}
+                            rows={4}
+                            placeholder="Write something about yourself or your company..."
+                          />
+                          <div className="mt-1 flex flex-col space-y-1">
+                            {descriptionError && (
+                              <p className="text-red-500 text-sm flex items-center">
+                                <AlertCircle className="h-4 w-4 mr-1" />
+                                {descriptionError}
+                              </p>
+                            )}
+                            <div className="flex justify-end">
+                              <span
+                                className={`text-sm ${description.trim().length < 20 ? "text-red-500" : "text-gray-500"}`}
+                              >
+                                {description.trim().length}/20 characters minimum
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={handleCancelEdit}
@@ -274,17 +352,21 @@ export default function ProfilePage() {
                           </button>
                           <button
                             onClick={handleSaveDescription}
-                            className="px-3 py-1.5 bg-[#D49F2E] text-white rounded-md hover:bg-[#D49F2E] flex items-center gap-1"
-                            disabled={isUpdating}
+                            className={`px-3 py-1.5 ${
+                              description.trim().length < 20
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-[#D49F2E] hover:bg-[#D49F2E] cursor-pointer"
+                            } text-white rounded-md flex items-center gap-1`}
+                            disabled={isUpdating || description.trim().length < 20}
                           >
-                            {isUpdating ? "Saving..." : <>Save</>}
+                            {isUpdating ? "Saving..." : "Save"}
                           </button>
                         </div>
                       </div>
                     ) : (
                       <div className="bg-gray-50 text-black p-4 rounded-md">
                         {currentUser.description ? (
-                          <p>{currentUser.description}</p>
+                          <TruncatedText text={currentUser.description} limit={200} />
                         ) : (
                           <p className="text-gray-500 italic">No description provided</p>
                         )}

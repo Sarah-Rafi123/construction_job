@@ -182,6 +182,9 @@ export default function PostJob() {
   // Add a new state for the address
   const [address, setAddress] = useState("")
 
+  // Add a new state for description validation error
+  const [descriptionError, setDescriptionError] = useState<string | null>(null)
+
   // Handle location selection from the map
   const handleLocationSelect = useCallback(async (lat: string, lng: string) => {
     setLatitude(lat)
@@ -257,6 +260,16 @@ export default function PostJob() {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validate description length
+    if (description.trim().length < 20) {
+      setNotification({
+        open: true,
+        message: "Description must be at least 20 characters long",
+        severity: "error",
+      })
+      return
+    }
 
     // Validate coordinates
     const lat = Number.parseFloat(latitude)
@@ -476,6 +489,12 @@ export default function PostJob() {
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Provide detailed information about the job requirements, expectations, and any specific skills needed."
                       variant="outlined"
+                      error={description.trim().length > 0 && description.trim().length < 20}
+                      helperText={
+                        description.trim().length > 0 && description.trim().length < 20
+                          ? "Description must be at least 20 characters long"
+                          : `${description.trim().length}/20 characters minimum`
+                      }
                     />
                   </CardContent>
                 </Card>

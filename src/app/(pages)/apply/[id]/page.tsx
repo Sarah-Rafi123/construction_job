@@ -167,7 +167,9 @@ export default function ApplyJobPage() {
 
   const handleEnquiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEnquiryText(e.target.value)
-    if (errors.enquiry) validateForm()
+    if (errors.enquiry && e.target.value.trim().length >= 20) {
+      setErrors({ ...errors, enquiry: "" })
+    }
   }
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -251,7 +253,7 @@ export default function ApplyJobPage() {
     if (isValid) {
       // Set loading state to true
       setIsSubmitting(true)
-      
+
       try {
         // Upload the single attachment
         const uploadedAttachments = await uploadAttachments(attachment)
@@ -259,9 +261,10 @@ export default function ApplyJobPage() {
         socket.emit(
           "sendMessage",
           {
-            recipientId: typeof job?.created_by === "object" && job?.created_by !== null && "_id" in job.created_by
-              ? (job.created_by as { _id: string })._id
-              : job?.created_by,
+            recipientId:
+              typeof job?.created_by === "object" && job?.created_by !== null && "_id" in job.created_by
+                ? (job.created_by as { _id: string })._id
+                : job?.created_by,
             enquiry: {
               title: enquiryTitle,
               description: enquiryText,
@@ -279,9 +282,9 @@ export default function ApplyJobPage() {
               // Set loading state to false if there's an error
               setIsSubmitting(false)
             }
-          }
+          },
         )
-        
+
         // Note: We don't reset the form or close the dialog here
         // because we're redirecting the user to the chat page
       } catch (error) {
@@ -422,10 +425,8 @@ export default function ApplyJobPage() {
                 <Typography variant="h6" gutterBottom>
                   Job Description
                 </Typography>
-                <Typography>
-                   {job.job_description ? `${job.job_description}` : "description not specified"}
-                </Typography>
-                 <Typography variant="h6" gutterBottom>
+                <Typography>{job.job_description ? `${job.job_description}` : "description not specified"}</Typography>
+                <Typography variant="h6" gutterBottom>
                   Job Details
                 </Typography>
                 <Typography variant="body1">
@@ -526,9 +527,9 @@ export default function ApplyJobPage() {
                   borderBottom: "1px solid #eee",
                 }}
               >
-                <ArrowBackIcon 
-                  sx={{ mr: 1, cursor: isSubmitting ? "default" : "pointer" }} 
-                  onClick={() => !isSubmitting && setOpenDialog(false)} 
+                <ArrowBackIcon
+                  sx={{ mr: 1, cursor: isSubmitting ? "default" : "pointer" }}
+                  onClick={() => !isSubmitting && setOpenDialog(false)}
                 />
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                   Send an enquiry
@@ -608,11 +609,16 @@ export default function ApplyJobPage() {
                       fullWidth
                       multiline
                       rows={5}
-                      placeholder="Describe your skills, expertise, and experience relevant to this job in alteast 20 characters..."
+                      placeholder="Describe your skills, expertise, and experience relevant to this job in at least 20 characters..."
                       value={enquiryText}
                       onChange={handleEnquiryChange}
-                      error={!!errors.enquiry}
-                      helperText={errors.enquiry}
+                      error={!!errors.enquiry || (enquiryText.trim().length > 0 && enquiryText.trim().length < 20)}
+                      helperText={
+                        errors.enquiry ||
+                        (enquiryText.trim().length > 0 && enquiryText.trim().length < 20
+                          ? "Enquiry must be at least 20 characters long"
+                          : `${enquiryText.trim().length}/20 characters minimum`)
+                      }
                       disabled={isSubmitting}
                       sx={{
                         "& .MuiOutlinedInput-root": {
@@ -676,7 +682,13 @@ export default function ApplyJobPage() {
                         Add attachment
                       </Button>
                     )}
-                    <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileUpload} disabled={isSubmitting} />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: "none" }}
+                      onChange={handleFileUpload}
+                      disabled={isSubmitting}
+                    />
                   </Box>
                 </Box>
               </DialogContent>
@@ -698,15 +710,15 @@ export default function ApplyJobPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <CircularProgress 
-                        size={24} 
-                        sx={{ 
+                      <CircularProgress
+                        size={24}
+                        sx={{
                           color: "white",
                           position: "absolute",
                           left: "calc(50% - 12px)",
-                        }} 
+                        }}
                       />
-                      <span >ENQUIRY BEING SUBMITTED</span>
+                      <span>ENQUIRY BEING SUBMITTED</span>
                     </>
                   ) : (
                     "Send enquiry"

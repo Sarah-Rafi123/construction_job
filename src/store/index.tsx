@@ -15,6 +15,7 @@ import { passwordResetApi } from "./api/passwordResetApi"
 import { userPostedJobsApi } from "./api/userPostedJobsApi"
 import { statisticsApi } from "./api/statisticsApi"
 import { sampleJobsApi } from "./api/sampleJobsApi"
+import { subscriptionApi } from "./api/subscriptionApi"
 export const store = configureStore({
   reducer: {
     user: userReducer,
@@ -32,6 +33,7 @@ export const store = configureStore({
     [passwordResetApi.reducerPath]: passwordResetApi.reducer,
     [userPostedJobsApi.reducerPath]: userPostedJobsApi.reducer,
     [sampleJobsApi.reducerPath]: sampleJobsApi.reducer,
+    [subscriptionApi.reducerPath]: subscriptionApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -47,6 +49,7 @@ export const store = configureStore({
       userPostedJobsApi.middleware,
       statisticsApi.middleware,
       sampleJobsApi.middleware,
+      subscriptionApi.middleware,
     ),
 })
 setupListeners(store.dispatch)

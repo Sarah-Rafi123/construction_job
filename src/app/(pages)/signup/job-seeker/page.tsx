@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Briefcase, Upload, X, FileText } from "lucide-react"
+import { Upload, X, FileText } from "lucide-react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
@@ -17,7 +17,7 @@ import { useCheckEmailMutation } from "@/store/api/authApi"
 import { useAppDispatch } from "@/store/hooks"
 import { setEmail, setUserType } from "@/store/slices/userSlice"
 import IconButton from "@mui/material/IconButton"
-import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg"
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -350,6 +350,7 @@ export default function JobSeekerSignup() {
           minHeight: "100vh",
           display: "flex",
           bgcolor: "background.default",
+          flexDirection: { xs: "column", md: "row" },
         }}
         className="bg-white"
       >
@@ -364,16 +365,25 @@ export default function JobSeekerSignup() {
             maxHeight: "100vh",
           }}
         >
-          {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
+          {/* Logo centered on mobile, left-aligned on desktop */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: { xs: "center", md: "flex-start" },
+              alignItems: "center",
+              mb: 6,
+              mt: 2,
+            }}
+            onClick={navigateToHome}
+          >
             <Image
-                           src={SitepalLogo || "/placeholder.svg"}
-                           alt="Company Logo"
-                           className="ml-2 sm:block hidden h-16"
-                           width={180}
-                           height={200}
-                           priority
-                         /> 
+              src={SitepalLogo || "/placeholder.svg"}
+              alt="Company Logo"
+              width={180}
+              height={200}
+              priority
+              style={{ cursor: "pointer" }}
+            />
           </Box>
 
           {/* Form content - centered with max width */}
@@ -401,7 +411,13 @@ export default function JobSeekerSignup() {
 
               <form onSubmit={handleSubmit}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  <Box sx={{ display: "flex", gap: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      flexDirection: { xs: "column", sm: "row" }, // Stack vertically on mobile
+                    }}
+                  >
                     <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
                       <FormLabel htmlFor="name" className="text-gray-700">
                         Full Name *
@@ -448,7 +464,13 @@ export default function JobSeekerSignup() {
                     </Box>
                   </Box>
 
-                  <Box sx={{ display: "flex", gap: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      flexDirection: { xs: "column", sm: "row" }, // Stack vertically on mobile
+                    }}
+                  >
                     <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
                       <FormLabel htmlFor="contactNumber" className="text-gray-700">
                         Contact Number *
@@ -662,7 +684,7 @@ export default function JobSeekerSignup() {
                     {isSubmitting ? "Submitting..." : "Continue to Set Password"}
                   </Button>
 
-                  <Box sx={{ textAlign: "center", mt: 2 }}>
+                  <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
                     <Link href="/signup" style={{ textDecoration: "none" }}>
                       <Typography variant="body2" color="text.secondary" sx={{ "&:hover": { color: "text.primary" } }}>
                         Back to selection
@@ -678,7 +700,7 @@ export default function JobSeekerSignup() {
         {/* Right side - Image */}
         <Box
           sx={{
-            width: "50%",
+            width: { xs: "100%", md: "50%" },
             display: { xs: "none", md: "block" },
             position: "relative",
             height: "100vh",

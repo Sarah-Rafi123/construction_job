@@ -4,7 +4,6 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Briefcase } from "lucide-react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
@@ -15,7 +14,7 @@ import ConstructionImage from "@/assets/images/ConstructionImage.png"
 import { useCheckEmailMutation } from "@/store/api/authApi"
 import { useAppDispatch } from "@/store/hooks"
 import { setEmail, setUserType } from "@/store/slices/userSlice"
-import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg"
 const theme = createTheme({
   palette: {
     mode: "light",
@@ -80,7 +79,7 @@ export default function MainContractorSignup() {
     const { id, value } = e.target
     if (id === "contactNumber" && value !== "") {
       if (!/^[0-9()\-+\s]*$/.test(value)) {
-        return 
+        return
       }
     }
     setFormData((prev) => ({
@@ -191,6 +190,7 @@ export default function MainContractorSignup() {
           minHeight: "100vh",
           display: "flex",
           bgcolor: "background.default",
+          flexDirection: { xs: "column", md: "row" },
         }}
         className="bg-white"
       >
@@ -204,15 +204,25 @@ export default function MainContractorSignup() {
             maxHeight: "100vh",
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center", mb: 6, mt: 2, ml: 2 }} onClick={navigateToHome}>
-              <Image
-                src={SitepalLogo || "/placeholder.svg"}
-                alt="Company Logo"
-                className="ml-2 sm:block hidden h-16"
-                width={180}
-                height={200}
-                priority
-              />
+          {/* Logo centered on mobile, left-aligned on desktop */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: { xs: "center", md: "flex-start" },
+              alignItems: "center",
+              mb: 6,
+              mt: 2,
+            }}
+            onClick={navigateToHome}
+          >
+            <Image
+              src={SitepalLogo || "/placeholder.svg"}
+              alt="Company Logo"
+              width={180}
+              height={200}
+              priority
+              style={{ cursor: "pointer" }}
+            />
           </Box>
           <Box
             sx={{
@@ -226,7 +236,7 @@ export default function MainContractorSignup() {
             <Box
               sx={{
                 width: "100%",
-                maxWidth: "480px", 
+                maxWidth: "480px",
               }}
             >
               <Typography variant="h4" fontWeight="bold" sx={{ mb: 1, color: "#333" }}>
@@ -347,7 +357,7 @@ export default function MainContractorSignup() {
                     {isSubmitting ? "Submitting..." : "Continue to Set Password"}
                   </Button>
 
-                  <Box sx={{ textAlign: "center", mt: 2 }}>
+                  <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
                     <Link href="/signup" style={{ textDecoration: "none" }}>
                       <Typography variant="body2" color="text.secondary" sx={{ "&:hover": { color: "text.primary" } }}>
                         Back to selection
@@ -361,7 +371,7 @@ export default function MainContractorSignup() {
         </Box>
         <Box
           sx={{
-            width: "50%",
+            width: { xs: "100%", md: "50%" },
             display: { xs: "none", md: "block" },
             position: "relative",
             height: "100vh",
