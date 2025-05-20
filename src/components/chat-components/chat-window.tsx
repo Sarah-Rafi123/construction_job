@@ -1,6 +1,8 @@
 "use client"
 import socket from "@/lib/socket/connectSocket"
-import { useRef, useEffect } from "react"
+import type React from "react"
+
+import { useRef, useEffect, useState } from "react"
 import { Avatar } from "@mui/material"
 import { Menu, FileText, Download } from "lucide-react"
 import { formatTime } from "../../../utils/formatTime"
@@ -10,7 +12,8 @@ import { useGetMessagesByConversationIdQuery } from "@/store/api/chatApi"
 import ChatInputForm from "./chat-input-form"
 import { useDispatch } from "react-redux"
 import { addMessage, updateConversationInInbox } from "@/store/slices/chatSlice"
-import Navbar from "../layout/navbar"
+import AttachmentViewer from "./attachment-viewer"
+
 interface ChatWindowProps {
   toggleMobileDrawer: () => void
   toggleDetailsPanel: () => void
@@ -26,7 +29,9 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
     skip: !activeConversation,
   })
 
-  // console.log("messages", messages)
+  // State for attachment viewer
+  const [viewingAttachment, setViewingAttachment] = useState<string | null>(null)
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
@@ -54,6 +59,12 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
     }
   }
 
+  // Handle attachment click
+  const handleAttachmentClick = (e: React.MouseEvent, url: string) => {
+    e.preventDefault()
+    setViewingAttachment(url)
+  }
+
   if (!messages || !activeConversation) {
     return (
       <div className=" flex flex-col h-screen bg-white">
@@ -75,6 +86,9 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
 
   return (
     <div className="flex flex-col h-full">
+      {/* Attachment Viewer Modal */}
+      {viewingAttachment && <AttachmentViewer url={viewingAttachment} onClose={() => setViewingAttachment(null)} />}
+
       <div className="flex items-center justify-between p-4 border border-gray-200 bg-white">
         <div className="flex items-center gap-3">
           <button className="lg:hidden text-gray-500 hover:text-gray-700 mr-1" onClick={toggleMobileDrawer}>
@@ -84,12 +98,6 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-medium text-gray-900">{user?.full_name ?? user?.company_name}</h2>
-              {/* {user?.isOnline && (
-                <span className="flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
-                  <span className="text-sm text-gray-500">Online</span>
-                </span>
-              )} */}
             </div>
           </div>
         </div>
@@ -103,11 +111,6 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-        {/* {conversation.dateRange && (
-          <div className="flex justify-center mb-4">
-            <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">{conversation.dateRange}</span>
-          </div>
-        )} */}
         {messages?.map((message, index) => {
           const isUser = message.sender === currentUser?.id
           return (
@@ -125,7 +128,7 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
                       <div className="bg-[#F2E2A0] text-gray-600 rounded-lg p-3 text-sm space-y-2">
                         {/* Enquiry Box with Title and Description */}
                         <div className="border-b border-[#D49F2E] pb-2 mb-2">
-                        <p className="text-xs font-medium text-black mb-2">Title</p>
+                          <p className="text-xs font-medium text-black mb-2">Title</p>
                           <h3 className="font-medium text-gray-800">{message.enquiry?.title}</h3>
                         </div>
                         <p className="text-xs font-medium text-black mb-2">Description</p>
@@ -136,19 +139,17 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
                           <div className="mt-3 pt-2 border-t border-[#D49F2E]">
                             <p className="text-xs font-medium text-black mb-2">Attachment</p>
                             {message.enquiry.attachments.map((attachment: string, idx: number) => (
-                              <a
+                              <div
                                 key={idx}
-                                href={attachment}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 p-2 bg-white rounded-md mb-1 hover:bg-gray-50 transition-colors"
+                                onClick={(e) => handleAttachmentClick(e, attachment)}
+                                className="flex items-center gap-2 p-2 bg-white rounded-md mb-1 hover:bg-gray-50 transition-colors cursor-pointer"
                               >
                                 <FileText size={16} className="text-[#D49F2E]" />
                                 <span className="text-xs text-gray-700 flex-1 truncate">
                                   {getFileNameFromUrl(attachment)}
                                 </span>
                                 <Download size={14} className="text-gray-500" />
-                              </a>
+                              </div>
                             ))}
                           </div>
                         )}

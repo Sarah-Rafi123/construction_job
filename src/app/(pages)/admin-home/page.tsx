@@ -99,20 +99,15 @@ export default function AdminHome() {
     severity: "success" as "success" | "error" | "info" | "warning",
   })
 
-  // Media query for responsive design
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
-  // Prevent back navigation
   useEffect(() => {
-    // Push a new state to history so we have something to replace
     window.history.pushState(null, "", window.location.pathname)
 
-    // Function to handle back button press
     const handlePopState = () => {
-      // Push the current state again to prevent going back
+
       window.history.pushState(null, "", window.location.pathname)
 
-      // Show notification that back navigation is disabled
       setNotification({
         open: true,
         message: "Back navigation is disabled for security reasons",
@@ -214,17 +209,6 @@ export default function AdminHome() {
     )
   }
 
-  // Error state
-  if (contractorsError) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", p: 3 }}>
-        <Alert severity="error" sx={{ width: "100%", maxWidth: 600 }}>
-          Error loading contractors. Please try again later.
-        </Alert>
-      </Box>
-    )
-  }
-
   // Render mobile card view
   const renderMobileView = () => {
     if (filteredContractors.length === 0) {
@@ -234,6 +218,12 @@ export default function AdminHome() {
         </Box>
       )
     }
+    useEffect(() => {
+  if (contractorsError) {
+    router.push("/login");
+  }
+}, [contractorsError, router]);
+
 
     return (
       <Stack spacing={2}>
