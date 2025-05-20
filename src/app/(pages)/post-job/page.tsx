@@ -290,13 +290,19 @@ export default function PostJob() {
       } else if (durationType === "months") {
         numberOfDays = (Number.parseInt(duration) || 1) * 30
       }
-      // Always include resource_count and number_of_days as numbers
-      return {
+      const serviceObj: any = {
         service_name: serviceName,
-        resource_count: service.count || 1,
-        number_of_days: numberOfDays,
       }
+
+      // Add additional fields only for job seekers
+      if (targetUsers !== "Sub Contractors") {
+        serviceObj.resource_count = service.count || 1
+        serviceObj.number_of_days = numberOfDays
+      }
+
+      return serviceObj
     })
+
     const formattedJobType = jobType.toLowerCase().replace(" ", "-")
     let formattedTargetUser = "job_seeker"
     if (targetUsers === "Sub Contractors") {
