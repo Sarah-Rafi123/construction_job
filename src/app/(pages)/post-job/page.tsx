@@ -38,6 +38,7 @@ import Footer from "@/components/layout/footer"
 
 // Import the geocoding service at the top of the file
 import { reverseGeocode } from "@/store/service/geocodingService"
+import SuccessDialog from "@/components/widgets/success-dialog"
 
 // Import the map component with dynamic import to avoid SSR issues
 const JobLocationMap = dynamic(() => import("@/components/maps/job-location-map"), {
@@ -140,6 +141,9 @@ export default function PostJob() {
   const [durationType, setDurationType] = useState("days")
   const [duration, setDuration] = useState("")
   const [location, setLocation] = useState("")
+   const [showSuccessDialog, setShowSuccessDialog] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
+
 
   // Replace coordinates state with separate latitude and longitude
   const [latitude, setLatitude] = useState<string>("12.9716") // Default to Bangalore
@@ -339,13 +343,18 @@ export default function PostJob() {
 
     try {
       const result = await postJob(requestBody).unwrap()
-      // console.log(result)
+      setShowSuccessDialog(true)
       setNotification({
         open: true,
         message: result.message || "Job posted successfully!",
         severity: "success",
       })
-      router.push("/home")
+      setTimeout(() => {
+        setIsRedirecting(true)
+        setTimeout(() => {
+          router.push("/home")
+        }, 1500)
+      }, 1000)
     } catch (error: any) {
       // console.error("Error posting job:", error)
       if (error.status === 403 && error.data?.message?.includes("admin approval")) {
@@ -717,6 +726,13 @@ export default function PostJob() {
             </Container>
           </Box>
           <DocumentSubmissionDialog open={showDocumentDialog} onClose={() => setShowDocumentDialog(false)} />
+            <SuccessDialog
+        open={showSuccessDialog}
+        onClose={() => router.push("/home")}
+        title="Job Posted Successfully!"
+        message={`Your job "${title}" has been posted successfully and is now visible to potential candidates.`}
+        redirecting={isRedirecting}
+      />
         </Box>
       </ThemeProvider>
       <Footer />
