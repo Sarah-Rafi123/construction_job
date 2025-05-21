@@ -366,7 +366,7 @@ export default function ProfilePage() {
                     ) : (
                       <div className="bg-gray-50 text-black p-4 rounded-md">
                         {currentUser.description ? (
-                          <TruncatedText text={currentUser.description} limit={200} />
+                          <TruncatedText text={currentUser.description} limit={400} />
                         ) : (
                           <p className="text-gray-500 italic">No description provided</p>
                         )}

@@ -113,16 +113,17 @@ export default function SubContractorSignup() {
   }
 
   const validatePhoneNumber = (phone: string) => {
-    const phoneRegex = /^\d+$/
+    // International phone number regex that supports various formats
+    const phoneRegex = /^\+?\d{10,15}$/
     return phoneRegex.test(phone)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target
 
-    // Apply specific validation during input for contact number
-    if (id === "contactNumber" && value !== "" && !/^\d*$/.test(value)) {
-      return // Don't update if not a number
+    // Allow digits, spaces, parentheses, hyphens, and plus sign for contact number
+    if (id === "contactNumber" && value !== "" && !/^[0-9()\-+\s]*$/.test(value)) {
+      return // Don't update if not a valid character
     }
 
     setFormData((prev) => ({
@@ -201,7 +202,7 @@ export default function SubContractorSignup() {
       newErrors.contactNumber = "Contact number is required"
       isValid = false
     } else if (!validatePhoneNumber(formData.contactNumber)) {
-      newErrors.contactNumber = "Contact number should only contain digits"
+      newErrors.contactNumber = "Please enter a valid phone number (e.g., +1 123-456-7890 or 123 456 7890)"
       isValid = false
     } else if (formData.contactNumber.length > 50) {
       newErrors.contactNumber = "Contact number cannot exceed 50 characters"
@@ -428,11 +429,10 @@ export default function SubContractorSignup() {
                       value={formData.contactNumber}
                       onChange={handleChange}
                       className="rounded"
-                      placeholder="Enter Phone Number"
+                      placeholder="e.g., +1 123-456-7890"
                       error={!!errors.contactNumber}
                       inputProps={{
-                        inputMode: "numeric",
-                        pattern: "[0-9]*",
+                        inputMode: "tel",
                         maxLength: 50,
                       }}
                     />

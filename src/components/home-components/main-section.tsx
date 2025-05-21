@@ -1,11 +1,11 @@
-"use client"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Home from "@/assets/images/Home.png"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
 import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
 import { useCookies } from "react-cookie"
 import DocumentSubmissionDialog from "@/components/widgets/document-submission-dialog"
+
 interface MainSectionProps {
   userType: string | null
 }
@@ -17,6 +17,8 @@ export default function MainSection({ userType }: MainSectionProps) {
   const [showVerificationMessage, setShowVerificationMessage] = useState<boolean>(false)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [showDocumentDialog, setShowDocumentDialog] = useState<boolean>(false)
+  const [showRejectedMessage, setShowRejectedMessage] = useState<boolean>(false) // For rejected documents
+
   useEffect(() => {
     if (userData?.data?.role) {
       const apiRole = userData.data.role.replace("_", "-")
@@ -30,13 +32,14 @@ export default function MainSection({ userType }: MainSectionProps) {
   useEffect(() => {
     if (userData?.data?.admin_status === "pending" || userData?.data?.admin_status === "not-verified") {
       setIsAdminVerified(false)
+    } else if (userData?.data?.admin_status === "rejected") {
+      setIsAdminVerified(true)
     } else {
       setIsAdminVerified(true)
     }
   }, [userData])
 
   const handlePostJob = () => {
- 
     if (userData?.data?.admin_status === "pending") {
       setShowVerificationMessage(true)
       setTimeout(() => {
@@ -44,10 +47,16 @@ export default function MainSection({ userType }: MainSectionProps) {
       }, 5000)
     } else if (userData?.data?.admin_status === "not-verified") {
       setShowDocumentDialog(true)
+    } else if (userData?.data?.admin_status === "rejected") {
+      setShowRejectedMessage(true) 
+      setTimeout(() => {
+        setShowRejectedMessage(false) 
+      }, 5000) // Hide the message after 5 seconds
     } else {
       router.push("/post-job")
     }
   }
+
   const isContractor =
     userRole === "main-contractor" ||
     userRole === "subcontractor" ||
@@ -68,7 +77,7 @@ export default function MainSection({ userType }: MainSectionProps) {
 
       {!isContractor ? (
         <>
-          <div className="relative hidden lg:block  w-full pt-6 md:pt-10 px-4">
+          <div className="relative hidden lg:block w-full pt-6 md:pt-10 px-4">
             <div className="flex flex-col gap-x-20 md:flex-row justify-center items-center gap-4">
               <div className="bg-white/30 backdrop-blur-sm px-4 py-2 rounded-md text-sm md:text-base">
                 <span className="flex items-center">
@@ -147,6 +156,15 @@ export default function MainSection({ userType }: MainSectionProps) {
           <p className="text-sm">You'll be able to post jobs once verified.</p>
         </div>
       )}
+
+      {/* Show rejected message */}
+      {showRejectedMessage && (
+        <div className="absolute bottom-20 left-0 z-50 right-0 mx-auto w-full max-w-md bg-white/90 backdrop-blur-sm border-l-4 border-red-500 text-gray-800 px-4 py-3 rounded shadow-md mt-4 text-center">
+          <p className="font-medium text-red-500">Your documents have been rejected by the admin.</p>
+          <p className="text-sm">Please contact support for further assistance.</p>
+        </div>
+      )}
+
       <button
                     className=" bg-white border border-[#D49F2E] mt-4 hover:bg-gray-50 text-[#D49F2E] font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     type="button"

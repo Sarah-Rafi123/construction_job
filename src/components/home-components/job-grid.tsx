@@ -66,8 +66,8 @@ export default function JobGrid({
         </div>
       </div>
 
-      {/* Pagination controls - only show when there are jobs */}
-      {jobs.length > 0 && (
+      {/* Pagination controls - only show when there are jobs AND more than one page */}
+      {jobs.length > 0 && totalPages > 1 && (
         <>
           <div className="flex justify-center items-center mt-8 space-x-2">
             <button

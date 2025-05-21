@@ -344,11 +344,6 @@ export default function PostJob() {
     try {
       const result = await postJob(requestBody).unwrap()
       setShowSuccessDialog(true)
-      setNotification({
-        open: true,
-        message: result.message || "Job posted successfully!",
-        severity: "success",
-      })
       setTimeout(() => {
         setIsRedirecting(true)
         setTimeout(() => {

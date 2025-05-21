@@ -116,7 +116,8 @@ export default function JobSeekerSignup() {
   }
 
   const validatePhoneNumber = (phone: string) => {
-    const phoneRegex = /^\d+$/
+    // International phone number regex that supports various formats
+    const phoneRegex = /^\+?\d{10,15}$/
     return phoneRegex.test(phone)
   }
 
@@ -127,14 +128,19 @@ export default function JobSeekerSignup() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
-    if (id === "contactNumber" && value !== "" && !/^\d*$/.test(value)) {
-      return
+
+    // Allow digits, spaces, parentheses, hyphens, and plus sign for contact number
+    if (id === "contactNumber" && value !== "") {
+      if (!/^[0-9()\-+\s]*$/.test(value)) {
+        return
+      }
     }
 
     setFormData((prev) => ({
       ...prev,
       [id]: value,
     }))
+
     setErrors((prev) => ({
       ...prev,
       [id]: "",
@@ -249,7 +255,7 @@ export default function JobSeekerSignup() {
       newErrors.contactNumber = "Contact number is required"
       isValid = false
     } else if (!validatePhoneNumber(formData.contactNumber)) {
-      newErrors.contactNumber = "Contact number should only contain digits"
+      newErrors.contactNumber = "Please enter a valid phone number (e.g., +1 123-456-7890 or 123 456 7890)"
       isValid = false
     } else if (formData.contactNumber.length > 50) {
       newErrors.contactNumber = "Contact number cannot exceed 50 characters"
@@ -485,11 +491,10 @@ export default function JobSeekerSignup() {
                         value={formData.contactNumber}
                         onChange={handleChange}
                         className="rounded"
-                        placeholder="Enter digits only"
+                        placeholder="e.g., +1 123-456-7890"
                         error={!!errors.contactNumber}
                         inputProps={{
-                          inputMode: "numeric",
-                          pattern: "[0-9]*",
+                          inputMode: "tel",
                           maxLength: 50,
                         }}
                       />

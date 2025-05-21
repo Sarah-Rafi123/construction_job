@@ -31,14 +31,7 @@ const theme = createTheme({
   },
 })
 const ErrorMessage = ({ message }: { message: string }) => (
-  <Box
-    sx={{
-      height: "20px",
-      mt: 0.5,
-      display: "flex",
-      alignItems: "center",
-    }}
-  >
+  <Box sx={{ height: "20px", mt: 0.5, display: "flex", alignItems: "center" }}>
     {message && (
       <Typography variant="caption" sx={{ color: "error.main", lineHeight: 1 }}>
         {message}
@@ -46,6 +39,7 @@ const ErrorMessage = ({ message }: { message: string }) => (
     )}
   </Box>
 )
+
 export default function MainContractorSignup() {
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -72,20 +66,24 @@ export default function MainContractorSignup() {
     return emailRegex.test(email)
   }
   const validatePhoneNumber = (phone: string) => {
-    const phoneRegex = /^(\+\d{1,3}\s?)?($$\d{1,4}$$\s?)?(\d{1,4}[-\s]?){1,3}\d{1,4}$/
+    // International phone number regex that supports various formats
+    const phoneRegex = /^\+?\d{10,15}$/
     return phoneRegex.test(phone)
   }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
-    if (id === "contactNumber" && value !== "") {
-      if (!/^[0-9()\-+\s]*$/.test(value)) {
-        return
-      }
+
+    
+    // Prevent alphabets and only allow numbers and symbols
+    if (id === "contactNumber" && /[a-zA-Z]/.test(value)) {
+      return; // Prevent the user from typing any alphabet
     }
+
     setFormData((prev) => ({
       ...prev,
       [id]: value,
     }))
+
     setErrors((prev) => ({
       ...prev,
       [id]: "",
@@ -135,13 +133,10 @@ export default function MainContractorSignup() {
       newErrors.contactNumber = "Contact number is required"
       isValid = false
     } else if (!validatePhoneNumber(formData.contactNumber)) {
-      newErrors.contactNumber = "Please enter a valid phone number format (e.g., +1 (123) 456-7890 or 123-456-7890)"
+      newErrors.contactNumber = "Please enter a valid phone number (e.g., +1 123-456-7890 or 123 456 7890)"
       isValid = false
     }
-    if (formData.contactNumber.length > 50) {
-      newErrors.contactNumber = "Contact number cannot exceed 50 characters"
-      isValid = false
-    }
+    
     setErrors(newErrors)
     return isValid
   }
@@ -341,7 +336,7 @@ export default function MainContractorSignup() {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !validatePhoneNumber(formData.contactNumber)}
                     fullWidth
                     sx={{
                       textTransform: "none",
