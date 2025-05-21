@@ -391,7 +391,6 @@ export default function SubContractorSignup() {
                       <ErrorMessage message={errors.companyName} />
                     </Box>
                   </Box>
-
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <FormLabel htmlFor="email" className="text-gray-700">
                       Email Address *

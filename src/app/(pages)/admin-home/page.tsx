@@ -36,7 +36,9 @@ import SortIcon from "@mui/icons-material/Sort"
 import { useGetUserProfileQuery } from "@/store/api/userProfileApi"
 import { useRouter } from "next/navigation"
 import { useGetPendingContractorsQuery, useVerifyContractorDocumentsMutation } from "@/store/api/pendingContractorApi"
-import CertificateViewer from "@/components/widgets/certificate-viewer"
+import dynamic from "next/dynamic"
+const CertificateViewer = dynamic(() => import("@/components/widgets/certificate-viewer"), { ssr: false })
+
 
 const theme = createTheme({
   palette: {

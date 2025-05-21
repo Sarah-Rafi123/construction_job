@@ -37,9 +37,15 @@ const VisuallyHiddenInput = styled("input")({
 interface DocumentSubmissionDialogProps {
   open: boolean
   onClose: () => void
+  title?: string
+  onSubmit?: (complianceCertificate: File | null, verificationCertificate: File | null) => Promise<void>
 }
 
-export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubmissionDialogProps) {
+export default function DocumentSubmissionDialog({
+  open,
+  onClose,
+  title = "Admin Approval Required",
+}: DocumentSubmissionDialogProps) {
   // File state
   const [complianceCertificate, setComplianceCertificate] = useState<File | null>(null)
   const [verificationCertificate, setVerificationCertificate] = useState<File | null>(null)
@@ -58,7 +64,12 @@ export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubm
   // Handle file selection for compliance certificate
   const handleComplianceFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setComplianceCertificate(event.target.files[0])
+      const file = event.target.files[0]
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size exceeds 5MB limit")
+        return
+      }
+      setComplianceCertificate(file)
       setError(null)
     }
   }
@@ -66,7 +77,12 @@ export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubm
   // Handle file selection for verification certificate
   const handleVerificationFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setVerificationCertificate(event.target.files[0])
+      const file = event.target.files[0]
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size exceeds 5MB limit")
+        return
+      }
+      setVerificationCertificate(file)
       setError(null)
     }
   }
@@ -120,25 +136,45 @@ export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubm
 
   return (
     <ProtectedRoute>
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontSize: "1.5rem", fontWeight: "bold", color: "#D49F2E" }}>
-          Admin Approval Required
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            m: { xs: 1, sm: 2 },
+            width: { xs: "calc(100% - 16px)", sm: "500px" },
+            maxHeight: { xs: "calc(100% - 16px)", sm: "90%" },
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontSize: { xs: "1.2rem", sm: "1.5rem" },
+            fontWeight: "bold",
+            color: "#D49F2E",
+            pt: { xs: 2, sm: 3 },
+            px: { xs: 2, sm: 3 },
+          }}
+        >
+          {title}
         </DialogTitle>
 
-        <DialogContent>
+        <DialogContent sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 2 } }}>
           {success ? (
-            <Box sx={{ textAlign: "center", py: 4 }}>
-              <CheckCircleIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
+            <Box sx={{ textAlign: "center", py: { xs: 2, sm: 4 } }}>
+              <CheckCircleIcon color="success" sx={{ fontSize: { xs: 40, sm: 60 }, mb: { xs: 1, sm: 2 } }} />
+              <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}>
                 Documents Submitted Successfully!
               </Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}>
                 Your documents have been submitted for review. You will be notified once approved.
               </Typography>
             </Box>
           ) : (
             <>
-              <Typography variant="body1" paragraph>
+              <Typography variant="body1" paragraph sx={{ fontSize: { xs: "0.875rem", sm: "1rem" }, mt: 1 }}>
                 Before you can post jobs, you need admin approval. Please upload your compliance and verification
                 certificates.
               </Typography>
@@ -150,58 +186,103 @@ export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubm
               )}
 
               <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: "medium" }}>
+                <Typography
+                  variant="subtitle1"
+                  gutterBottom
+                  sx={{
+                    fontWeight: "medium",
+                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                    mt: { xs: 2, sm: 1 },
+                  }}
+                >
                   Compliance Certificate
                 </Typography>
                 <Button
                   component="label"
                   variant={complianceCertificate ? "outlined" : "contained"}
                   startIcon={<CloudUploadIcon />}
-                  sx={{ mt: 1, mb: 1 }}
+                  sx={{
+                    mt: 1,
+                    mb: 1,
+                    py: { xs: 1, sm: 1.5 },
+                    fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                  }}
                   fullWidth
                   color={complianceCertificate ? "success" : "primary"}
                 >
-                  {complianceCertificate ? complianceCertificate.name : "Upload Compliance Certificate"}
+                  {complianceCertificate
+                    ? complianceCertificate.name.length > 20
+                      ? `${complianceCertificate.name.substring(0, 20)}...`
+                      : complianceCertificate.name
+                    : "Upload Compliance Certificate"}
                   <VisuallyHiddenInput
                     type="file"
                     onChange={handleComplianceFileChange}
                     accept=".pdf,.jpg,.jpeg,.png,.webp"
                   />
                 </Button>
-                <Typography variant="caption" color="text.secondary">
-                  Accepted formats: PDF, JPG, PNG, WEBP (Max size: 5MB)
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: "0.7rem", sm: "0.75rem" } }}>
+                  Accepted formats: PDF, JPG, PNG (Max size: 5MB)
                 </Typography>
               </Box>
 
               <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: "medium" }}>
+                <Typography
+                  variant="subtitle1"
+                  gutterBottom
+                  sx={{
+                    fontWeight: "medium",
+                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                    mt: { xs: 2, sm: 1 },
+                  }}
+                >
                   Verification Certificate
                 </Typography>
                 <Button
                   component="label"
                   variant={verificationCertificate ? "outlined" : "contained"}
                   startIcon={<CloudUploadIcon />}
-                  sx={{ mt: 1, mb: 1 }}
+                  sx={{
+                    mt: 1,
+                    mb: 1,
+                    py: { xs: 1, sm: 1.5 },
+                    fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                  }}
                   fullWidth
                   color={verificationCertificate ? "success" : "primary"}
                 >
-                  {verificationCertificate ? verificationCertificate.name : "Upload Verification Certificate"}
+                  {verificationCertificate
+                    ? verificationCertificate.name.length > 20
+                      ? `${verificationCertificate.name.substring(0, 20)}...`
+                      : verificationCertificate.name
+                    : "Upload Verification Certificate"}
                   <VisuallyHiddenInput
                     type="file"
                     onChange={handleVerificationFileChange}
                     accept=".pdf,.jpg,.jpeg,.png,.webp"
                   />
                 </Button>
-                <Typography variant="caption" color="text.secondary">
-                  Accepted formats: PDF, JPG, PNG, WEBP (Max size: 5MB)
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: { xs: "0.7rem", sm: "0.75rem" } }}>
+                  Accepted formats: PDF, JPG, PNG (Max size: 5MB)
                 </Typography>
               </Box>
             </>
           )}
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={handleClose} disabled={isLoading} variant="outlined">
+        <DialogActions
+          sx={{
+            px: { xs: 2, sm: 3 },
+            pb: { xs: 2, sm: 3 },
+            pt: { xs: 1, sm: 2 },
+            flexDirection: { xs: "column", sm: "row" },
+            "& > button": {
+              mb: { xs: 1, sm: 0 },
+              width: { xs: "100%", sm: "auto" },
+            },
+          }}
+        >
+          <Button onClick={handleClose} disabled={isLoading} variant="outlined" sx={{ order: { xs: 2, sm: 1 } }}>
             Cancel
           </Button>
           <Button
@@ -209,6 +290,7 @@ export default function DocumentSubmissionDialog({ open, onClose }: DocumentSubm
             disabled={isLoading || success || !complianceCertificate || !verificationCertificate}
             variant="contained"
             startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+            sx={{ order: { xs: 1, sm: 2 }, mb: { xs: 1, sm: 0 } }}
           >
             {isLoading ? "Submitting..." : "Submit Documents"}
           </Button>

@@ -20,6 +20,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.487.0",
     "next": "15.2.4",
+    "pdfjs-dist": "^5.2.133",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.1.0",
