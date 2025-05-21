@@ -1,4 +1,3 @@
-"use client"
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -10,10 +9,12 @@ import type { RootState } from "@/store"
 import ProtectedRoute from "../global/ProtectedRoute"
 import { clearCurrentUser } from "@/store/slices/userSlice"
 import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
+
 interface NavbarProps {
   messageCount?: number
   requireAuth?: boolean
 }
+
 export default function Navbar({ messageCount = 0, requireAuth = false }: NavbarProps) {
   const router = useRouter()
   const dispatch = useDispatch()
@@ -25,6 +26,7 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
   const user = currentUser
   const isLoading = false
   const displayName = user?.full_name || user?.company_name || "Account"
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -45,7 +47,6 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
       localStorage.removeItem("userType")
       window.location.href = "/landing-page"
     } catch (error) {
-      // console.error("Logout failed:", error)
       dispatch(clearCurrentUser())
       localStorage.removeItem("userType")
       window.location.href = "/landing-page"
@@ -91,7 +92,9 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
                     aria-label="User menu"
                   >
                     <User size={20} className="mr-1" />
-                    <span className="text-sm text-[#D49F2E] font-medium">{displayName}</span>
+                    <span className="text-sm text-[#D49F2E] font-medium" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '150px' }}>
+                      {displayName.length > 30 ? `${displayName.substring(0, 50)}...` : displayName}
+                    </span>
                     <ChevronDown size={16} className="ml-1" />
                   </button>
                   {isUserMenuOpen && (
@@ -139,6 +142,7 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
       </div>
     </nav>
   )
+
   return requireAuth ? (
     <ProtectedRoute redirectUnauthenticated={true}>{renderNavbarContent()}</ProtectedRoute>
   ) : (
