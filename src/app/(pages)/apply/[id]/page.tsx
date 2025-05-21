@@ -349,8 +349,6 @@ export default function ApplyJobPage() {
         </div>
         <Box sx={{ bgcolor: "background.default", minHeight: "calc(100vh - 64px)", mt: 6 }}>
           <Container maxWidth="md" sx={{ py: 4 }}>
-            {/* Removed the back button from here */}
-
             <Card sx={{ mb: 4, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}>
               <CardContent>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>

@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useRef, useEffect, useState } from "react"
 import { Avatar } from "@mui/material"
-import { Menu, FileText, Download } from "lucide-react"
+import { Menu, FileText, Download, Info } from "lucide-react"
 import { formatTime } from "../../../utils/formatTime"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store"
@@ -101,12 +101,14 @@ export default function ChatWindow({ toggleMobileDrawer, toggleDetailsPanel }: C
             </div>
           </div>
         </div>
-        <div className="items-center gap-2 lg:flex">
+        <div className="flex items-center gap-2">
           <button
-            className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 lg"
+            className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 flex items-center"
             onClick={toggleDetailsPanel}
+            aria-label="View user profile"
+            title="View user profile"
           >
-            <span className="underline text-[#D49F2E] hover">View Profile </span>
+            <Info size={20} className="text-[#D49F2E]" />
           </button>
         </div>
       </div>

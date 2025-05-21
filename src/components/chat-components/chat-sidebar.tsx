@@ -11,9 +11,10 @@ import type { RootState } from "@/store"
 interface ChatSidebarProps {
   isMobileDrawerOpen: boolean
   toggleMobileDrawer: () => void
+  closeDetailsPanel?: () => void // Make this prop optional
 }
 
-export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: ChatSidebarProps) {
+export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer, closeDetailsPanel }: ChatSidebarProps) {
   const { isLoading, isError } = useGetInboxQuery()
   const router = useRouter()
   const { inbox, activeConversation } = useSelector((state: RootState) => state.chat)
@@ -22,14 +23,19 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
 
   const updateActiveConversation = (conversation: Chat) => {
     router.push(`/chat/${conversation._id}`)
+    // Only call closeDetailsPanel if it exists
+    if (closeDetailsPanel) {
+      closeDetailsPanel()
+    }
   }
 
   const navigateToHome = () => {
     router.push("/home")
+    // Only call closeDetailsPanel if it exists
+    if (closeDetailsPanel) {
+      closeDetailsPanel()
+    }
   }
-
-  // console.log("current user is", currentUser)
-  // console.log("inbox is", inbox)
 
   const filteredInbox = inbox?.filter((conversation) => {
     const otherParticipant = conversation.participants.find((participant) => participant._id !== currentUser?.id)
@@ -44,7 +50,10 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
   return (
     <>
       {isMobileDrawerOpen && (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm  bg-opacity-50 z-20 lg:hidden" onClick={toggleMobileDrawer} />
+        <div
+          className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-50 z-20 lg:hidden"
+          onClick={toggleMobileDrawer}
+        />
       )}
       <div
         className={`
@@ -96,11 +105,6 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center">
                         <h3 className="font-medium text-gray-900 truncate">{user.full_name ?? user.company_name}</h3>
-                        {/* {conversation.unreadCount > 0 && (
-                          <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                            {conversation.unreadCount}
-                          </span>
-                        )} */}
                       </div>
                       <p className="text-gray-600 text-sm truncate">{conversation.lastMessage.content}</p>
                     </div>
@@ -111,12 +115,12 @@ export default function ChatSidebar({ isMobileDrawerOpen, toggleMobileDrawer }: 
           </div>
         </div>
       </div>
-      <button
+      {/* <button
         className="fixed bottom-4 left-4 lg:hidden z-10 bg-[#D49F2E] text-white p-3 rounded-full shadow-lg"
         onClick={toggleMobileDrawer}
       >
         <Menu size={24} />
-      </button>
+      </button> */}
     </>
   )
 }
