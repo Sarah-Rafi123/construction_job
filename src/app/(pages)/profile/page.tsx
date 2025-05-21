@@ -15,8 +15,12 @@ import {
   Shield,
   Edit,
   Upload,
+  HardHat,
   ChevronDown,
+  Building2,
   ChevronUp,
+  FileUser,
+  PhoneCall,
   AlertCircle,
 } from "lucide-react"
 import { useUpdateUserProfileMutation, useGetUserProfileQuery } from "@/store/api/userProfileApi"
@@ -267,7 +271,7 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                     {currentUser.role === "job_seeker" ? (
                       <div className="flex text-black items-start gap-3">
-                        <Briefcase size={18} className="text-gray-500 mt-0.5" />
+                        <HardHat size={18} className="text-gray-500 mt-0.5" />
                         <div>
                           <p className="text-sm text-gray-500">Trade</p>
                           <TruncatedText text={currentUser.trade || ""} limit={30} />
@@ -276,14 +280,14 @@ export default function ProfilePage() {
                     ) : (
                       <>
                         <div className="flex text-black items-start gap-3">
-                          <Building size={18} className="text-gray-500 mt-0.5" />
+                          <Building2 size={18} className="text-gray-500 mt-0.5" />
                           <div>
                             <p className="text-sm text-gray-500">Company Name</p>
                             <TruncatedText text={currentUser.company_name || ""} limit={30} />
                           </div>
                         </div>
                         <div className="flex text-black items-center gap-3">
-                          <Hash size={18} className="text-gray-500" />
+                          <PhoneCall size={18} className="text-gray-500" />
                           <div>
                             <p className="text-sm text-gray-500">Contact Number</p>
                             <p className="font-medium">{currentUser.company_number || "Not provided"}</p>
@@ -296,7 +300,7 @@ export default function ProfilePage() {
                   <div>
                     <div className="flex items-center text-black justify-between mb-2">
                       <h3 className="text-lg font-medium flex items-center gap-2">
-                        <Briefcase size={18} className="text-gray-500" />
+                        <FileUser size={18} className="text-gray-500" />
                         About
                       </h3>
                       {!isEditingDescription && (
