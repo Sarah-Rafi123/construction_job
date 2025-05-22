@@ -14,18 +14,21 @@ export default function JobMarker({ job, position }: JobMarkerProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Determine marker color based on job type or target user
   const getMarkerColor = () => {
     if (job.target_user === "subcontractor") {
-      return "#D49F2E"; // amber color for subcontractor jobs
-    } else if (job.job_type === "Full-Time") {
-      return "#2563EB"; // blue for full-time
-    } else if (job.job_type === "Part-Time") {
-      return "#10B981"; // green for part-time
+      return "#D49F2E" // amber color for subcontractor jobs
+    } else if (job.job_type === "apprentice") {
+      return "#2563EB" // blue for apprentice
+    } else if (job.job_type === "graduate") {
+      return "#10B981" // green for graduate
+    } else if (job.job_type === "fixed") {
+      return "#8B5CF6" // purple for fixed
+    } else if (job.job_type === "permanent") {
+      return "#EC4899" // pink for permanent
     } else {
-      return "#6366F1"; // indigo for other types
+      return "#6366F1" // indigo for other types
     }
-  };
+  }
 
   // SVG marker with dynamic color
   const svgMarker = {

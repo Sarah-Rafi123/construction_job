@@ -29,7 +29,7 @@ const serviceTypes = [
   "Pipe Fitter",
 ]
 
-const jobTypes = ["full-time", "part-time"]
+const jobTypes = ["apprentice", "graduate", "fixed", "permanent"]
 
 const targetUserTypes = [
   { label: "Job Seekers", value: "job_seeker" },
@@ -87,6 +87,13 @@ export default function JobEditForm({
         ...prev,
         job_description: value,
       }))
+    } else if (name === "job_type") {
+      // Special handling for job_type to ensure it's updated correctly
+      console.log("Updating job_type to:", value)
+      setFormData((prev: any) => ({
+        ...prev,
+        job_type: value,
+      }))
     } else {
       setFormData((prev: any) => ({
         ...prev,
@@ -94,6 +101,33 @@ export default function JobEditForm({
       }))
     }
   }
+
+ const handleTargetUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target
+    console.log(`Target user changed to: ${value}`)
+
+    // Update formData with the new target_user
+    setFormData((prev: any) => ({
+      ...prev,
+      target_user: value,
+      // Update services to remove resource_count and number_of_days for subcontractor
+      services: prev.services.map((service: any) => {
+        if (value === "subcontractor") {
+          // For subcontractor, remove resource_count and number_of_days
+          const { service_name } = service
+          return { service_name }
+        } else {
+          // For job_seeker, ensure resource_count and number_of_days exist
+          return {
+            ...service,
+            resource_count: service.resource_count || 1,
+            number_of_days: service.number_of_days || 7,
+          }
+        }
+      }),
+    }))
+}
+
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target
@@ -116,12 +150,20 @@ export default function JobEditForm({
     }))
   }
 
-  const addService = () => {
-    setFormData((prev: any) => ({
+const addService = () => {
+  setFormData((prev: any) => {
+    const newService =
+      prev.target_user === "subcontractor"
+        ? { service_name: "Electrician" }
+        : { service_name: "Electrician", resource_count: 1, number_of_days: 7 }
+
+    return {
       ...prev,
-      services: [...prev.services, { service_name: "Electrician", resource_count: 1, number_of_days: 7 }],
-    }))
-  }
+      services: [...prev.services, newService],
+    }
+  })
+}
+
 
   const removeService = (index: number) => {
     if (formData.services.length > 1) {
@@ -156,22 +198,68 @@ export default function JobEditForm({
     [setFormData],
   )
 
-  // Custom form submit handler to log what's being submitted
   function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    // Calculate number of days based on duration type and value
+    let numberOfDays = Number.parseInt(formData.duration) || 7
+    if (formData.durationType === "weeks") {
+      numberOfDays = numberOfDays * 7
+    } else if (formData.durationType === "months") {
+      numberOfDays = numberOfDays * 30
+    }
+
+    // Prepare services data based on target user
+    const preparedServices = formData.services.map((service: any) => {
+      if (formData.target_user === "subcontractor") {
+        // For subcontractor, ONLY include service_name and nothing else
+        return {
+          service_name: service.service_name,
+        }
+      } else {
+        // For job_seeker, include all fields
+        return {
+          service_name: service.service_name,
+          resource_count: service.resource_count || 1,
+          number_of_days: service.number_of_days || numberOfDays,
+        }
+      }
+    })
+
+    // Log the prepared services to verify
+    console.log("Target user:", formData.target_user)
+    console.log("Prepared services:", preparedServices)
 
     // Create a new object with the correct field mapping for the API
     const apiData = {
       ...formData,
-      job_description: undefined, // Remove job_description from the payload
-      description: formData.job_description, // Map job_description to description for the API
+      services: preparedServices,
+    }
+
+    // Remove number_of_days from the form data if target user is subcontractor
+    if (formData.target_user === "subcontractor") {
+      delete apiData.number_of_days
+      console.log("Removed number_of_days field for subcontractor")
     }
 
     console.log("Submitting form with data:", apiData)
+    console.log("Job type being submitted:", formData.job_type)
+    console.log("Target user being submitted:", formData.target_user)
+    console.log("Services being submitted:", preparedServices)
 
-    // Call the original submit handler with the modified data
-    const originalEvent = e
-    handleSubmit(originalEvent)
+    // Call the original submit handler
+    handleSubmit(e)
+  }
+
+  // Calculate number of days based on duration type and value
+  const calculateNumberOfDays = () => {
+    let numberOfDays = Number.parseInt(formData.duration) || 7
+    if (formData.durationType === "weeks") {
+      numberOfDays = numberOfDays * 7
+    } else if (formData.durationType === "months") {
+      numberOfDays = numberOfDays * 30
+    }
+    return numberOfDays
   }
 
   return (
@@ -199,7 +287,7 @@ export default function JobEditForm({
             </div>
 
             {/* Job Type */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 relative">
               <div className="p-4 border-b border-gray-200 bg-gray-50">
                 <h3 className="font-medium text-gray-700">Job Type</h3>
               </div>
@@ -208,7 +296,7 @@ export default function JobEditForm({
                   name="job_type"
                   value={formData.job_type}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E]"
+                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E] relative z-20"
                   required
                 >
                   {jobTypes.map((type) => (
@@ -221,7 +309,7 @@ export default function JobEditForm({
             </div>
 
             {/* Target User */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 relative">
               <div className="p-4 border-b border-gray-200 bg-gray-50">
                 <h3 className="font-medium text-gray-700">Target Users</h3>
               </div>
@@ -229,8 +317,8 @@ export default function JobEditForm({
                 <select
                   name="target_user"
                   value={formData.target_user}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E]"
+                  onChange={handleTargetUserChange}
+                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E] relative z-20"
                   required
                 >
                   {targetUserTypes.map((type) => (
@@ -239,6 +327,11 @@ export default function JobEditForm({
                     </option>
                   ))}
                 </select>
+                {formData.target_user === "subcontractor" && (
+                  <p className="mt-2 text-xs text-amber-600">
+                    Note: Subcontractor jobs do not require resource count or number of days.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -435,7 +528,7 @@ export default function JobEditForm({
                 {formData.services.map((service: any, index: number) => (
                   <div
                     key={index}
-                    className="mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50 last:mb-0"
+                    className="mb-4 p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-50 last:mb-0 relative"
                   >
                     <div className="flex justify-between items-center mb-3">
                       <h4 className="font-medium text-gray-700">Service {index + 1}</h4>
@@ -456,7 +549,7 @@ export default function JobEditForm({
                         <select
                           value={service.service_name}
                           onChange={(e) => handleServiceChange(index, "service_name", e.target.value)}
-                          className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E]"
+                          className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E] relative z-20"
                           required
                         >
                           {serviceTypes.map((type) => (
@@ -467,22 +560,34 @@ export default function JobEditForm({
                         </select>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Number of {service.service_name}s Required
-                          </label>
-                          <input
-                            type="number"
-                            value={service.resource_count}
-                            onChange={(e) => handleServiceChange(index, "resource_count", e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E]"
-                            min="1"
-                            required
-                          />
+                      {formData.target_user !== "subcontractor" && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Number of {service.service_name}s Required
+                            </label>
+                            <input
+                              type="number"
+                              value={service.resource_count || 1}
+                              onChange={(e) => handleServiceChange(index, "resource_count", e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E]"
+                              min="1"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Number of Days</label>
+                            <input
+                              type="number"
+                              value={service.number_of_days || calculateNumberOfDays()}
+                              onChange={(e) => handleServiceChange(index, "number_of_days", e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-[#D49F2E] focus:border-[#D49F2E]"
+                              min="1"
+                              required
+                            />
+                          </div>
                         </div>
-                        <div></div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -6,9 +6,7 @@ import LocationPermissionRequest from "./location-permission-request"
 import Script from "next/script"
 import { Crosshair, X } from "lucide-react"
 // In your API files (e.g., jobsApi.ts, userPostedJobsApi.ts)
-import { 
-  Job
-} from '@/types/jobTypes';
+import type { Job } from "@/types/jobTypes"
 
 // Then use these imported types instead of redefining them
 declare global {
@@ -16,8 +14,6 @@ declare global {
     google: any
   }
 }
-
-
 
 interface GoogleMapComponentProps {
   jobs: Job[]
@@ -166,10 +162,14 @@ export default function GoogleMapComponent({
   const getMarkerColor = (job: Job) => {
     if (job.target_user === "subcontractor") {
       return "#D49F2E" // amber color for subcontractor jobs
-    } else if (job.job_type?.toLowerCase() === "full-time") {
-      return "#2563EB" // blue for full-time
-    } else if (job.job_type?.toLowerCase() === "part-time") {
-      return "#10B981" // green for part-time
+    } else if (job.job_type?.toLowerCase() === "apprentice") {
+      return "#2563EB" // blue for apprentice
+    } else if (job.job_type?.toLowerCase() === "graduate") {
+      return "#10B981" // green for graduate
+    } else if (job.job_type?.toLowerCase() === "fixed") {
+      return "#8B5CF6" // purple for fixed
+    } else if (job.job_type?.toLowerCase() === "permanent") {
+      return "#EC4899" // pink for permanent
     } else {
       return "#6366F1" // indigo for other types
     }

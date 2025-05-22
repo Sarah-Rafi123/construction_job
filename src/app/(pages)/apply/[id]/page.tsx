@@ -429,9 +429,15 @@ export default function ApplyJobPage() {
                 </Typography>
                 <Typography variant="body1">
                   This is a detailed job description for the {job.job_title} role.
-                  {job.job_type === "Full-Time"
-                    ? " This is a full-time position requiring commitment to the entire project duration."
-                    : " This is a part-time position with flexible hours."}
+                  {job.job_type === "apprentice"
+                    ? " This is an apprentice position with training and development opportunities."
+                    : job.job_type === "graduate"
+                      ? " This is a graduate position suitable for those who have recently completed their education."
+                      : job.job_type === "fixed"
+                        ? " This is a fixed-term position for a specific project duration."
+                        : job.job_type === "permanent"
+                          ? " This is a permanent position with long-term career prospects."
+                          : " This position offers flexible working arrangements."}
                   {(job.services ?? []).length > 0 &&
                     ` We are looking for professionals with expertise in ${job.services?.map((s: { service_name: any }) => s.service_name).join(", ")}.`}
                 </Typography>

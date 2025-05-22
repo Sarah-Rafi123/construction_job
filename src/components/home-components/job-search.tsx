@@ -25,6 +25,9 @@ interface CustomDropdownProps {
   className?: string
 }
 
+const jobTypes = ["All Types", "apprentice", "graduate", "fixed", "permanent"]
+
+// Add z-index to the CustomDropdown component to fix dropdown display issues
 function CustomDropdown({ options, value, onChange, placeholder, className = "" }: CustomDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -52,7 +55,7 @@ function CustomDropdown({ options, value, onChange, placeholder, className = "" 
       </div>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
           {options.map((option) => (
             <div
               key={option}
@@ -74,6 +77,7 @@ function CustomDropdown({ options, value, onChange, placeholder, className = "" 
   )
 }
 
+
 export default function JobSearch({
   searchTerm,
   setSearchTerm,
@@ -88,8 +92,7 @@ export default function JobSearch({
   userLocation,
 }: JobSearchProps) {
   const [showFilters, setShowFilters] = useState(false)
-
-  const jobTypes = ["All Types", "Full-Time", "Part-Time"]
+const jobTypes = ["All Types", "apprentice", "graduate", "fixed", "permanent"]
   const serviceTypes = ["All Services", "Electrician", "Plumber", "Carpenter", "Painter", "Construction Manager"]
   const sortOptions = [
     { value: "newest", label: "Newest First" },

@@ -18,10 +18,8 @@ export default function JobSeekersSection() {
   const handleFindJobsClick = () => {
     // Check if user is authenticated
     if (isAuthenticated) {
-      // If logged in, navigate to jobs page
       router.push("/home")
     } else {
-      // If not logged in, navigate to login page
       router.push("/login")
     }
   }

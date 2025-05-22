@@ -128,7 +128,7 @@ const serviceTypes = [
   "Pipe Fitter",
 ]
 
-const jobTypes = ["Full Time", "Part Time"]
+const jobTypes = ["apprentice", "graduate", "fixed", "permanent"]
 
 const targetUserTypes = ["Sub Contractors", "Job Seekers"]
 
@@ -141,9 +141,8 @@ export default function PostJob() {
   const [durationType, setDurationType] = useState("days")
   const [duration, setDuration] = useState("")
   const [location, setLocation] = useState("")
-   const [showSuccessDialog, setShowSuccessDialog] = useState(false)
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
-
 
   // Replace coordinates state with separate latitude and longitude
   const [latitude, setLatitude] = useState<string>("12.9716") // Default to Bangalore
@@ -155,7 +154,7 @@ export default function PostJob() {
   const [budget, setBudget] = useState("")
   const [isUrgent, setIsUrgent] = useState(false)
   const [targetUsers, setTargetUsers] = useState("Job Seekers")
-  const [jobType, setJobType] = useState("Full Time")
+  const [jobType, setJobType] = useState("apprentice")
 
   // Check if user is authorized to access this page
   const [userType, setUserType] = useState<string | null>(null)
@@ -320,7 +319,7 @@ export default function PostJob() {
       return serviceObj
     })
 
-    const formattedJobType = jobType.toLowerCase().replace(" ", "-")
+    const formattedJobType = jobType.toLowerCase()
     let formattedTargetUser = "job_seeker"
     if (targetUsers === "Sub Contractors") {
       formattedTargetUser = "subcontractor"
@@ -721,13 +720,13 @@ export default function PostJob() {
             </Container>
           </Box>
           <DocumentSubmissionDialog open={showDocumentDialog} onClose={() => setShowDocumentDialog(false)} />
-            <SuccessDialog
-        open={showSuccessDialog}
-        onClose={() => router.push("/home")}
-        title="Job Posted Successfully!"
-        message={`Your job "${title}" has been posted successfully and is now visible to potential candidates.`}
-        redirecting={isRedirecting}
-      />
+          <SuccessDialog
+            open={showSuccessDialog}
+            onClose={() => router.push("/home")}
+            title="Job Posted Successfully!"
+            message={`Your job "${title}" has been posted successfully and is now visible to potential candidates.`}
+            redirecting={isRedirecting}
+          />
         </Box>
       </ThemeProvider>
       <Footer />

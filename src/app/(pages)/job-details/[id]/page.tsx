@@ -16,6 +16,34 @@ import JobEditForm from "@/components/job-details/JobEditForm"
 import DeleteConfirmationDialog from "@/components/job-details/DeleteConfirmationDialog"
 import Notification from "@/components/job-details/Notification"
 
+// Define types for the services to handle conditional structure
+type JobSeekerService = {
+  service_name: string
+  resource_count: number
+  number_of_days: number
+}
+
+type SubcontractorService = {
+  service_name: string
+}
+
+type ServiceType = JobSeekerService | SubcontractorService
+
+// Define the job data structure with conditional services
+type JobData = {
+  job_title: string
+  job_description: string
+  job_type: string
+  target_user: string
+  job_priority: boolean
+  budget: number | null
+  job_location: {
+    coordinates: number[]
+    type: string
+  }
+  services: ServiceType[]
+}
+
 export default function JobDetailsPage() {
   const router = useRouter()
   const params = useParams()
@@ -37,7 +65,7 @@ export default function JobDetailsPage() {
   const [formData, setFormData] = useState({
     job_title: "",
     job_description: "",
-    job_type: "full-time",
+    job_type: "apprentice",
     target_user: "job_seeker",
     job_priority: false,
     budget: 0,
@@ -54,7 +82,7 @@ export default function JobDetailsPage() {
       setFormData({
         job_title: job.job_title || "",
         job_description: job.job_description || "",
-        job_type: job.job_type || "full-time",
+        job_type: job.job_type || "apprentice",
         target_user: job.target_user || "job_seeker",
         job_priority: job.job_priority || false,
         budget: job.budget || 0,
@@ -104,10 +132,27 @@ export default function JobDetailsPage() {
         numberOfDays = numberOfDays * 30
       }
 
+      // Prepare services data based on target user
+      let preparedServices: ServiceType[]
+
+      if (formData.target_user === "subcontractor") {
+        // For subcontractor, ONLY include service_name and nothing else
+        preparedServices = formData.services.map((service): SubcontractorService => ({
+          service_name: service.service_name,
+        }))
+      } else {
+        // For job_seeker, include all fields
+        preparedServices = formData.services.map((service): JobSeekerService => ({
+          service_name: service.service_name,
+          resource_count: service.resource_count,
+          number_of_days: service.number_of_days || numberOfDays,
+        }))
+      }
+
       // Format the data according to the API requirements
-      const jobData = {
+      const jobData: JobData = {
         job_title: formData.job_title,
-        job_description: formData.job_description, // API expects 'description' not 'job_description'
+        job_description: formData.job_description,
         job_type: formData.job_type,
         target_user: formData.target_user,
         job_priority: formData.job_priority,
@@ -116,16 +161,18 @@ export default function JobDetailsPage() {
           coordinates: [lng, lat], // [longitude, latitude]
           type: "Point",
         },
-        services: formData.services.map((service: any) => ({
-          service_name: service.service_name,
-          resource_count: service.resource_count,
-          number_of_days: service.number_of_days || numberOfDays,
-        })),
+        services: preparedServices,
       }
 
+      console.log("Target user:", formData.target_user)
+      console.log("Submitting job data:", jobData)
+      console.log("Services being submitted:", preparedServices)
+
+      // Type assertion to bypass the strict type checking for the API call
+      // This is necessary because the API type definition doesn't account for conditional service structures
       await updateJob({
         jobId: id,
-        jobData,
+        jobData: jobData as any, // Type assertion here
       }).unwrap()
 
       setNotification({
@@ -137,7 +184,7 @@ export default function JobDetailsPage() {
       setIsEditing(false)
     } catch (error) {
       console.error("Failed to update job:", error)
-      console.log(error);
+      console.log(error)
       setNotification({
         show: true,
         message: "Failed to update job. Please try again.",
@@ -226,9 +273,9 @@ export default function JobDetailsPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex flex-col bg-white">
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
-             <Navbar />
-           </div>
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+          <Navbar />
+        </div>
         <main className="mt-10 flex-grow">
           <Notification notification={notification} />
           <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
