@@ -6,7 +6,8 @@ import { useState } from "react"
 import { Briefcase, Facebook, Linkedin, Instagram, CheckCircle, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { useSubscribeEmailMutation } from "@/store/api/subscriptionApi"
-
+import SitepalLogo from "@/assets/images/SitepalLogo.jpg";
+import Image from "next/image";
 export default function Footer() {
   const [email, setEmail] = useState("")
   const [emailError, setEmailError] = useState<string | null>(null)
@@ -72,8 +73,16 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center mb-4">
-              <Briefcase className="h-6 w-6 mr-2 text-[#F5A623]" />
-              <span className="text-xl font-bold text-white">Site-Pal</span>
+            <Link href="/" className="flex-shrink-0 cursor-pointer flex items-center">
+              <Image
+                src={SitepalLogo || "/placeholder.svg"}
+                alt="Company Logo"
+                className="ml-2 sm:block hidden h-16"
+                width={150}
+                height={200}
+                priority
+              />
+            </Link>
             </div>
             <p className="text-gray-400 mb-4">
               The ultimate platform connecting contractors, sub-contractors, and skilled workers for successful

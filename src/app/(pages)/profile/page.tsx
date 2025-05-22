@@ -386,7 +386,6 @@ export default function ProfilePage() {
             </div>
           )}
         </main>
-
         <Footer />
       </div>
     </ProtectedRoute>

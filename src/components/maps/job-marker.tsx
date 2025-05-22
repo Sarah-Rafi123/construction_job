@@ -56,16 +56,16 @@ export default function JobMarker({ job, position }: JobMarkerProps) {
       {isOpen && (
         <InfoWindow position={position} onCloseClick={() => setIsOpen(false)}>
           <div className="p-2 max-w-[220px]">
-            <h3 className="font-semibold text-sm">{job.job_title}</h3>
+            <h3 className="font-semibold text-black text-sm">{job.job_title}</h3>
             <div className="flex items-center gap-2 mt-1">
               <span
                 className="inline-block w-2 h-2 rounded-full"
                 style={{ backgroundColor: getMarkerColor() }}
               ></span>
-              <p className="text-xs text-gray-600">{job.job_type}</p>
+              <p className="text-xs text-black">{job.job_type}</p>
             </div>
             {job.target_user && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-black mt-1">
                 For:{" "}
                 {job.target_user.charAt(0).toUpperCase() +
                   job.target_user.slice(1)}

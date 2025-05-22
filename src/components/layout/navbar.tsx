@@ -63,8 +63,8 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
               <Image
                 src={SitepalLogo || "/placeholder.svg"}
                 alt="Company Logo"
-                className="ml-2 sm:block hidden h-16"
-                width={180}
+                className="ml-2 block  h-16"
+                width={150}
                 height={200}
                 priority
               />
@@ -93,7 +93,7 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
                   >
                     <User size={20} className="mr-1" />
                     <span className="text-sm text-[#D49F2E] font-medium" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '150px' }}>
-                      {displayName.length > 30 ? `${displayName.substring(0, 50)}...` : displayName}
+                      {displayName.length > 30 ? `${displayName.substring(0, 20)}...` : displayName}
                     </span>
                     <ChevronDown size={16} className="ml-1" />
                   </button>

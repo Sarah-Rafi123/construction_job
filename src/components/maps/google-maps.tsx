@@ -293,20 +293,20 @@ export default function GoogleMapComponent({
         {selectedJob && (
           <InfoWindow position={getJobCoordinates(selectedJob)} onCloseClick={() => setSelectedJob(null)}>
             <div className="p-2 max-w-[220px]">
-              <h3 className="font-semibold text-sm">{selectedJob.job_title}</h3>
+              <h3 className="font-semibold text-black text-sm">{selectedJob.job_title}</h3>
               <div className="flex items-center gap-2 mt-1">
                 <span
                   className="inline-block w-2 h-2 rounded-full"
                   style={{ backgroundColor: getMarkerColor(selectedJob) }}
                 ></span>
-                <p className="text-xs text-gray-600">{selectedJob.job_type}</p>
+                <p className="text-xs text-black">{selectedJob.job_type}</p>
               </div>
               {selectedJob.services && selectedJob.services.length > 0 && (
                 <div className="mt-1">
-                  <p className="text-xs text-gray-500">Services:</p>
+                  <p className="text-xs text-black">Services:</p>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {selectedJob.services.slice(0, 3).map((service) => (
-                      <span key={service._id} className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">
+                      <span key={service._id} className="text-xs bg-gray-100 text-black px-1.5 py-0.5 rounded">
                         {service.service_name}
                       </span>
                     ))}

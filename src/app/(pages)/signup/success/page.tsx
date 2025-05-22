@@ -107,7 +107,7 @@ export default function SignupSuccess() {
             <Image
               src={SitepalLogo || "/placeholder.svg"}
               alt="Company Logo"
-              width={180}
+              width={150}
               height={200}
               priority
               style={{ cursor: "pointer" }}

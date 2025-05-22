@@ -262,7 +262,7 @@ export default function PasswordSetup() {
                            src={SitepalLogo || "/placeholder.svg"}
                            alt="Company Logo"
                            className="ml-2 sm:block hidden h-16"
-                           width={180}
+                           width={150}
                            height={200}
                            priority
                          />
