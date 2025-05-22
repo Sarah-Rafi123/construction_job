@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
 
 
 
-  
+
   const [email, setEmail] = useState("")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
@@ -125,16 +125,24 @@ export default function ForgotPasswordPage() {
             p: { xs: 2, sm: 4 },
           }}
         >
-          {/* Logo and brand name */}
-          <Box sx={{ display: "flex", alignItems: "center", mt: 4, ml: 4 }} onClick={navigateToHome}>
-              <Image
-                            src={SitepalLogo || "/placeholder.svg"}
-                            alt="Company Logo"
-                            className="ml-2 sm:block hidden h-16"
-                            width={180}
-                            height={200}
-                            priority
-                          />
+         <Box
+            sx={{
+              display: "flex",
+              justifyContent: { xs: "center", md: "flex-start" },
+              alignItems: "center",
+              mb: 6,
+              mt: 2,
+            }}
+            onClick={navigateToHome}
+          >
+            <Image
+              src={SitepalLogo || "/placeholder.svg"}
+              alt="Company Logo"
+              width={180}
+              height={200}
+              priority
+              style={{ cursor: "pointer" }}
+            />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>

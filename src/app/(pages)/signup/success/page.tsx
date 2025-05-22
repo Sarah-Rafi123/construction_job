@@ -97,21 +97,21 @@ export default function SignupSuccess() {
           <Box
             sx={{
               display: "flex",
+              justifyContent: { xs: "center", md: "flex-start" },
               alignItems: "center",
-              mt: 4,
-              ml: 4,
-              cursor: "pointer",
+              mb: 6,
+              mt: 2,
             }}
             onClick={navigateToHome}
           >
-             <Image
-                src={SitepalLogo || "/placeholder.svg"}
-                alt="Company Logo"
-                className="ml-2 sm:block hidden h-16"
-                width={180}
-                height={200}
-                priority
-              />
+            <Image
+              src={SitepalLogo || "/placeholder.svg"}
+              alt="Company Logo"
+              width={180}
+              height={200}
+              priority
+              style={{ cursor: "pointer" }}
+            />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>
@@ -140,7 +140,7 @@ export default function SignupSuccess() {
                   . Please check your inbox and follow the instructions to activate your account.
                 </Typography>
                 <Typography color="text.secondary" sx={{ textAlign: "center" }} className="text-gray-600 mb-4">
-                  Didn't receive the verification email? Click the button below to resend it.
+                  Didn't receive the verification email? You will be able to send another verification email after 30 minutes.
                 </Typography>
 
                 {resendStatus.type && (

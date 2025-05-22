@@ -175,24 +175,24 @@ export default function LoginPage() {
             p: { xs: 2, sm: 4 },
           }}
         >
-          <Box
+         <Box
             sx={{
               display: "flex",
+              justifyContent: { xs: "center", md: "flex-start" },
               alignItems: "center",
-              mt: 4,
-              ml: 4,
-              cursor: "pointer",
+              mb: 6,
+              mt: 2,
             }}
             onClick={navigateToHome}
           >
-             <Image
-                src={SitepalLogo || "/placeholder.svg"}
-                alt="Company Logo"
-                className="ml-2 sm:block hidden h-16"
-                width={180}
-                height={200}
-                priority
-              />
+            <Image
+              src={SitepalLogo || "/placeholder.svg"}
+              alt="Company Logo"
+              width={180}
+              height={200}
+              priority
+              style={{ cursor: "pointer" }}
+            />
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1 }}>

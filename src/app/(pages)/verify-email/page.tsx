@@ -117,17 +117,25 @@ export default function VerifyEmail() {
               p: { xs: 3, sm: 6 },
             }}
           >
-            <Box sx={{ position: "absolute", top: 20, left: 20, display: "flex", alignItems: "center" }}   onClick={navigateToHome}>
-               <Image
-                src={SitepalLogo || "/placeholder.svg"}
-                alt="Company Logo"
-                className="ml-2 sm:block hidden h-16"
-                width={180}
-                height={200}
-                priority
-              />
-            </Box>
-
+           <Box
+            sx={{
+              display: "flex",
+              justifyContent: { xs: "center", md: "flex-start" },
+              alignItems: "center",
+              mb: 6,
+              mt: 2,
+            }}
+            onClick={navigateToHome}
+          >
+            <Image
+              src={SitepalLogo || "/placeholder.svg"}
+              alt="Company Logo"
+              width={180}
+              height={200}
+              priority
+              style={{ cursor: "pointer" }}
+            />
+          </Box>
             <Box sx={{ maxWidth: "450px", width: "100%", mt: 4 }}>
               <Card
                 sx={{

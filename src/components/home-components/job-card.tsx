@@ -89,7 +89,7 @@ export default function JobCard({ job, router, onViewDetails }: JobCardProps) {
 
         <button
           onClick={handleViewDetails}
-          className="text-[#D49F2E] hover:text-[#A87723] hover:bg-amber-100 p-1 text-sm font-medium flex items-center"
+          className="text-[#D49F2E] hover:underline hover:text-[#A87723] hover:bg-amber-100 p-1 text-sm font-medium flex items-center"
         >
           View Details
           <span className="ml-1">→</span>
