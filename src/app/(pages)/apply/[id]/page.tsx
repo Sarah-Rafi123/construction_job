@@ -102,8 +102,8 @@ export default function ApplyJobPage() {
   const job = data?.job
   const [openDialog, setOpenDialog] = useState(false)
   const [openDisclaimerDialog, setOpenDisclaimerDialog] = useState(false)
-  const [enquiryTitle, setEnquiryTitle] = useState("")
-  const [enquiryText, setEnquiryText] = useState("")
+  const [enquiryTitle, setEnquiryTitle] = useState(job?.job_title || "")
+  const [enquiryText, setEnquiryText] = useState(userData?.data?.description || "")
   // Replace the attachments array with a single attachment
   const [attachment, setAttachment] = useState<Attachment | null>(null)
   const [errors, setErrors] = useState({
@@ -122,6 +122,18 @@ export default function ApplyJobPage() {
       setIsMainContractor(userRole === "main_contractor" || userRole === "main-contractor")
     }
   }, [userData])
+
+  useEffect(() => {
+    // Update title when job data is available
+    if (job?.job_title) {
+      setEnquiryTitle(job.job_title)
+    }
+
+    // Update enquiry text when user data is available
+    if (userData?.data?.description) {
+      setEnquiryText(userData.data.description)
+    }
+  }, [job, userData])
 
   const validateForm = () => {
     const newErrors = {

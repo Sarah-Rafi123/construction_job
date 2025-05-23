@@ -593,9 +593,9 @@ export default function JobSeekerSignup() {
                           backgroundColor: "rgba(0, 0, 0, 0.02)",
                         }}
                       >
-                        <FileText size={20} className="text-gray-500 mr-2" />
+                        <FileText size={20} className="text-black mr-2" />
                         <Box sx={{ flex: 1, ml: 1 }}>
-                          <Typography variant="body2" noWrap>
+                          <Typography variant="body2" color="text.secondary" noWrap>
                             {idDocument.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
@@ -655,7 +655,7 @@ export default function JobSeekerSignup() {
                       >
                         <FileText size={20} className="text-gray-500 mr-2" />
                         <Box sx={{ flex: 1, ml: 1 }}>
-                          <Typography variant="body2" noWrap>
+                          <Typography variant="body2" color="text.secondary" noWrap>
                             {qualificationDocument.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
