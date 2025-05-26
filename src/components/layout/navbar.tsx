@@ -92,9 +92,16 @@ export default function Navbar({ messageCount = 0, requireAuth = false }: Navbar
                     aria-label="User menu"
                   >
                     <User size={20} className="mr-1" />
-                    <span className="text-sm text-[#D49F2E] font-medium" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '150px' }}>
-                      {displayName.length > 30 ? `${displayName.substring(0, 20)}...` : displayName}
-                    </span>
+                     <span className="text-sm text-[#D49F2E] font-medium" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '150px' }}>
+            {/* Show truncated name on small screens only */}
+            <span className="block sm:hidden">
+              {displayName.length > 6 ? `${displayName.substring(0, 6)}...` : displayName}
+            </span>
+            {/* Show full name on sm screens and larger */}
+            <span className="hidden sm:block">
+              {displayName}
+            </span>
+          </span>
                     <ChevronDown size={16} className="ml-1" />
                   </button>
                   {isUserMenuOpen && (
